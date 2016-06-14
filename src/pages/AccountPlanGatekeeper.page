@@ -1,0 +1,4 @@
+<apex:page standardController="Account" extensions="ctlr_AccountPlanGatekeeper" action="{!checkAccess}">
+    <apex:variable var="errorMessage" value="You do not have access to view the Client Plan data. Please contact your local Sales Operations Team." />
+    <apex:pageMessage summary="{!errorMessage}" severity="error" strength="3" />
+</apex:page>

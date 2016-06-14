@@ -1,0 +1,81 @@
+<apex:page standardcontroller="Case" extensions="ctlr_CreateCaseCommentChatter" showHeader="false" docType="html-5.0" cache="true">
+    <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    
+    
+    
+    <script type='text/javascript' src='/canvas/sdk/js/publisher.js'/>
+    <link rel="stylesheet" href="{!URLFOR($Resource.JqueryMobile, 'jquery.mobile-1.3.2.min.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.JqueryMobile, 'jquery.mobile.structure-1.3.2.min.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.JqueryMobile, 'sftheme.min.css')}" />
+    <apex:includeScript value="{!URLFOR($Resource.JqueryMobile, 'jquery-2.0.3.min.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.JqueryMobile, 'jquery.mobile-1.3.2.min.js')}"/>
+    
+    <style>
+                
+        
+        .ui-table-columntoggle-btn  {
+            display: none;
+        }
+           
+        .totalRow{
+            background-color:#cde1ef;
+            border-color:#cde1ef;
+        }
+        
+    </style>
+    
+    <script>
+         // Post completed?
+         if ("{!lastError}" === "ok") {
+            Sfdc.canvas.publisher.publish({name: "publisher.close", payload:{ refresh:"true"}});
+         }
+             
+        Sfdc.canvas.publisher.subscribe({name: "publisher.setupPanel", onData:function(e) {
+        }});
+        
+        Sfdc.canvas.publisher.subscribe({name: "publisher.showPanel", onData:function(e) {
+            Sfdc.canvas.publisher.publish({name: "publisher.setValidForSubmit", payload:"true"});
+        }});  
+        
+        Sfdc.canvas.publisher.subscribe({name: "publisher.post", onData:function(e) {
+            var uploadID = document.getElementById("uploadID").innerHTML;
+            var upload = document.getElementById(uploadID);
+            upload.click();
+         }}); 
+    </script>
+    </head>
+    <Body>
+    <div data-role="page">
+    <div data-role="body">
+       
+    <apex:form id="form">
+        <div><apex:outputLabel value="Comment" for="theComment" /><apex:inputField value="{!theComment.CommentBody}" id="theComment" style="width=100%"/></div>
+        <div><apex:outputLabel value="Visible to Portal" for="isPublished" /><apex:inputField value="{!theComment.IsPublished}" id="isPublished"/></div>
+        <div style="display:none"><apex:commandButton action="{!createComment}" value="Create Comment" id="theButton" /></div>
+        <div id="uploadID" style="display:none">{!$Component.form.theButton}</div>
+        <div id="commentBodyId" style="display:none">{!$Component.form.theComment}</div>
+        <div id="myCommand" style="display:none" class="allow-clicks"><apex:commandButton value="Submit" id="desktopButton" action="{!createComment}" /></div>
+
+        <div id="other">
+        <table data-role="table" data-mode="columntoggle">
+            <thead data-role="header" ><tr ><th >Last Case Comment</th></tr></thead>
+            <tbody>
+                <tr class="totalRow"><td><apex:outputText value="{!lastComment.CreatedBy.Name}"/></td></tr>
+                <tr class="totalRow"><td><apex:outputText value="{!lastComment.CreatedDate}"/></td></tr>
+                <tr><td><apex:outputText value="{!lastComment.CommentBody}"/></td></tr>
+            </tbody>
+        </table>
+        </div>
+    <script>
+        var uagent = navigator.userAgent;
+        if(uagent.indexOf("iPhone") == -1 && uagent.indexOf("Android") == -1) {
+            var e = document.getElementById("myCommand");
+            e.style.display = 'inline';
+        }
+    </script>
+    </apex:form>
+    </div>
+    </div>
+    </body>
+</apex:page>

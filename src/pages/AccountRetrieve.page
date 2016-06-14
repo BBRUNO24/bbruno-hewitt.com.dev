@@ -1,0 +1,3 @@
+<apex:page controller="ctlr_AccountRetrieve" showHeader="false" contentType="text/xml" action="{!init}" cache="false">
+{!responseXmlString}
+</apex:page>

@@ -1,0 +1,102 @@
+<apex:component >
+	<title>Mobile Opportunity</title>
+    <apex:stylesheet value="{!URLFOR($Resource.SLDS0122, 'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+    <apex:includeScript value="{!URLFOR($Resource.jQueryUI, 'jquery-ui-1.11.4/external/jquery/jquery.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.jQueryUI, 'jquery-ui-1.11.4/jquery-ui.min.js')}"/>
+
+    <script type="text/javascript">
+
+        var j$ = jQuery.noConflict();
+
+        j$(window).load(function(){
+        
+        });
+
+        j$(document).ready(function(){
+
+
+            //j$('.multiSelectPicklistRow').hide();
+            // j$('[id$=description]').hide();
+            // j$('[id$=nextStep]').hide();
+            // j$('[id$=approverName]').hide();
+
+            // j$('.slds-tabs__item').on('click', function(){
+            //     alert('test');
+            //     j$(this).addClass('slds-active');
+            //     j$(this).find('a').attr('aria-selected', true);
+                
+            //     var j$contentToShow = j$('#'+j$(this).find('a').attr('aria-controls'));
+            //     j$contentToShow.removeClass('slds-hide');
+            //     j$contentToShow.addClass('slds-show');
+
+            //     j$(this).siblings().removeClass('slds-active');
+            //     j$(this).siblings().find('a').attr('aria-selected', false);
+            //     j$contentToShow.siblings('.slds-tabs__content').removeClass('slds-show');
+            //     j$contentToShow.siblings('.slds-tabs__content').addClass('slds-hide');
+            // });
+
+            // j$('#btnShowProducts').on('click', function(){
+            //     var j$products = j$('#tabProducts');
+            //     j$products.addClass('slds-active');
+            //     j$products.attr('aria-selected', true);
+
+            //     var j$contentToShow = j$('#'+j$products.find('a').attr('aria-controls'));
+            //     j$contentToShow.removeClass('slds-hide');
+            //     j$contentToShow.addClass('slds-show');
+
+            //     var j$Opportunity = j$('#tabOpportunity');
+            //     j$Opportunity.removeClass('slds-active');
+            //     j$Opportunity.find('a').attr('aria-selected', false);
+
+            //     var j$oppContentToShow = j$('#'+j$Opportunity.find('a').attr('aria-controls'));
+            //     j$oppContentToShow.removeClass('slds-show');
+            //     j$oppContentToShow.addClass('slds-hide');
+
+            // });
+
+            //alert(j$('#j_id0:opportunityForm:j_id50:j_id51:selPicklist').html());
+            //alert("Page loaded.");
+
+            j$('[id$=stageName]').change(function() {
+
+                
+                // if(j$('[id$=stageName]').val() == "Closed Won"){
+                //     j$('[id$=description]').toggle();
+                // }
+                // if(j$('[id$=stageName]').val() == "Negotiate"){
+                //     j$('[id$=nextStep]').toggle();
+                // }
+                // if(j$('[id$=stageName]').val() == "Closed Lost"){
+                //     j$('[id$=approverName]').toggle();
+                // }
+            });
+
+            // function stageChanged(){
+
+            //     if(j$('[id$=stageName]').val() == "Closed Won"){
+            //         j$('[id$=description]').toggle();
+            //     }
+            //     if(j$('[id$=stageName]').val() == "Negotiate"){
+            //         j$('[id$=nextStep]').toggle();
+            //     }
+            //     if(j$('[id$=stageName]').val() == "Closed Lost"){
+            //         j$('[id$=approverName]').toggle();
+            //     }
+
+            // }  
+
+
+
+            
+        });
+
+ // function test(){
+ //                alert('test');
+ //                Bryan();
+ //                return false;
+ //            }
+            
+    </script>
+
+
+</apex:component>

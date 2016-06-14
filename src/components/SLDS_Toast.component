@@ -1,0 +1,72 @@
+<apex:component controller="ctlr_SLDS_TOAST">
+	<apex:attribute name="toast" type="SLDS_Toast" description="Used to conditionally show or hide Toast" required="true" assignTo="{!myToast}"/>
+	<!-- <apex:attribute name="tabToShow" type="String" description="Used to conditionally show or hide Toast" required="true"/> -->
+
+	 
+
+    <script type="text/javascript">
+         var j$ = jQuery.noConflict();
+
+        j$(window).load(function(){
+        
+        });
+
+        j$(document).ready(function(){
+
+            j$('.slds-notify__close').on('click',function(){
+            	j$('.slds-notify_container').addClass('slds-hide');
+                return false;
+            });
+            setTimeout(function() {
+              j$('.slds-notify_container').fadeOut();
+            }, 5000);
+
+        });
+
+    </script>
+ 
+	
+    <apex:outputPanel id="toastContainer" layout="block" styleClass="{!IF(toast.showToast, 'slds-notify_container', 'slds-hide')}">
+    	
+		<apex:outputPanel layout="block" styleClass="slds-notify slds-notify--toast" rendered="{!toastType == 'BASE'}">
+		    <span class="slds-assistive-text">Info</span>
+		    <button class="slds-button slds-button--icon-inverse slds-notify__close">
+		    	<c:SLDS_SVG styleClass="slds-button__icon slds-button__icon--large" path="assets/icons/utility-sprite/svg/symbols.svg#close" ></c:SLDS_SVG>
+		    	<span class="slds-assistive-text">Close</span>
+		    </button>
+		    <div class="notify__content">
+		    	<h2 class="slds-text-heading--small">{!toast.toastMsg}</h2>
+		    </div>
+	    </apex:outputPanel>
+
+	    <apex:outputPanel layout="block" styleClass="slds-notify slds-notify--toast slds-theme--inverse-text slds-theme--error" rendered="{!toastType == 'ERROR'}">
+	    	<span class="slds-assistive-text">Error</span>
+	    	<button class="slds-button slds-button--icon-inverse slds-notify__close" name="close" id="lc-291-close" title="Close" type="button">
+				<c:SLDS_SVG styleClass="slds-button__icon slds-button__icon--large" path="assets/icons/utility-sprite/svg/symbols.svg#close" ></c:SLDS_SVG>
+	    	</button>
+	    	<div class="notify__content slds-grid">
+	    		<c:SLDS_SVG styleClass="slds-icon slds-icon--small slds-m-right--x-small slds-grow-none slds-m-right--small slds-col" path="assets/icons/utility-sprite/svg/symbols.svg#error" ></c:SLDS_SVG>
+	    		<div class="slds-col slds-align-middle">
+	    			<h2 class="slds-text-heading--small">{!toast.toastMsg}</h2>
+	    		</div>
+	    	</div>
+		</apex:outputPanel>
+
+		<apex:outputPanel layout="block" styleClass="slds-notify slds-notify--toast slds-theme--inverse-text slds-theme--success" rendered="{!toastType == 'SUCCESS'}">
+			<span class="slds-assistive-text">Success</span>
+			<button class="slds-button slds-button--icon-inverse slds-notify__close" name="close" id="lc-289-close" title="Close" type="button">
+				<c:SLDS_SVG styleClass="slds-button__icon slds-button__icon--large" path="assets/icons/utility-sprite/svg/symbols.svg#close" ></c:SLDS_SVG>
+		    	<span class="slds-assistive-text">Close</span>
+			</button>
+			<div class="notify__content slds-grid">
+				<c:SLDS_SVG styleClass="slds-icon slds-icon--small slds-m-right--x-small slds-grow-none slds-m-right--small slds-col" path="assets/icons/utility-sprite/svg/symbols.svg#success" ></c:SLDS_SVG>
+				<div class="slds-col slds-align-middle">
+					<h2 class="slds-text-heading--small">{!toast.toastMsg}</h2>
+				</div>
+			</div>
+		</apex:outputPanel>
+
+	</apex:outputPanel>
+
+
+</apex:component>

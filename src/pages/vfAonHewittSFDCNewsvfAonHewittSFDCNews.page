@@ -1,0 +1,25 @@
+<apex:page sidebar="false" >
+    <table border="1" cellpadding="3" cellspacing="2" width="101%" align="right"> 
+        <tbody> 
+            <tr> 
+                <td bgcolor="#ffff66" valign="top" width="51%"> 
+                    <h3>News &amp; Updates:</h3> 
+                    <ul> 
+                        <li><font face="Arial, sans-serif" size="2">To request the reopening of a Closed Opportunity please raise a Question Issue Request - Oppty Change Case</font></li>
+                        <li><font face="Arial, sans-serif" size="2">UK Account and Contact Segments update: Please note that the structure of segments has been updated.The specific groupings related to that segment can now be found at the sub-segment level.</font></li> 
+                        <li><font face="Arial, sans-serif" size="2">US and Canada Users: New Limitation of Liability (LOL) section added to Account Records to indicate the client's LOL status. <a href="https://na13.salesforce.com/015a0000002lIrT" target="_blank">More Info</a></font></li> 
+                        <li><font face="Arial, sans-serif" size="2">US Users: Introducing new Opportunity Strategy Planning in SFDC. <a href="https://c.na13.content.force.com/servlet/servlet.FileDownload?file=015a0000002jsJu" target="_blank">More Info</a></font></li> 
+                        <li><font face="Arial, sans-serif" size="2">New US List Review Process to add clients/prospects to Marketing campaigns. <a href="https://na13.salesforce.com/015a0000002jn4t" target="_blank">More Info</a></font></li>
+                    </ul>
+                </td>
+                <td bgcolor="#ffff66" valign="top" width="52%"> 
+                    <h3>Tips &amp; Tricks:</h3>
+                    <ul style="MARGIN-BOTTOM: 0px; HEIGHT: 95px; OVERFLOW: auto" type="square">
+                        <li>Utilize the ARS Accounts search tool in SFDC to see who at ARS is aligned to a given account and what cross sell opportunities may exist. <a href="https://login.salesforce.com/servlet/servlet.FileDownload?file=01530000001wyLz" target="_blank">More Info</a> </li> 
+                        <li><a href="https://login.salesforce.com/servlet/servlet.FileDownload?file=01530000001Qsur" target="_blank">SFDC Frequently Asked Questions </a></li>
+                    </ul>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</apex:page>

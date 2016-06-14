@@ -1,0 +1,36 @@
+<apex:page showHeader="false" sidebar="false" standardStylesheets="true">
+<apex:pageBlock >
+<TABLE cellSpacing="2" cellPadding="3" width="100%" border="1" class="bPageBlock brndScnBrd secondaryPalette">
+    <TBODY>
+        <TR>
+            <TD vAlign="top" width="33%">
+                <H3> My Open Leads:</H3>
+                <DIV style="MARGIN-BOTTOM: 0px; OVERFLOW: auto; HEIGHT: 95px">
+                    <UL>
+                        <LI> 
+                            <A href="/00O30000007NyT2" target="new">My Open Leads</A>
+                        </LI>
+                    </UL>
+                </DIV>
+            </TD>
+            <TD vAlign="top" width="33%">
+                <H3> My Neglected Leads:</H3>
+                <UL style="MARGIN-BOTTOM: 0px; OVERFLOW: auto; HEIGHT: 95px" type="square">
+                    <LI>
+                        <A href="/00O30000007NyTM" target="new">My Neglected Leads</A>
+                    </LI>
+                </UL>
+            </TD>
+            <TD vAlign="top" width="33%">
+                <H3> My Contacts To Review:</H3>
+                <UL style="MARGIN-BOTTOM: 0px; OVERFLOW: auto; HEIGHT: 95px" type="square">
+                    <LI>
+                        <A href="/00O30000007NyUe" target="new">My Contacts for Review</A>
+                    </LI>
+                </UL>
+            </TD>
+        </TR>
+    </TBODY>
+</TABLE>
+</apex:pageBlock>
+</apex:page>

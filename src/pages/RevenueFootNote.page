@@ -1,0 +1,8 @@
+<apex:page standardController="Revenue_Sales_Pipeline__c">
+    <div align="left" style="color: red;">
+    <br/>
+        &#42; PPY values reflect US revenue only while PY and YTD reflects North America. YTD values reflect data as of &nbsp;<apex:outputText value="{0,date,dd MMMMM yyyy}"><apex:param value="{!Revenue_Sales_Pipeline__c.CreatedDate}"/></apex:outputText><br/>
+        &#42; The sales and pipeline results for <b>Health &amp; Benefits</b>, <b>Global Benefits</b> and <b>Executive Benefits</b> reflect only those opportunities managed by an Aon Hewitt Account Executive and do not represent all ARS activity<br/>
+        &#42; Global Compensation revenue is currently unavailable at the client level. Therefore, all clients will show $0 revenue for this practice
+    </div>
+</apex:page>

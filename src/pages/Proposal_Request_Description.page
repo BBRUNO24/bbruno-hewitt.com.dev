@@ -1,0 +1,6 @@
+<apex:page standardController="Proposal_Request__c">
+   <h1><font color="#FF0000">Please be sure to attach required RFP documents prior to clicking the Submit Proposal Request button.<br/>
+   An email confirmation will be sent to the requester once the proposal request has been processed. If you do not receive confirmation by end of day, 
+   or are experiencing any issues with attaching large files to this form, please contact the Aon.Hewitt.Sales.and.Marketing@aon.com mailbox for assistance.
+   </font></h1>
+</apex:page>

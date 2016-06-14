@@ -1,0 +1,145 @@
+<apex:component controller="ctlr_MobileOpportunityProducts">
+<apex:attribute name="opp" description="" type="Opportunity" required="true" assignTo="{!newOpp}"/>
+<apex:attribute name="tabToShow" description="" type="String" required="true" assignTo="{!tab}"/>
+<apex:attribute name="toast" description="" type="SLDS_Toast" required="true" assignTo="{!myToast}"/>
+<apex:form id="productForm">
+ <apex:outputPanel id="productsPanel" layout="block" >
+    <apex:outputPanel id="pruductsContainter" layout="block" rendered="{!tabToShow = 'Products'}">
+ 	<div id="tab-default-2" class="slds-tabs__content slds-tabs--default__content slds-show" role="tabpanel" aria-labelledby="tab-default-2__item">
+     	<!-- PRIMARY CONTENT WRAPPER -->
+	<div class="myapp">     
+	     <!-- BOXED AREA -->
+	    <fieldset class="slds-box slds-theme--default slds-container--small">
+	        <legend id="newaccountform" class="slds-text-heading--medium slds-p-vertical--medium">Add a Product</legend>
+
+	            <!-- PRICEBOOK OPTIONS -->
+	            <!-- <div styleClass="slds-form-element" >
+	                <div class="requiredInput"> 
+	                    <div class="requiredBlock"></div>
+	                     <apex:actionRegion >
+	                        <label class="slds-form-element__label" for="selPicklist">Pricebook</label>
+	                        <div class="slds-form-element__control">
+	                            <apex:selectList size="1" required="true" id="pricebookSelectList" value="{!pricebookSelection}" styleClass="slds-select">
+	                                <apex:selectOptions value="{!pricebookOptions}" />
+	                                <apex:actionSupport event="onchange" reRender="practice, error" action="{!refreshPracticeOptions}"/>
+	                                </apex:selectList>
+	                        </div>
+	                    </apex:actionRegion>
+	                </div>
+	            </div> -->
+	           <!-- / PRICEBOOK OPTIONS -->                            
+
+	            <!-- PRACTICE OPTIONS -->
+	            <div styleClass="slds-form-element" >
+	                <apex:outputPanel styleClass="requiredInput" layout="block" id="practice" >
+	                    <div class="requiredInput"> 
+	                        <div class="requiredBlock"></div>
+	                         <apex:actionRegion >
+	                            <label class="slds-form-element__label" for="selPicklist">Practice</label>
+	                            <div class="slds-form-element__control">
+	                                <apex:selectList size="1" id="practiceSelectList" value="{!practiceSelection}" styleClass="slds-select">
+	                                    <apex:selectOptions value="{!practiceOptions}" />
+	                                    <apex:actionSupport event="onchange" reRender="products, error" action="{!refreshProductOptions}"/>
+	                                    </apex:selectList>
+	                            </div>
+	                        </apex:actionRegion>
+	                    </div>
+	                </apex:outputPanel>
+	            </div>
+	           <!-- / PRACTICE OPTIONS -->
+
+	            <!-- PR0ODUCTS OPTIONS -->
+	            <div styleClass="slds-form-element" >
+	                <apex:outputPanel styleClass="requiredInput" layout="block" id="products" >
+	                    <apex:outputPanel styleClass="requiredBlock"/>
+	                        <label class="slds-form-element__label" for="selPicklist">Products</label>
+	                        <div class="slds-form-element__control">
+	                            <apex:selectList size="1" id="productSelectList" value="{!productSelection}" styleClass="slds-select">
+	                                <apex:selectOptions value="{!productOptions}" />
+	                            </apex:selectList>
+	                        </div>
+	                </apex:outputPanel>
+	            </div>
+	           <!-- / PRODUCTE OPTIONS -->                            
+
+	            <!-- RECURRING -->
+	            <c:LexInputField sObject="{!currOLI}" Field="Recurring_Non_Recurring__c" required="true"></c:LexInputField>
+	            <!-- / RECURRING --> 
+
+	            <!-- COMMISSION -->
+	            <c:LexInputField sObject="{!currOLI}" Field="Fee_Commission__c" required="true"></c:LexInputField>
+	            <!-- / COMMISSION -->                              
+
+	            <!-- TYPE -->
+	            <c:LexInputField sObject="{!currOLI}" Field="Type__c" required="true"></c:LexInputField>
+	            <!-- / TYPE -->                                 
+
+	            <!-- FIRST YEAR VALUE -->
+	            <c:LexInputField sObject="{!currOLI}" Field="First_Year_Value__c" required="true"></c:LexInputField>
+	            <!-- / FIRST YEAR VALUE -->
+
+	            <!-- UNIT PRICE -->
+	            <c:LexInputField sObject="{!currOLI}" Field="UnitPrice" required="true"></c:LexInputField>
+	            <!-- / UNIT PRICE -->    
+
+
+	            <!-- <apex:commandButton value="Back" action="{!goToProducts}" styleClass="slds-button slds-button--brand slds-m-top--medium" reRender="productsList, toastContainer"   /> --> 
+	            <apex:pageBlock id="productsBottons">
+	                <apex:outputPanel >
+	                  <!--   <apex:commandLink value="Back" action="{!goToProducts}" styleClass="slds-button slds-button--brand slds-m-top--medium" id="oppLink" reRender="tabsPanel,productsPanel,opportunityPanel" /> -->
+	                    <apex:commandButton value="Add Product" action="{!addProduct}" styleClass="slds-button slds-button--brand slds-m-top--medium" reRender="productsList, toastContainer" />       
+	                </apex:outputPanel>
+	            </apex:pageBlock>                      
+	            <br />
+	            <div class="slds-card">
+	                <header class="slds-card__header slds-grid">
+	                  <div class="slds-col slds-media slds-media--center">
+	                    <div class="slds-media__figure">
+	                    <!-- FOR SOME REASON THIS BREAKS THE RERENCER ON ADDING OPPORTUNITY -->
+	                      <!-- <svg aria-hidden="true" class="slds-icon slds-icon-standard-contact slds-icon--small">
+	                        <use xlink:href="{!URLFOR($Resource.SLDS0122, 'assets/icons/standard-sprite/svg/symbols.svg#product')}"></use>
+	                      </svg> -->
+	                    </div>
+	                    <div class="slds-media__body">
+	                      <h3 class="slds-text-heading--small">Added Products</h3>
+	                    </div>
+	                  </div>
+	                </header>
+
+	                <!-- CARD BODY = TABLE -->
+	                <section class="slds-card__body">
+	                  <div class="slds-scrollable--x">
+	                    <apex:outputPanel id="productsList" layout="block">
+	                        <table class="slds-table slds-table--bordered slds-max-medium-table--stacked-horizontal">
+	                          <thead>
+	                            <tr class="slds-no-hover">
+	                              <th class="slds-text-heading--label slds-size--1-of-4" scope="col">Name</th>
+	                            </tr>
+	                          </thead>
+	                          <tbody>
+	                            <apex:repeat var="p"  value="{!pbEntryList}">
+	                                <tr class="slds-hint-parent">
+	                                    <td class="slds-size--1-of-4" data-label="Name">{!p.Name}</td>
+	                                </tr>
+
+	                            </apex:repeat>                                                            
+	                          </tbody>
+
+	                        </table>
+	                    </apex:outputPanel>
+	                  </div>
+	                </section>
+	                <!-- / CARD BODY = SECTION + TABLE -->
+	               
+	                <apex:commandButton value="Save and Create Opportunity" action="{!saveWithProducts}" styleClass="slds-button slds-button--brand slds-m-top--medium" />    
+
+	            </div>
+
+	        </fieldset>
+	        <!-- / BOXED AREA -->
+	        </div>
+	</div>
+	</apex:outputPanel>
+</apex:outputPanel>
+</apex:form>
+</apex:component>

@@ -1,0 +1,31 @@
+<apex:page >
+
+    <script type="text/javascript">
+        
+        function redirectUser() {
+        
+            var redirectUrl = '';
+        
+            if ({!$CurrentPage.parameters.retURL = null}) {
+                redirectUrl = '/home/home.jsp';
+            } else {
+                redirectUrl = '{!$CurrentPage.parameters.retURL}';
+            }
+        
+            location.href = redirectUrl;
+        
+            return false;   
+        }
+        
+    </script>
+
+    <apex:form >
+        <apex:pageBlock >
+            <apex:pageMessage summary="{!$Label.Opportunity_Error}" severity="warning" strength="3" />
+        
+            <apex:pageBlockButtons >
+                <apex:commandButton onclick="return redirectUser();" value="Return" id="theButton" />
+            </apex:pageBlockButtons>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

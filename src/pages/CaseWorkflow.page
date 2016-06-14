@@ -1,0 +1,27 @@
+<apex:page sidebar="false" controller="CaseWorkflow">
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.5.7/es5-shim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.5.7/es5-sham.min.js"></script>
+  <apex:stylesheet value="{!URLFOR($Resource.LightningDesignSystem, 'assets/styles/salesforce-lightning-design-system-vf.css')}"/>
+  <apex:includeScript value="{!URLFOR($Resource.CaseWorkflow, 'js/main.js')}"/>
+  <apex:includeScript value="{!URLFOR($Resource.StreamingApiUtil, '/js/cometd.js')}"/>
+  <apex:includeScript value="{!URLFOR($Resource.StreamingApiUtil, '/js/jquery-1.5.1.js')}"/>
+  <apex:includeScript value="{!URLFOR($Resource.StreamingApiUtil, '/js/json2.js')}"/>
+  <apex:includeScript value="{!URLFOR($Resource.StreamingApiUtil, '/js/jquery.cometd.js')}"/>
+
+  <script>
+      window.staticUrl = "{!URLFOR($Resource.LightningDesignSystem)}";
+      window.sessionId = "{!$Api.Session_ID}";
+      window.user = {!user};
+      window.users = {!users};
+      window.caseModel = {!caseModel};
+  </script>
+  <style>
+
+      .noSidebarCell{
+         padding: 0px;
+       }
+  </style>
+  <div class="slds" id="app">
+  </div>
+</apex:page>

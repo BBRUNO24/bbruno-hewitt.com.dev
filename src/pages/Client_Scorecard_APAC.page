@@ -1,0 +1,583 @@
+<!-- 
+/******************************************************************************
+ * Filename: Client_Scorecard_APAC.page
+ * Author:   Chintan Adhyapak
+ * Purpose:  Renders a Client Scorecard as a PDF. 
+ ****************************************************************************** 
+ * History
+ * ----------------------------------------------------------------------------
+ * 2012-10-28   Chintan Adhyapak    Created
+ ******************************************************************************/
+-->
+<apex:page cache="false" title="APAC Client Scorecard" standardController="Account" extensions="ctlr_Client_Scorecard_APAC" renderAs="PDF">
+<apex:stylesheet value="{!URLFOR($Resource.Client_Scorecard, 'Client_Scorecard_StyleSheet.css')}" />
+<head>
+    <style type="text/css">
+    @page {
+        counter-increment: page;
+        @bottom-right {
+            font-family: Arial Sans-Serif;
+            font-size: 9.0pt;
+            font-style: italic;
+            content: "Page " counter(page) " of " counter(pages) "&nbsp;&nbsp;&nbsp;" 
+        }
+        @bottom-center {
+            font-family: Arial Sans-Serif;
+            font-size: 9.0pt;
+            font-style: italic;
+            content: "Printed on &nbsp;<apex:outputText value="{0,date,MMMM dd, yyyy}"><apex:param value="{!today()}"/></apex:outputText>" 
+        }
+        @bottom-left {
+            font-family: Arial Sans-Serif;
+            font-size: 9.0pt;
+            font-style: italic;
+            content: "&nbsp;&nbsp;&nbsp;{!myScorecard.accountName}";
+        }
+    }
+    </style>
+</head>
+<div class="container">
+    <table class="table0">
+        <tr>
+            <td align="left"><apex:image url="{!URLFOR($Resource.Client_Scorecard, 'AonHewittLogo.PNG')}" width="100" height="27"/></td>
+        </tr>
+    </table>
+
+    <div class="top">
+        <table class="table0">
+            <tr>
+                <th align="left" class="title">{!financialYear} {!quarter} APAC Client Scorecard</th>
+                <th align="right" class="title">&nbsp;</th>
+            </tr>
+        </table>
+        <hr class="hr"/>
+    </div>
+    
+    <div class="div1">
+        <table class="table1">
+        <tr>
+            <th class="tableHeadGray" colspan="2">Account Summary</th>
+        </tr>
+        <tr>
+            <td width="45%" class="tableRow">Account</td>
+            <td width="55%" class="tableRow"><apex:outputText value="{!myScorecard.accountName}"/></td>
+        </tr>
+        <tr>
+            <td class="tableRowBlue">Market</td>
+            <td class="tableRowBlue"><apex:outputText value="{!myScorecard.market}"/></td>
+        </tr>
+        <tr>
+            <td class="tableRow">Account Executive</td>
+            <td class="tableRow"><apex:outputText value="{!myScorecard.ownerName}"/></td>
+        </tr>
+        <tr>
+            <td class="tableRowBlue">Executive Sponsor</td>
+            <td class="tableRowBlue"><apex:outputText value="{!myScorecard.executiveSponsor}"/></td>
+        </tr>
+        <apex:repeat var="iat" value="{!myScorecard.iatList}">
+        <tr style="{!IF(iat.Contact_Role__c == 'General Manager (HRO GM)', 'display:visible;' , 'display:none')}">
+            <td class="tableRow">GM</td>
+            <td class="tableRow">{!iat.Contact__r.Name}</td>
+        </tr>
+        </apex:repeat>
+        <apex:repeat var="iat" value="{!myScorecard.iatList}">
+        <tr style="{!IF(iat.Contact_Role__c == 'BGM (Business Group Manager)', 'display:visible;' , 'display:none')}">  
+            <td class="tableRowBlue">BGM</td>
+            <td class="tableRowBlue">{!iat.Contact__r.Name}</td>
+        </tr>
+        </apex:repeat>
+        <tr>
+            <td class="tableRow">Client Promise Required</td>
+            <td class="tableRow"><apex:outputText value="{!If(account.Client_Promise_Required__c, 'Yes', 'No')}"/></td>
+        </tr>
+        <tr>
+            <td class="tableRowBlue">Client Promise Score</td>
+            <td class="tableRowBlue"><apex:outputText value="{!score} % for {!currYear}"/></td>
+        </tr>
+        </table>
+        <br/>
+        
+        <table class="table1a">
+        <tr>
+            <th class="tableHeadGray" colspan="2">Overall Relationship</th>
+        </tr>
+        <apex:repeat var="cas" value="{!myScorecard.casList}">
+        <tr>
+            <td class="tableRow" width="45%">Overall Status</td>
+            <td class="tableRowRed" width="55%" style="{!If(cas.Overall_Relationship_Status__c == 'Red', 'display:visible;' , 'display:none')}">{!cas.Overall_Relationship_Status__c}</td>
+            <td class="tableRowYellow" width="55%" style="{!If(cas.Overall_Relationship_Status__c == 'Yellow', 'display:visible;' , 'display:none')}">{!cas.Overall_Relationship_Status__c}</td>
+            <td class="tableRowGreen" width="55%" style="{!If(cas.Overall_Relationship_Status__c == 'Green', 'display:visible;' , 'display:none')}">{!cas.Overall_Relationship_Status__c}</td>
+        </tr>
+        <tr>
+            <td class="tableRowBlue">Consulting Status</td>
+            <td class="tableRowRed" width="50%" style="{!If(cas.Consulting_Relationship_Status__c == 'Red', 'display:visible;' , 'display:none')}">{!cas.Consulting_Relationship_Status__c}</td>
+            <td class="tableRowYellow" width="50%" style="{!If(cas.Consulting_Relationship_Status__c == 'Yellow', 'display:visible;' , 'display:none')}">{!cas.Consulting_Relationship_Status__c}</td>
+            <td class="tableRowGreen" width="50%" style="{!If(cas.Consulting_Relationship_Status__c == 'Green', 'display:visible;' , 'display:none')}">{!cas.Consulting_Relationship_Status__c}</td>
+        </tr>
+        <tr>
+            <td class="tableRow">Outsourcing Status</td>
+            <td class="tableRowRed" width="50%" style="{!If(cas.Outsourcing_Relationship_Status__c == 'Red', 'display:visible;' , 'display:none')}">{!cas.Outsourcing_Relationship_Status__c}</td>
+            <td class="tableRowYellow" width="50%" style="{!If(cas.Outsourcing_Relationship_Status__c == 'Yellow', 'display:visible;' , 'display:none')}">{!cas.Outsourcing_Relationship_Status__c}</td>
+            <td class="tableRowGreen" width="50%" style="{!If(cas.Outsourcing_Relationship_Status__c == 'Green', 'display:visible;' , 'display:none')}">{!cas.Outsourcing_Relationship_Status__c}</td>
+        </tr>
+        <tr>
+            <td class="tableRowBlue">Leverage ARS Relationship</td>
+            <td class="tableRowBlue">{!cas.ARS_Relationship__c}</td>
+        </tr>
+        <tr>
+            <td class="tableRow">Risks</td>
+            <td class="tableRow">{!cas.Risks__c}</td>
+        </tr>
+        <tr>
+            <td class="tableRowBlue">Opportunities</td>
+            <td class="tableRowBlue">{!cas.Opportunities__c}</td>
+        </tr>
+        </apex:repeat>
+        </table>
+        <br/>
+        
+        <apex:dataTable value="{!myScorecard.winList}" var="opp" cellpadding="2" cellspacing="2" rowClasses="tableRow,tableRowBlue" styleClass="table3" headerClass="tableHeadGray">
+            <apex:facet name="header"><apex:outputText value="Top 5 Recently Won Opportunities by First Year Value as of {0,date,MMMMM dd, yyyy}"><apex:param value="{!today()}"/></apex:outputText></apex:facet>
+            <apex:column styleClass="tableRow" headerValue="Opportunity Name" headerClass="tableRow">
+                <apex:outputText value="{!opp.Name}"/>
+            </apex:column>
+            <apex:column styleClass="tableRow" headerValue="Current Provider" headerClass="tableRow">
+                <apex:outputText value="{!opp.Current_Provider_Reference__r.Name}"/>
+            </apex:column>
+            <apex:column styleClass="tableRowData" headerValue="FY Value" headerClass="tableRowData">
+                <apex:outputText value="$ {0,number,###,###,###,###}"><apex:param value="{!opp.Total_First_Year_Value__c}"/></apex:outputText>
+            </apex:column>
+            <apex:column styleClass="tableRow" headerValue="Reason" headerClass="tableRow">
+                <apex:outputText value="{!opp.Reason_Won_or_Lost__c}"/>
+            </apex:column>
+            <apex:column styleClass="tableRowData" headerValue="Opportunity Closed Date" headerClass="tableRowData">
+                <apex:outputText value="{0,date,dd/MM/yy}"><apex:param value="{!opp.Opportunity_Closed_Date__c}"/></apex:outputText>
+            </apex:column>
+        </apex:dataTable>
+        <br/>
+        
+        <apex:dataTable value="{!myScorecard.lostList}" var="opp" cellpadding="2" cellspacing="2" rowClasses="tableRow,tableRowBlue" styleClass="table3" headerClass="tableHeadGray">
+            <apex:facet name="header"><apex:outputText value="Top 5 Recently Lost Opportunities by First Year Value as of {0,date,MMMMM dd, yyyy}"><apex:param value="{!today()}"/></apex:outputText></apex:facet>
+            <apex:column styleClass="tableRow" headerValue="Opportunity Name" headerClass="tableRow">
+                <apex:outputText value="{!opp.Name}"/>
+            </apex:column>
+            <apex:column styleClass="tableRow" headerValue="Chosen Provider" headerClass="tableRow">
+                <apex:outputText value="{!opp.Chosen_Provider_Reference__r.Name}"/>
+            </apex:column>
+            <apex:column styleClass="tableRowData" headerValue="FY Value" headerClass="tableRowData">
+                <apex:outputText value="$ {0,number,###,###,###,###}"><apex:param value="{!opp.Total_First_Year_Value__c}"/></apex:outputText>
+            </apex:column>
+            <apex:column styleClass="tableRow" headerValue="Reason" headerClass="tableRow">
+                <apex:outputText value="{!opp.Reason_Won_or_Lost__c}"/>
+            </apex:column>
+            <apex:column styleClass="tableRowData" headerValue="Opportunity Closed Date" headerClass="tableRowData">
+                <apex:outputText value="{0,date,dd/MM/yy}"><apex:param value="{!opp.Opportunity_Closed_Date__c}"/></apex:outputText>
+            </apex:column>
+        </apex:dataTable>
+        <br/>
+        
+        <apex:dataTable value="{!myScorecard.openList}" var="opp" cellpadding="2" cellspacing="2" rowClasses="tableRow,tableRowBlue" styleClass="table3" headerClass="tableHeadGray">
+            <apex:facet name="header"><apex:outputText value="Top 5 Opportunities in the Pipeline by First Year Value as of {0,date,MMMMM dd, yyyy}"><apex:param value="{!today()}"/></apex:outputText></apex:facet>
+            <apex:column styleClass="tableRow" headerValue="Opportunity Name" headerClass="tableRow">
+                <apex:outputText value="{!opp.Name}"/>
+            </apex:column>
+            <apex:column styleClass="tableRow" headerValue="Stage" headerClass="tableRow">
+                <apex:outputText value="{!opp.StageName}"/>
+            </apex:column>
+            <apex:column styleClass="tableRowData" headerValue="Probability" headerClass="tableRowData">
+                <apex:outputText value="{0,number,###}"><apex:param value="{!opp.Probability}"/></apex:outputText>%
+            </apex:column>
+            <apex:column styleClass="tableRowData" headerValue="FY Value" headerClass="tableRowData">
+                <apex:outputText value="$ {0,number,###,###,###,###}"><apex:param value="{!opp.Total_First_Year_Value__c}"/></apex:outputText>
+            </apex:column>
+            <apex:column styleClass="tableRowData" headerValue="Expected Close Date" headerClass="tableRowData">
+                <apex:outputText value="{0,date,dd/MM/yy}"><apex:param value="{!opp.CloseDate}"/></apex:outputText>
+            </apex:column>
+        </apex:dataTable>
+    </div>
+    <br/>
+
+    <div class="div2">
+        <table class="table2">
+        <tr>
+            <th class="tableHeadGray">Client Satisfaction Survey</th>
+            <th class="tableHeadGray" align="center">{!prevYear}</th>
+            <th class="tableHeadGray" align="center">{!financialYear}</th>
+        </tr>
+        <tr>
+            <td class="tableRow">Likelihood to Recommend</td>
+            <td class="tableRow" align="center">{!myScorecard.cssMap['PYlikelihood']}</td>
+            <td class="tableRow" align="center">{!myScorecard.cssMap['CYlikelihood']}</td>
+        </tr>
+        <tr>
+            <td class="tableRowBlue">Overall Satisfaction</td>
+            <td class="tableRowBlue" align="center">{!myScorecard.cssMap['PYsatisfaction']}</td>
+            <td class="tableRowBlue" align="center">{!myScorecard.cssMap['CYsatisfaction']}</td>
+        </tr>
+        </table>
+    </div>
+</div>
+
+<div class="containerWithBreakBefore">
+    <table class="table0">
+        <tr>
+            <td align="left"><apex:image url="{!URLFOR($Resource.Client_Scorecard, 'AonHewittLogo.PNG')}" width="100" height="27"/></td>
+        </tr>
+    </table>
+
+    <div class="top">
+        <table class="table0">
+            <tr>
+                <th align="left" class="title">{!financialYear} {!quarter} APAC Client Scorecard</th>
+            </tr>
+        </table>
+        <hr class="hr"/>
+    </div>
+    
+    <div class="div6">
+        <table class="table3">
+            <tr>
+                <th colspan="6" class="tableHeadGray">Penetration</th>
+                <th class="tableHeadGray" style="{!If(casListSize > 0, 'display:visible;' , 'display:none')}">Score<font style="font-size: 9.0pt;">&#42;</font> &nbsp;<apex:outputText value="{0,number,###}"><apex:param value="{!penetrationScore}"/></apex:outputText>%</th>
+                <th class="tableHeadGray" style="{!If(casListSize == 0, 'display:visible;' , 'display:none')}">Score<font style="font-size: 9.0pt;">&#42;</font> &nbsp;0%</th>
+            </tr>
+            <tr>
+                <td width="25%" class="tableRowRight">Service</td>
+                <td align="center" width="12.5%" class="tableRowRight">Not Viable</td>
+                <td align="center" width="12.5%" class="tableRowRight">Recent Loss</td>
+                <td align="center" width="12.5%" class="tableRowRight">No Activity or N/A</td>
+                <td align="center" width="12.5%" class="tableRowRight">Opportunity in SFDC</td>
+                <td align="center" width="12.5%" class="tableRowRight">Partially Penetrated</td>
+                <td align="center" width="12.5%" class="tableRow">Lead Provider</td>
+            </tr>
+            <apex:repeat var="cas" value="{!myScorecard.casList}">
+            <tr>
+                <td colspan="7" class="tableRowGray">Performance &amp; Talent</td>
+            </tr>
+            <tr>
+                <td class="tableRowBottom">Performance and Organisation</td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Performance_and_Organisation__c == 'Not Viable', 'black', 'white')}"><apex:outputText value="" rendered="{!If(cas.Performance_and_Organisation__c == 'Not Viable', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Performance_and_Organisation__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Performance_and_Organisation__c == 'Recent Loss', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Performance_and_Organisation__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Performance_and_Organisation__c == 'No Activity or N/A', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Performance_and_Organisation__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Performance_and_Organisation__c == 'Opportunity in SFDC', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Performance_and_Organisation__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Performance_and_Organisation__c == 'Partially Penetrated', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Performance_and_Organisation__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Performance_and_Organisation__c == 'Lead Provider', true, false)}" /></td>
+            </tr>
+            <tr>
+                <td class="tableRowBottom">Talent and Engagement Consulting</td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Talent_and_Engagement_Consulting__c == 'Not Viable', 'black', 'white')}"><apex:outputText value="" rendered="{!If(cas.Talent_and_Engagement_Consulting__c == 'Not Viable', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Talent_and_Engagement_Consulting__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Talent_and_Engagement_Consulting__c == 'Recent Loss', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Talent_and_Engagement_Consulting__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Talent_and_Engagement_Consulting__c == 'No Activity or N/A', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Talent_and_Engagement_Consulting__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Talent_and_Engagement_Consulting__c == 'Opportunity in SFDC', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Talent_and_Engagement_Consulting__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Talent_and_Engagement_Consulting__c == 'Partially Penetrated', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Talent_and_Engagement_Consulting__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Talent_and_Engagement_Consulting__c == 'Lead Provider', true, false)}" /></td>
+            </tr>
+            <tr>
+                <td class="tableRowBottom">Engagement Surveys</td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Engagement_Surveys__c == 'Not Viable', 'black', 'white')}"><apex:outputText value="" rendered="{!If(cas.Engagement_Surveys__c == 'Not Viable', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Engagement_Surveys__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Engagement_Surveys__c == 'Recent Loss', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Engagement_Surveys__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Engagement_Surveys__c == 'No Activity or N/A', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Engagement_Surveys__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Engagement_Surveys__c == 'Opportunity in SFDC', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Engagement_Surveys__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Engagement_Surveys__c == 'Partially Penetrated', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Engagement_Surveys__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Engagement_Surveys__c == 'Lead Provider', true, false)}" /></td>
+            </tr>
+            <tr>
+                <td class="tableRowBottom">Best Employers</td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Best_Employers__c == 'Not Viable', 'black', 'white')}"><apex:outputText value="" rendered="{!If(cas.Best_Employers__c == 'Not Viable', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Best_Employers__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Best_Employers__c == 'Recent Loss', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Best_Employers__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Best_Employers__c == 'No Activity or N/A', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Best_Employers__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Best_Employers__c == 'Opportunity in SFDC', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Best_Employers__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Best_Employers__c == 'Partially Penetrated', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Best_Employers__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Best_Employers__c == 'Lead Provider', true, false)}" /></td>
+            </tr>
+            <tr>
+                <td class="tableRowBottom">Leadership Consulting</td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Leadership_Consulting__c == 'Not Viable', 'black', 'white')}"><apex:outputText value="" rendered="{!If(cas.Leadership_Consulting__c == 'Not Viable', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Leadership_Consulting__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Leadership_Consulting__c == 'Recent Loss', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Leadership_Consulting__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Leadership_Consulting__c == 'No Activity or N/A', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Leadership_Consulting__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Leadership_Consulting__c == 'Opportunity in SFDC', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Leadership_Consulting__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Leadership_Consulting__c == 'Partially Penetrated', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Leadership_Consulting__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Leadership_Consulting__c == 'Lead Provider', true, false)}" /></td>
+            </tr>
+            <tr>
+                <td class="tableRowBottom">Selection and Assessment</td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Selection_and_Assessment__c == 'Not Viable', 'black', 'white')}"><apex:outputText value="" rendered="{!If(cas.Selection_and_Assessment__c == 'Not Viable', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Selection_and_Assessment__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Selection_and_Assessment__c == 'Recent Loss', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Selection_and_Assessment__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Selection_and_Assessment__c == 'No Activity or N/A', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Selection_and_Assessment__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Selection_and_Assessment__c == 'Opportunity in SFDC', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Selection_and_Assessment__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Selection_and_Assessment__c == 'Partially Penetrated', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Selection_and_Assessment__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Selection_and_Assessment__c == 'Lead Provider', true, false)}" /></td>
+            </tr>
+            <tr>
+                <td class="tableRowBottom">HR Effectiveness</td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.HRE__c == 'Not Viable', 'black', 'white')}"><apex:outputText value="" rendered="{!If(cas.HRE__c == 'Not Viable', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.HRE__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.HRE__c == 'Recent Loss', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.HRE__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.HRE__c == 'No Activity or N/A', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.HRE__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.HRE__c == 'Opportunity in SFDC', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.HRE__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.HRE__c == 'Partially Penetrated', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.HRE__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.HRE__c == 'Lead Provider', true, false)}" /></td>
+            </tr>
+            <tr>
+                <td class="tableRow">Sales Force Effectiveness</td>
+                <td class="tableRow" bgcolor="{!If(cas.Sales_Force_Effectiveness__c == 'Not Viable', 'black', 'white')}"><apex:outputText value="" rendered="{!If(cas.Sales_Force_Effectiveness__c == 'Not Viable', true, false)}" /></td>
+                <td class="tableRow" bgcolor="{!If(cas.Sales_Force_Effectiveness__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Sales_Force_Effectiveness__c == 'Recent Loss', true, false)}" /></td>
+                <td class="tableRow" bgcolor="{!If(cas.Sales_Force_Effectiveness__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Sales_Force_Effectiveness__c == 'No Activity or N/A', true, false)}" /></td>
+                <td class="tableRow" bgcolor="{!If(cas.Sales_Force_Effectiveness__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Sales_Force_Effectiveness__c == 'Opportunity in SFDC', true, false)}" /></td>
+                <td class="tableRow" bgcolor="{!If(cas.Sales_Force_Effectiveness__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Sales_Force_Effectiveness__c == 'Partially Penetrated', true, false)}" /></td>
+                <td class="tableRow" bgcolor="{!If(cas.Sales_Force_Effectiveness__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Sales_Force_Effectiveness__c == 'Lead Provider', true, false)}" /></td>
+            </tr>
+            <tr>
+                <td colspan="7" class="tableRowGray">Performance &amp; Rewards</td>
+            </tr>
+            <tr>
+                <td class="tableRowBottom">Broad Based Compensation</td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Broad_Based_Compensation__c == 'Not Viable', 'black', 'white')}"><apex:outputText value="" rendered="{!If(cas.Broad_Based_Compensation__c == 'Not Viable', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Broad_Based_Compensation__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Broad_Based_Compensation__c == 'Recent Loss', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Broad_Based_Compensation__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Broad_Based_Compensation__c == 'No Activity or N/A', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Broad_Based_Compensation__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Broad_Based_Compensation__c == 'Opportunity in SFDC', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Broad_Based_Compensation__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Broad_Based_Compensation__c == 'Partially Penetrated', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Broad_Based_Compensation__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Broad_Based_Compensation__c == 'Lead Provider', true, false)}" /></td>
+            </tr>
+            <tr>
+                <td class="tableRowBottom">Productivity and Performance Measurement</td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Productivity_and_Performance_Measurement__c == 'Not Viable', 'black', 'white')}"><apex:outputText value="" rendered="{!If(cas.Productivity_and_Performance_Measurement__c == 'Not Viable', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Productivity_and_Performance_Measurement__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Productivity_and_Performance_Measurement__c == 'Recent Loss', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Productivity_and_Performance_Measurement__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Productivity_and_Performance_Measurement__c == 'No Activity or N/A', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Productivity_and_Performance_Measurement__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Productivity_and_Performance_Measurement__c == 'Opportunity in SFDC', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Productivity_and_Performance_Measurement__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Productivity_and_Performance_Measurement__c == 'Partially Penetrated', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Productivity_and_Performance_Measurement__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Productivity_and_Performance_Measurement__c == 'Lead Provider', true, false)}" /></td>
+            </tr>
+            <tr>
+                <td class="tableRowBottom">Executive Compensation</td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Executive_Compensation__c == 'Not Viable', 'black', 'white')}"><apex:outputText value="" rendered="{!If(cas.Executive_Compensation__c == 'Not Viable', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Executive_Compensation__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Executive_Compensation__c == 'Recent Loss', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Executive_Compensation__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Executive_Compensation__c == 'No Activity or N/A', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Executive_Compensation__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Executive_Compensation__c == 'Opportunity in SFDC', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Executive_Compensation__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Executive_Compensation__c == 'Partially Penetrated', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Executive_Compensation__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Executive_Compensation__c == 'Lead Provider', true, false)}" /></td>
+            </tr>
+            <tr>
+                <td class="tableRowBottom">Total Rewards</td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Total_Rewards__c == 'Not Viable', 'black', 'white')}"><apex:outputText value="" rendered="{!If(cas.Total_Rewards__c == 'Not Viable', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Total_Rewards__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Total_Rewards__c == 'Recent Loss', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Total_Rewards__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Total_Rewards__c == 'No Activity or N/A', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Total_Rewards__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Total_Rewards__c == 'Opportunity in SFDC', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Total_Rewards__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Total_Rewards__c == 'Partially Penetrated', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Total_Rewards__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Total_Rewards__c == 'Lead Provider', true, false)}" /></td>
+            </tr>
+            <tr>
+                <td class="tableRowBottom">Job Evaluation</td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Job_Evaluation__c == 'Not Viable', 'black', 'white')}"><apex:outputText value="" rendered="{!If(cas.Job_Evaluation__c == 'Not Viable', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Job_Evaluation__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Job_Evaluation__c == 'Recent Loss', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Job_Evaluation__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Job_Evaluation__c == 'No Activity or N/A', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Job_Evaluation__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Job_Evaluation__c == 'Opportunity in SFDC', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Job_Evaluation__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Job_Evaluation__c == 'Partially Penetrated', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Job_Evaluation__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Job_Evaluation__c == 'Lead Provider', true, false)}" /></td>
+            </tr>
+            <tr>
+                <td class="tableRowBottom">Sales Compensation</td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Sales_Compensation__c == 'Not Viable', 'black', 'white')}"><apex:outputText value="" rendered="{!If(cas.Sales_Compensation__c == 'Not Viable', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Sales_Compensation__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Sales_Compensation__c == 'Recent Loss', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Sales_Compensation__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Sales_Compensation__c == 'No Activity or N/A', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Sales_Compensation__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Sales_Compensation__c == 'Opportunity in SFDC', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Sales_Compensation__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Sales_Compensation__c == 'Partially Penetrated', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Sales_Compensation__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Sales_Compensation__c == 'Lead Provider', true, false)}" /></td>
+            </tr>
+            <tr>
+                <td class="tableRowBottom">Pay Strategy/Pay Design</td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Pay_Strategy_Pay_Design__c == 'Not Viable', 'black', 'white')}"><apex:outputText value="" rendered="{!If(cas.Pay_Strategy_Pay_Design__c == 'Not Viable', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Pay_Strategy_Pay_Design__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Pay_Strategy_Pay_Design__c == 'Recent Loss', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Pay_Strategy_Pay_Design__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Pay_Strategy_Pay_Design__c == 'No Activity or N/A', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Pay_Strategy_Pay_Design__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Pay_Strategy_Pay_Design__c == 'Opportunity in SFDC', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Pay_Strategy_Pay_Design__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Pay_Strategy_Pay_Design__c == 'Partially Penetrated', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Pay_Strategy_Pay_Design__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Pay_Strategy_Pay_Design__c == 'Lead Provider', true, false)}" /></td>
+            </tr>
+            <tr>
+                <td class="tableRow">Remuneration Review</td>
+                <td class="tableRow" bgcolor="{!If(cas.Remuneration_Review__c == 'Not Viable', 'black', 'white')}"><apex:outputText value="" rendered="{!If(cas.Remuneration_Review__c == 'Not Viable', true, false)}" /></td>
+                <td class="tableRow" bgcolor="{!If(cas.Remuneration_Review__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Remuneration_Review__c == 'Recent Loss', true, false)}" /></td>
+                <td class="tableRow" bgcolor="{!If(cas.Remuneration_Review__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Remuneration_Review__c == 'No Activity or N/A', true, false)}" /></td>
+                <td class="tableRow" bgcolor="{!If(cas.Remuneration_Review__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Remuneration_Review__c == 'Opportunity in SFDC', true, false)}" /></td>
+                <td class="tableRow" bgcolor="{!If(cas.Remuneration_Review__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Remuneration_Review__c == 'Partially Penetrated', true, false)}" /></td>
+                <td class="tableRow" bgcolor="{!If(cas.Remuneration_Review__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Remuneration_Review__c == 'Lead Provider', true, false)}" /></td>
+            </tr>
+            <tr>
+                <td colspan="7" class="tableRowGray">Retirement</td>
+            </tr>
+            <tr>
+                <td class="tableRowBottom">Actuarial Services</td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Actuarial_Services__c == 'Not Viable', 'black', 'white')}"><apex:outputText value="" rendered="{!If(cas.Actuarial_Services__c == 'Not Viable', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Actuarial_Services__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Actuarial_Services__c == 'Recent Loss', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Actuarial_Services__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Actuarial_Services__c == 'No Activity or N/A', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Actuarial_Services__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Actuarial_Services__c == 'Opportunity in SFDC', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Actuarial_Services__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Actuarial_Services__c == 'Partially Penetrated', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Actuarial_Services__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Actuarial_Services__c == 'Lead Provider', true, false)}" /></td>
+            </tr>
+            <tr>
+                <td class="tableRowBottom">Retirement Plan Consulting</td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Retirement_Plan_Consulting__c == 'Not Viable', 'black', 'white')}"><apex:outputText value="" rendered="{!If(cas.Retirement_Plan_Consulting__c == 'Not Viable', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Retirement_Plan_Consulting__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Retirement_Plan_Consulting__c == 'Recent Loss', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Retirement_Plan_Consulting__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Retirement_Plan_Consulting__c == 'No Activity or N/A', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Retirement_Plan_Consulting__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Retirement_Plan_Consulting__c == 'Opportunity in SFDC', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Retirement_Plan_Consulting__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Retirement_Plan_Consulting__c == 'Partially Penetrated', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Retirement_Plan_Consulting__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Retirement_Plan_Consulting__c == 'Lead Provider', true, false)}" /></td>
+            </tr>
+            <tr>
+                <td class="tableRowBottom">Retirement Plan Administration</td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Retirement_Plan_Administration__c == 'Not Viable', 'black', 'white')}"><apex:outputText value="" rendered="{!If(cas.Retirement_Plan_Administration__c == 'Not Viable', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Retirement_Plan_Administration__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Retirement_Plan_Administration__c == 'Recent Loss', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Retirement_Plan_Administration__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Retirement_Plan_Administration__c == 'No Activity or N/A', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Retirement_Plan_Administration__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Retirement_Plan_Administration__c == 'Opportunity in SFDC', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Retirement_Plan_Administration__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Retirement_Plan_Administration__c == 'Partially Penetrated', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Retirement_Plan_Administration__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Retirement_Plan_Administration__c == 'Lead Provider', true, false)}" /></td>
+            </tr>
+            <tr>
+                <td class="tableRowBottom">Accounting Services</td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Accounting_Services__c == 'Not Viable', 'black', 'white')}"><apex:outputText value="" rendered="{!If(cas.Accounting_Services__c == 'Not Viable', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Accounting_Services__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Accounting_Services__c == 'Recent Loss', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Accounting_Services__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Accounting_Services__c == 'No Activity or N/A', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Accounting_Services__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Accounting_Services__c == 'Opportunity in SFDC', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Accounting_Services__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Accounting_Services__c == 'Partially Penetrated', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Accounting_Services__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Accounting_Services__c == 'Lead Provider', true, false)}" /></td>
+            </tr>
+            <tr>
+                <td class="tableRowBottom">Financial Planning</td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Financial_Planning__c == 'Not Viable', 'black', 'white')}"><apex:outputText value="" rendered="{!If(cas.Financial_Planning__c == 'Not Viable', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Financial_Planning__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Financial_Planning__c == 'Recent Loss', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Financial_Planning__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Financial_Planning__c == 'No Activity or N/A', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Financial_Planning__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Financial_Planning__c == 'Opportunity in SFDC', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Financial_Planning__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Financial_Planning__c == 'Partially Penetrated', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Financial_Planning__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Financial_Planning__c == 'Lead Provider', true, false)}" /></td>
+            </tr>
+            <tr>
+                <td class="tableRow">Investment Consulting</td>
+                <td class="tableRow" bgcolor="{!If(cas.Investment_Consulting__c == 'Not Viable', 'black', 'white')}"><apex:outputText value="" rendered="{!If(cas.Investment_Consulting__c == 'Not Viable', true, false)}" /></td>
+                <td class="tableRow" bgcolor="{!If(cas.Investment_Consulting__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Investment_Consulting__c == 'Recent Loss', true, false)}" /></td>
+                <td class="tableRow" bgcolor="{!If(cas.Investment_Consulting__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Investment_Consulting__c == 'No Activity or N/A', true, false)}" /></td>
+                <td class="tableRow" bgcolor="{!If(cas.Investment_Consulting__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Investment_Consulting__c == 'Opportunity in SFDC', true, false)}" /></td>
+                <td class="tableRow" bgcolor="{!If(cas.Investment_Consulting__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Investment_Consulting__c == 'Partially Penetrated', true, false)}" /></td>
+                <td class="tableRow" bgcolor="{!If(cas.Investment_Consulting__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Investment_Consulting__c == 'Lead Provider', true, false)}" /></td>
+            </tr>
+            <tr>
+                <td colspan="7" class="tableRowGray">Health &amp; Benefits</td>
+            </tr>
+            <tr>
+                <td class="tableRowBottom">Group Insurance</td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Group_Insurance__c == 'Not Viable', 'black', 'white')}"><apex:outputText value="" rendered="{!If(cas.Group_Insurance__c == 'Not Viable', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Group_Insurance__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Group_Insurance__c == 'Recent Loss', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Group_Insurance__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Group_Insurance__c == 'No Activity or N/A', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Group_Insurance__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Group_Insurance__c == 'Opportunity in SFDC', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Group_Insurance__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Group_Insurance__c == 'Partially Penetrated', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Group_Insurance__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Group_Insurance__c == 'Lead Provider', true, false)}" /></td>
+            </tr>
+            <tr>
+                <td class="tableRowBottom">Corporate Health</td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Corporate_Health__c == 'Not Viable', 'black', 'white')}"><apex:outputText value="" rendered="{!If(cas.Corporate_Health__c == 'Not Viable', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Corporate_Health__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Corporate_Health__c == 'Recent Loss', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Corporate_Health__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Corporate_Health__c == 'No Activity or N/A', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Corporate_Health__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Corporate_Health__c == 'Opportunity in SFDC', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Corporate_Health__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Corporate_Health__c == 'Partially Penetrated', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Corporate_Health__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Corporate_Health__c == 'Lead Provider', true, false)}" /></td>
+            </tr>
+            <tr>
+                <td class="tableRowBottom">Personal Accident</td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Personal_Accident__c == 'Not Viable', 'black', 'white')}"><apex:outputText value="" rendered="{!If(cas.Personal_Accident__c == 'Not Viable', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Personal_Accident__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Personal_Accident__c == 'Recent Loss', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Personal_Accident__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Personal_Accident__c == 'No Activity or N/A', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Personal_Accident__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Personal_Accident__c == 'Opportunity in SFDC', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Personal_Accident__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Personal_Accident__c == 'Partially Penetrated', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Personal_Accident__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Personal_Accident__c == 'Lead Provider', true, false)}" /></td>
+            </tr>
+            <tr>
+                <td class="tableRowBottom">Corporate Travel</td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Corporate_Travel__c == 'Not Viable', 'black', 'white')}"><apex:outputText value="" rendered="{!If(cas.Corporate_Travel__c == 'Not Viable', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Corporate_Travel__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Corporate_Travel__c == 'Recent Loss', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Corporate_Travel__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Corporate_Travel__c == 'No Activity or N/A', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Corporate_Travel__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Corporate_Travel__c == 'Opportunity in SFDC', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Corporate_Travel__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Corporate_Travel__c == 'Partially Penetrated', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Corporate_Travel__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Corporate_Travel__c == 'Lead Provider', true, false)}" /></td>
+            </tr>
+            <tr>
+                <td class="tableRowBottom">Expat or Non Resident Medical</td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Expat_or_Non_Resident_Medical__c == 'Not Viable', 'black', 'white')}"><apex:outputText value="" rendered="{!If(cas.Expat_or_Non_Resident_Medical__c == 'Not Viable', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Expat_or_Non_Resident_Medical__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Expat_or_Non_Resident_Medical__c == 'Recent Loss', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Expat_or_Non_Resident_Medical__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Expat_or_Non_Resident_Medical__c == 'No Activity or N/A', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Expat_or_Non_Resident_Medical__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Expat_or_Non_Resident_Medical__c == 'Opportunity in SFDC', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Expat_or_Non_Resident_Medical__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Expat_or_Non_Resident_Medical__c == 'Partially Penetrated', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Expat_or_Non_Resident_Medical__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Expat_or_Non_Resident_Medical__c == 'Lead Provider', true, false)}" /></td>
+            </tr>
+            <tr>
+                <td class="tableRow">Life Disability Consulting</td>
+                <td class="tableRow" bgcolor="{!If(cas.Life_Disability_Consulting__c == 'Not Viable', 'black', 'white')}"><apex:outputText value="" rendered="{!If(cas.Life_Disability_Consulting__c == 'Not Viable', true, false)}" /></td>
+                <td class="tableRow" bgcolor="{!If(cas.Life_Disability_Consulting__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Life_Disability_Consulting__c == 'Recent Loss', true, false)}" /></td>
+                <td class="tableRow" bgcolor="{!If(cas.Life_Disability_Consulting__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Life_Disability_Consulting__c == 'No Activity or N/A', true, false)}" /></td>
+                <td class="tableRow" bgcolor="{!If(cas.Life_Disability_Consulting__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Life_Disability_Consulting__c == 'Opportunity in SFDC', true, false)}" /></td>
+                <td class="tableRow" bgcolor="{!If(cas.Life_Disability_Consulting__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Life_Disability_Consulting__c == 'Partially Penetrated', true, false)}" /></td>
+                <td class="tableRow" bgcolor="{!If(cas.Life_Disability_Consulting__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Life_Disability_Consulting__c == 'Lead Provider', true, false)}" /></td>
+            </tr>
+            <tr>
+                <td colspan="7" class="tableRowGray">Other</td>
+            </tr>
+            <tr>
+                <td class="tableRowBottom">Mergers &amp; Acquisitions</td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Mergers_Acquisitions__c == 'Not Viable', 'black', 'white')}"><apex:outputText value="" rendered="{!If(cas.Mergers_Acquisitions__c == 'Not Viable', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Mergers_Acquisitions__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Mergers_Acquisitions__c == 'Recent Loss', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Mergers_Acquisitions__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Mergers_Acquisitions__c == 'No Activity or N/A', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Mergers_Acquisitions__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Mergers_Acquisitions__c == 'Opportunity in SFDC', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Mergers_Acquisitions__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Mergers_Acquisitions__c == 'Partially Penetrated', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Mergers_Acquisitions__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Mergers_Acquisitions__c == 'Lead Provider', true, false)}" /></td>
+            </tr>
+            <tr>
+                <td class="tableRowBottom">Global Benefits/Brokerage</td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Global_Benefits_Brokerage__c == 'Not Viable', 'black', 'white')}"><apex:outputText value="" rendered="{!If(cas.Global_Benefits_Brokerage__c == 'Not Viable', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Global_Benefits_Brokerage__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Global_Benefits_Brokerage__c == 'Recent Loss', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Global_Benefits_Brokerage__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Global_Benefits_Brokerage__c == 'No Activity or N/A', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Global_Benefits_Brokerage__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Global_Benefits_Brokerage__c == 'Opportunity in SFDC', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Global_Benefits_Brokerage__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Global_Benefits_Brokerage__c == 'Partially Penetrated', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Global_Benefits_Brokerage__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Global_Benefits_Brokerage__c == 'Lead Provider', true, false)}" /></td>
+            </tr>
+            <tr>
+                <td class="tableRowBottom">Workers' Compensation</td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Workers_Compensation__c == 'Not Viable', 'black', 'white')}"><apex:outputText value="" rendered="{!If(cas.Workers_Compensation__c == 'Not Viable', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Workers_Compensation__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Workers_Compensation__c == 'Recent Loss', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Workers_Compensation__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Workers_Compensation__c == 'No Activity or N/A', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Workers_Compensation__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Workers_Compensation__c == 'Opportunity in SFDC', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Workers_Compensation__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Workers_Compensation__c == 'Partially Penetrated', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Workers_Compensation__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Workers_Compensation__c == 'Lead Provider', true, false)}" /></td>
+            </tr>
+            <tr>
+                <td class="tableRowBottom">Workforce Risk</td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Workforce_Risk__c == 'Not Viable', 'black', 'white')}"><apex:outputText value="" rendered="{!If(cas.Workforce_Risk__c == 'Not Viable', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Workforce_Risk__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Workforce_Risk__c == 'Recent Loss', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Workforce_Risk__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Workforce_Risk__c == 'No Activity or N/A', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Workforce_Risk__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Workforce_Risk__c == 'Opportunity in SFDC', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Workforce_Risk__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Workforce_Risk__c == 'Partially Penetrated', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Workforce_Risk__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Workforce_Risk__c == 'Lead Provider', true, false)}" /></td>
+            </tr>
+            <tr>
+                <td class="tableRowBottom">Workday Implementation Services</td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Workday_Implementation_Services__c == 'Not Viable', 'black', 'white')}"><apex:outputText value="" rendered="{!If(cas.Workers_Compensation__c == 'Not Viable', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Workday_Implementation_Services__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Workers_Compensation__c == 'Recent Loss', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Workday_Implementation_Services__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Workers_Compensation__c == 'No Activity or N/A', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Workday_Implementation_Services__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Workers_Compensation__c == 'Opportunity in SFDC', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Workday_Implementation_Services__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Workers_Compensation__c == 'Partially Penetrated', true, false)}" /></td>
+                <td class="tableRowBottom" bgcolor="{!If(cas.Workday_Implementation_Services__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Workers_Compensation__c == 'Lead Provider', true, false)}" /></td>
+            </tr>
+            <tr>
+                <td class="tableRow">Cornerstone OnDemand Services</td>
+                <td class="tableRow" bgcolor="{!If(cas.Cornerstone_OnDemand_Services__c == 'Not Viable', 'black', 'white')}"><apex:outputText value="" rendered="{!If(cas.Workers_Compensation__c == 'Not Viable', true, false)}" /></td>
+                <td class="tableRow" bgcolor="{!If(cas.Cornerstone_OnDemand_Services__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Workers_Compensation__c == 'Recent Loss', true, false)}" /></td>
+                <td class="tableRow" bgcolor="{!If(cas.Cornerstone_OnDemand_Services__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Workers_Compensation__c == 'No Activity or N/A', true, false)}" /></td>
+                <td class="tableRow" bgcolor="{!If(cas.Cornerstone_OnDemand_Services__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Workers_Compensation__c == 'Opportunity in SFDC', true, false)}" /></td>
+                <td class="tableRow" bgcolor="{!If(cas.Cornerstone_OnDemand_Services__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Workers_Compensation__c == 'Partially Penetrated', true, false)}" /></td>
+                <td class="tableRow" bgcolor="{!If(cas.Cornerstone_OnDemand_Services__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Workers_Compensation__c == 'Lead Provider', true, false)}" /></td>
+            </tr>
+            </apex:repeat>
+        </table>
+        <font style="font-size: 9.0pt; color: red;">
+            &#42; Penetration Score = [(Number <b>Partially Penetrated</b> x 1) + (Number <b>Lead Provider</b> x 2)] ÷ [68 - (Number <b>Not Viable</b> x 2)]<br/> 
+            &nbsp;&nbsp;34 Total Service Areas x 2 = 68
+        </font>
+    </div>
+</div>
+</apex:page>

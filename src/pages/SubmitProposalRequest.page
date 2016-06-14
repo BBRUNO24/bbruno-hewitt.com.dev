@@ -1,0 +1,20 @@
+<apex:page standardController="Proposal_Request__c" extensions="ctlr_SubmitProposalRequest" action="{!init}">
+    <apex:pageMessage summary="The Proposal Request has been Successfully Submitted" severity="info" strength="3" rendered="{!errorMessage==''}"/> <!--00077630-Ritu-Added Rendered property to hide the message if there is an error--> 
+    <!--00077630-Ritu-Added Error Message-->
+    <apex:pageMessage summary="{!errorMessage}" severity="error" strength="3" rendered="{!errorMessage!=''}"/>
+    <apex:pageBlock rendered="{!errorMessage==''}">  <!--00077630-Ritu-Added Rendered property to hide the email details when there is an error--> 
+        <table cellpadding="2" cellspacing="1">
+            <tr>
+                <th width="40%">Proposal Request Email Sent To</th>
+                <td>{!emailList}</td>
+            </tr>
+            <tr>
+                <th>Attachment(s) Sent</th>
+                <td>{!attachmentList}</td>
+            </tr>
+        </table>
+    </apex:pageBlock>
+    <apex:form >
+        <apex:commandButton action="{!returnBack}" value="Return"></apex:commandButton>
+    </apex:form>
+</apex:page>

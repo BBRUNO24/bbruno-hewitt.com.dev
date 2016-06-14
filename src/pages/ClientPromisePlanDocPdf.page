@@ -1,0 +1,1873 @@
+<!--
+/******************************************************************************
+ * Filename: ClientPromisePlanDocPdf.page
+ * Author:   Chintan Adhyapak
+ * Purpose:  Renders Annual_Account_Plan__c as a PDF 
+ ****************************************************************************** 
+ * History
+ * ----------------------------------------------------------------------------
+ * 2012-12-20   Chintan Adhyapak        Created
+ * 2013-02-12   Chintan Adhyapak        Modified for EMEA and APAC Support
+ * 2013-09-24   Sunny Mohla             Case # 00100918 - Edited Footers
+ * 2014-02-14   Chintan Adhyapak        Case 118295
+ * 2014-05-12   Luke Hitpas             Case #00125738 - Added "Existing Client Relationships" for EMEA
+ * 2014-07-21   Chintan Adhyapak        Case 125704 - Print Client Satisfaction Survey Data etc. for APAC
+ ******************************************************************************
+-->
+
+<apex:page cache="false" renderAs="PDF" title="Client Promise Plan Document" standardController="Annual_Account_Plan__c" extensions="ctlr_ext_ClientPromisePlanDoc">
+<apex:stylesheet value="{!URLFOR($Resource.ClientPromisePlan, 'CP_Plan_Doc_StyleSheet.css')}" />
+<head>
+    <style type="text/css">
+        
+    </style>
+</head> 
+    <!--  Do not print header on Page 1 -->
+    <apex:outputPanel rendered="true">
+        <c:comp_ClientPromisePlanDocHeaderFooter type="header" position="right"></c:comp_ClientPromisePlanDocHeaderFooter>
+        <c:comp_ClientPromisePlanDocHeaderFooter type="header" position="left"></c:comp_ClientPromisePlanDocHeaderFooter>
+        <c:comp_ClientPromisePlanDocHeaderFooter type="header" position="center"></c:comp_ClientPromisePlanDocHeaderFooter>
+    </apex:outputPanel>
+    
+    <!--  Header for all other pages -->
+    <c:comp_ClientPromisePlanDocHeaderFooter type="header" position="left">Client Plan</c:comp_ClientPromisePlanDocHeaderFooter>
+    <c:comp_ClientPromisePlanDocHeaderFooter type="header" position="center"><div style="color:red;">Confidential &amp; Proprietary. Internal Aon Use Only</div></c:comp_ClientPromisePlanDocHeaderFooter>
+    <c:comp_ClientPromisePlanDocHeaderFooter type="header" position="right"><apex:image url="{!URLFOR($Resource.ClientPromisePlan, 'AonLogo.gif')}" width="100" height="32"/></c:comp_ClientPromisePlanDocHeaderFooter>
+
+     <!-- SunnyM - Case 00100918 -  Removed rendered keyword for footer to be visible on cover page -->
+     <!-- Print footer on Page 1 -->
+    <apex:outputPanel >
+        <c:comp_ClientPromisePlanDocHeaderFooter type="footer" position="left" showPageNumbers="false"></c:comp_ClientPromisePlanDocHeaderFooter>
+    </apex:outputPanel>
+    <apex:outputPanel >
+        <c:comp_ClientPromisePlanDocHeaderFooter type="footer" position="center" showPageNumbers="false"></c:comp_ClientPromisePlanDocHeaderFooter>
+    </apex:outputPanel>
+    <apex:outputPanel >
+        <c:comp_ClientPromisePlanDocHeaderFooter type="footer" position="right" showPageNumbers="false"></c:comp_ClientPromisePlanDocHeaderFooter>
+    </apex:outputPanel>
+    <!-- SunnyM - Case 00100918 - Removed rendered keyword for footer to be visible on cover page -->
+ 
+    <!--  Footer for all other pages -->
+    <c:comp_ClientPromisePlanDocHeaderFooter type="footer" position="left">{!account.Legal_Name__c}</c:comp_ClientPromisePlanDocHeaderFooter>
+    <c:comp_ClientPromisePlanDocHeaderFooter type="footer" position="center" showPageNumbers="true"></c:comp_ClientPromisePlanDocHeaderFooter>
+    <c:comp_ClientPromisePlanDocHeaderFooter type="footer" position="right">Printed on &nbsp;{!currentDate}</c:comp_ClientPromisePlanDocHeaderFooter>
+    
+    <apex:outputPanel >
+        <!--  SunnyM - Case 00100918 - Modified Cover Page contents as per case -->
+        <div class="coverPage">
+        <br/><br/><br/><br/><br/><br/>
+            <p class="documentTitle1" >
+                &nbsp;&nbsp;Aon Client Promise <br/>&nbsp;&nbsp;Client Plan
+            </p>
+            <br/><br/>
+            <div class="documentTitle2">&nbsp;&nbsp;<apex:outputText value="{!account.Legal_Name__c}"/><br/></div>
+            <div class="documentTitle3"><apex:outputText value="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{!currentDate}<br/><br/> &nbsp;&nbsp;&nbsp;&nbsp; Confidential &amp; Proprietary. Internal Aon Use Only" escape="false"/></div>
+            <br/><br/><br/><br/><br/>
+            <div >
+                <apex:outputText value="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This Client Plan contains sensitive confidential information related to Aon’s strategy, revenue and client development.<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;It is intended for internal use only, and is not to be shared externally." escape="false"/>
+            </div>
+
+            <!--img class="coverImage" src="{!URLFOR($Resource.ClientPromisePlan, 'AonClientPromise.png')}"></img-->
+         <!--  SunnyM - Case 00100918 - Modified Cover Page contents as per case -->
+        </div>
+    </apex:outputPanel>
+<div id="non_apac" style="{!If(region == 'Asia Pacific', 'display:none;', 'display:visible;')}">
+    <div class="div1">
+        <table class="table1">
+            <tr>
+                <th class="tableTitle" colspan="4">Client Organizational Information<br/></th>
+            </tr>
+            <tr>
+                <td width="20%" class="tableRowBlueTop">Company Name</td>
+                <td width="30%" class="tableRowTop"><apex:outputText value="{!account.Legal_Name__c}"/></td>
+                <td class="tableRowBlueTop">Global Employees</td>
+                <td class="tableRowTop"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!account.NumberOfEmployees}"/></apex:outputText></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueTop">Client ID</td>
+                <td class="tableRowTop"><apex:outputText value="{!account.CRM_ID__c}"/></td>
+                <td class="tableRowBlueTop">Local Employees</td>
+                <td class="tableRowTop"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!account.DB_Employee_Here__c}"/></apex:outputText></td>
+            </tr>
+            <tr>
+                <td width="20%" class="tableRowBlueTop">Industry</td>
+                <td width="30%" class="tableRowTop"><apex:outputText value="{!account.Industry}"/></td>
+                <td class="tableRowBlueTop">Current FY Revenue</td>
+                <td class="tableRowTop"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!account.AnnualRevenue}"/></apex:outputText></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueTop">Company Website</td>
+                <td class="tableRowTop">{!account.Website}</td>
+                <td class="tableRowBlueTop">Current FY Net Income</td>
+                <td class="tableRowTop"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!account.Net_Income__c}"/></apex:outputText></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueTop">Ownership Structure</td>
+                <td class="tableRowTop"><apex:outputText value="{!account.Ownership}"/></td>
+                <td class="tableRowBlueTop">Fiscal Year End</td>
+                <td class="tableRowTop"><apex:outputText value="{!account.Fiscal_Year_End_Month__c}"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueTopBottom">HQ Country Location</td>
+                <td class="tableRowTopBottom"><apex:outputText value="{!account.SDO_Billing_Country_Name__c}"/></td>
+                <td class="tableRowBlueTopBottom" style="{!If(region == 'North America', 'display:visible;' , 'display:none;')}">&nbsp;</td>
+                <td class="tableRowTopBottom" style="{!If(region == 'North America', 'display:visible;' , 'display:none;')}">&nbsp;</td>
+                <td class="tableRowBlueTopBottom" style="{!If(region != 'North America', 'display:visible;' , 'display:none;')}">DB Assets in Plan</td>
+                <td class="tableRowTopBottom" style="{!If(region != 'North America', 'display:visible;' , 'display:none;')}"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!account.DB_Assets_in_Plan__c}"/></apex:outputText></td>
+            </tr>
+        </table>
+        <br/><br/>
+        
+        <table class="table1">
+            <tr>
+                <th class="tableHeadGray">Aligned Executives</th>
+            </tr>
+        </table>
+        <apex:dataTable value="{!alignedExecList}" var="iat" cellpadding="0" cellspacing="2" rowClasses="tableRow,tableRowBlue" styleClass="table1" headerClass="tableHeadGray">
+            <apex:column styleClass="tableRow" width="30%">
+                <apex:outputText value="{!iat.Role}"/>
+            </apex:column>
+            <apex:column styleClass="tableRow" width="70%">
+                <apex:outputText value="{!iat.Name}"/>
+            </apex:column>
+        </apex:dataTable>
+        <table class="table1"><tr><td class="tableRowTop">&nbsp;</td></tr></table>
+        <br/>              
+        
+        <table class="table1">
+            <tr>
+                <th class="tableHeadGray" colspan="4">Client Business Overview</th>
+            </tr>
+            <tr>
+                <td class="tableRowBottom" colspan="4">{!account.Description}</td>
+            </tr>
+        </table>
+        <br/><br/>
+        
+        <table class="table1">
+            <tr>
+                <th class="tableHeadGray" colspan="4">Key Competitors</th>
+            </tr>
+            <tr>
+                <td class="tableRowBottom" colspan="4">{!account.Key_Competitors__c}</td>
+            </tr>
+        </table>
+        <br/><br/>
+        
+        <table class="table1">
+            <tr>
+                <th class="tableHeadGray" colspan="4">Recent Newsworthy Events</th>
+            </tr>
+            <tr>
+                <td class="tableRowBottom" colspan="4"><apex:outputText value="{!plan.Recent_News_Worthy_Events__c}" escape="false"/></td>
+            </tr>
+        </table>
+        <br/><br/><br/>
+        
+        <table class="table1" cellspacing="0">
+            <tr>
+                <th class="tableTitle" colspan="2">Business Analysis<br/></th>
+            </tr>
+            <tr>
+                <th class="tableHeadGray">Key Business Strategies</th>
+                <td class="tableHeadGrayDate" align="right"><apex:outputText value="As of {0,date,MMMM dd, yyyy}&nbsp;" escape="false"><apex:param value="{!plan.LastModifiedDate}"/></apex:outputText></td>
+            </tr>
+        </table>
+        <apex:dataTable value="{!keyBusinessStrategies}" var="business_strategy" cellpadding="2" cellspacing="2" rowClasses="tableRow,tableRowBlue" styleClass="table1" headerClass="tableHeadGray">
+            <apex:column >
+                <apex:outputText value="{!business_strategy}" escape="false"/>
+            </apex:column>
+        </apex:dataTable>
+        <table class="table1"><tr><td class="tableRowTop">&nbsp;</td></tr></table>
+    </div>
+    
+    <div class="div2">
+        <table class="table1" cellspacing="0">
+            <tr>
+                <th class="tableHeadGray">Key HR Goals</th>
+                <td class="tableHeadGrayDate" align="right"><apex:outputText value="As of {0,date,MMMM dd, yyyy}&nbsp;" escape="false"><apex:param value="{!plan.LastModifiedDate}"/></apex:outputText></td>
+            </tr>
+        </table>
+        <apex:dataTable value="{!keyHRGoals}" var="hr_goal" cellpadding="2" cellspacing="2" rowClasses="tableRow,tableRowBlue" styleClass="table1" headerClass="tableHeadGray">
+            <apex:column >
+                <apex:outputText value="{!hr_goal}" escape="false"/>
+            </apex:column>
+        </apex:dataTable>
+        <table class="table1"><tr><td class="tableRowTop">&nbsp;</td></tr></table>
+        <br/><span style="{!If(region == 'EMEA' || region == 'UKI', 'display:visible;' , 'display:none;')}"><br/></span>
+        
+        <table class="table1" cellspacing="0" style="{!If(region == 'EMEA' || region == 'UKI', 'display:visible;' , 'display:none;')}">
+            <tr>
+                <th class="tableHeadGray">Key Pension Fund Strategies/Issues</th>
+                <td class="tableHeadGrayDate" align="right"><apex:outputText value="As of {0,date,MMMM dd, yyyy}&nbsp;" escape="false"><apex:param value="{!plan.LastModifiedDate}"/></apex:outputText></td>
+            </tr>
+        </table>
+        
+        <apex:dataTable value="{!keyPensionFundStrategies}" var="pf_strategy" cellpadding="2" cellspacing="2" rowClasses="tableRow,tableRowBlue" 
+                styleClass="table1" headerClass="tableHeadGray" style="{!If(region == 'EMEA' || region == 'UKI', 'display:visible;' , 'display:none;')}">
+            <apex:column >
+                <apex:outputText value="{!pf_strategy}" escape="false"/>
+            </apex:column>
+        </apex:dataTable>
+            
+        <table class="table1" style="{!If(region == 'EMEA' || region == 'UKI', 'display:visible;' , 'display:none;')}">
+            <tr><td class="tableRowTop">&nbsp;</td></tr>
+        </table>
+        <span style="{!If(region == 'EMEA' || region == 'UKI', 'display:visible;' , 'display:none;')}">
+            <br/><br/>
+        </span>
+        
+        
+        <table class="table1" cellspacing="0">
+            <tr>
+                <th class="tableHeadGray">Aon Strategic Client Plan</th>
+                <td class="tableHeadGrayDate" align="right"><apex:outputText value="As of {0,date,MMMM dd, yyyy}&nbsp;" escape="false"><apex:param value="{!plan.LastModifiedDate}"/></apex:outputText></td>
+            </tr>
+        </table>
+        <table class="table1">
+            <tr>
+                <td width="15%" class="tableRowBlueBottom">Situation</td>
+                <td width="85%" class="tableRowBottom15"><apex:outputText value="{!plan.Situation__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom">Opportunities</td>
+                <td class="tableRowBottom15"><apex:outputText value="{!plan.Opportunities__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom">Walls (Barriers)</td>
+                <td class="tableRowBottom15"><apex:outputText value="{!plan.Barriers__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom">Solutions</td>
+                <td class="tableRowBottom15"><apex:outputText value="{!plan.Solutions__c}" escape="false"/></td>
+            </tr>
+        </table>
+        <br/><br/>
+        
+        <table class="table1" cellspacing="0">
+            <tr>
+                <th class="tableHeadGray">What Client Promise Means to Your Client</th>
+                <td class="tableHeadGrayDate" align="right"><apex:outputText value="As of {0,date,MMMM dd, yyyy}&nbsp;" escape="false"><apex:param value="{!plan.LastModifiedDate}"/></apex:outputText></td>
+            </tr>
+        </table>
+        <table class="table1">
+            <tr>
+                <td width="15%" class="tableRowBlueBottom">Partnership</td>
+                <td width="85%" class="tableRowBottom15"><apex:outputText value="{!plan.Partnership__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom">Expertise</td>
+                <td class="tableRowBottom15"><apex:outputText value="{!plan.Talent__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom">Innovation</td>
+                <td class="tableRowBottom15"><apex:outputText value="{!plan.Innovation__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom">Excellence</td>
+                <td class="tableRowBottom15"><apex:outputText value="{!plan.Excellence__c}" escape="false"/></td>
+            </tr>
+             <tr>
+                <td class="tableRowBlueBottom">Results</td>
+                <td class="tableRowBottom15"><apex:outputText value="{!plan.Results__c}" escape="false"/></td>
+            </tr>
+        </table>
+        <br/><br/>
+        <!-- Added by Devesh panwar Case # 00262422 -->
+         <table class="table1" cellspacing="0">
+            <tr>
+                <th class="tableHeadGray">Promises Action Plan – What are this team’s actions to deliver on our goals for Go To Market?</th>
+                <td class="tableHeadGrayDate" align="right"><apex:outputText value="As of {0,date,MMMM dd, yyyy}&nbsp;" escape="false"><apex:param value="{!plan.LastModifiedDate}"/></apex:outputText></td>
+            </tr>
+        </table>        
+        <table class="table1">
+            <tr>
+                <td width="20%" class="tableRowBlueBottom">Partnership Action</td>
+                <td width="80%" class="tableRowBottom15"><apex:outputText value="{!plan.Partnership_Action__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom">Expertise Action</td>
+                <td class="tableRowBottom15"><apex:outputText value="{!plan.Expertise_Action__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom">Innovation</td>
+                <td class="tableRowBottom15"><apex:outputText value="{!plan.Innovation_Plan__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom">Excellence</td>
+                <td class="tableRowBottom15"><apex:outputText value="{!plan.Excellence_Plan__c}" escape="false"/></td>
+            </tr>
+             <tr>
+                <td class="tableRowBlueBottom">Results</td>
+                <td class="tableRowBottom15"><apex:outputText value="{!plan.Results_Plan__c}" escape="false"/></td>
+            </tr>
+             <tr>
+                <td class="tableRowBlueBottom">Partnership Action</td>
+                <td class="tableRowBottom15"><apex:outputText value="{!plan.Partnership_Action_Plan__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom">Expertise Action</td>
+                <td class="tableRowBottom15"><apex:outputText value="{!plan.Expertise_Action_Plan__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom">Innovation Action</td>
+                <td class="tableRowBottom15"><apex:outputText value="{!plan.Innovation_Action_Plan__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom">Excellence Action</td>
+                <td class="tableRowBottom15"><apex:outputText value="{!plan.Excellence_Action_Plan__c}" escape="false"/></td>
+            </tr>
+             <tr>
+                <td class="tableRowBlueBottom">Results Action</td>
+                <td class="tableRowBottom15"><apex:outputText value="{!plan.Results_Action_Plan__c}" escape="false"/></td>
+            </tr>
+        </table>
+       <!-- Added by Devesh panwar till here --> 
+        <br/><br/>
+    </div>
+    
+    <div class="div3">
+        <table class="table1" style="{!If(region == 'North America', 'display:visible;' , 'display:none;')}">
+            <tr>
+                <th class="tableHeadGray" colspan="6">H&amp;B – Retain &amp; Grow Initiative</th>
+            </tr>
+            <tr>
+                <td width="15%" class="tableRowBlueTopBottom">Retain</td>
+                <td width="85%" class="tableRowTopBottom"><apex:outputText value="{!plan.Retain__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom">Strength of Current Relationships</td>
+                <td class="tableRowBottom15"><apex:outputText value="{!plan.Retain_Comments__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom">Expand</td>
+                <td class="tableRowBottom15"><apex:outputText value="{!plan.Expand__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom">Opportunities for Potential Investment</td>
+                <td class="tableRowBottom15"><apex:outputText value="{!plan.Expand_Comments__c}" escape="false"/></td>
+            </tr>
+             <tr>
+                <td class="tableRowBlueBottom">Relationship Development Action Plan</td>
+                <td class="tableRowBottom15"><apex:outputText value="{!plan.Relationship__c}" escape="false"/></td>
+            </tr>
+        </table>
+        <span style="{!If(region == 'North America', 'display:visible;' , 'display:none;')}"><br/><br/></span>
+        
+        <table class="table1">
+            <tr>
+                <th class="tableTitle" colspan="4">Demographics<br/></th>
+            </tr>
+            <tr>
+                <th class="tableHeadGray">Home Country</th>
+                <th class="tableHeadGray">Active Population</th>
+                <th align="center" class="tableHeadGray">Retirees</th>
+                <th class="tableHeadGray">Terminated Vested</th>
+            </tr>
+            <tr>
+                <td class="tableRow">Total Employees</td>
+                <td class="tableRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!account.Total_Active_Population_Employees__c}"/></apex:outputText></td>
+                <td class="tableRowGray">&nbsp;</td>
+                <td class="tableRowGray">&nbsp;</td>
+            </tr>
+            <tr>
+                <td class="tableRowBlue15">Healthcare Coverage Participants</td>
+                <td class="tableRowBlue15"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!account.Active_Health_Care_PPTS__c}"/></apex:outputText></td>
+                <td class="tableRowBlue">
+                    <table cellpadding="2" width="100%">
+                        <tr>
+                            <td width="50%" class="tableHeadGray">Pre-65</td>
+                            <td width="50%" class="tableHeadGray">Post-65</td>
+                        </tr>
+                        <tr>
+                            <td class="tableRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!account.HW_Ret_Pre_65_PPT_Count__c}"/></apex:outputText></td>
+                            <td class="tableRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!account.HW_Ret_Post_65_PPT_Count__c}"/></apex:outputText></td>
+                        </tr>
+                        <tr>
+                            <td class="tableRowNoBottom"><apex:outputText value="{!pre65}"/></td>
+                            <td class="tableRowNoBottom"><apex:outputText value="{!post65}"/></td>
+                        </tr>
+                    </table>
+                </td>
+                <td class="tableRowGray">&nbsp;</td>
+            </tr>
+            <tr>
+                <td class="tableRow">DC Retirement Plan Participants</td>
+                <td class="tableRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!account.Active_DC_Ret_PPTS__c}"/></apex:outputText></td>
+                <td class="tableRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!account.DC_Ret_PPTS__c}"/></apex:outputText></td>
+                <td class="tableRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!account.DC_Term_Vest_PPTS__c}"/></apex:outputText></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom">DB Retirement Plan Participants</td>
+                <td class="tableRowBlueBottom"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!account.Active_DB_Ret_PPTS__c}"/></apex:outputText></td>
+                <td class="tableRowBlueBottom"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!account.DB_Ret_PPTS__c}"/></apex:outputText></td>
+                <td class="tableRowBlueBottom"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!account.DB_Term_Vest_PPTS__c}"/></apex:outputText></td>
+            </tr>
+        </table>
+    </div>
+    
+    <div class="div3">
+    <table class="table1" style="{!If(region == 'North America', 'display:visible;' , 'display:none;')}">
+            <tr>
+                <th class="tableTitle" colspan="4">Current Provider Information<br/></th>
+            </tr>
+            <tr>
+                <th class="tableHeadGray">Practice</th>
+                <th class="tableHeadGray">Current Provider</th>
+                <th class="tableHeadGray">Practice</th>
+                <th class="tableHeadGray">Current Provider</th>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom25">Actuary</td>
+                <td class="tableRowBottom"><apex:outputText value="{!consultingSP.Actuary_Pension_Company__r.Name}"/>
+                    <div class="expiry" style="{!If(IsNull(consultingSP.Actuary_Pension_Contract_End_Date__c), 'display:none;' , 'display:visible')}">
+                        <apex:outputText value="End Date: {0,date,MMM dd, yyyy}"><apex:param value="{!consultingSP.Actuary_Pension_Contract_End_Date__c}"/></apex:outputText>
+                    </div>
+                </td>
+                <td class="tableRowBlueBottom25">Broadbased Compensation</td>
+                <td class="tableRowBottom"><apex:outputText value="{!consultingSP.Broadbased_Compensation_Consultant__r.Name}"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom25">Communication</td>
+                <td class="tableRowBottom"><apex:outputText value="{!consultingSP.Communication_Consulting__r.Name}"/></td>
+                <td class="tableRowBlueBottom25">Executive Compensation</td>
+                <td class="tableRowBottom"><apex:outputText value="{!consultingSP.Executive_Compensation_Mgmt_Consultant__r.Name}"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom25">Global Benefits</td>
+                <td class="tableRowBottom"><apex:outputText value="{!consultingSP.Global_Benefits_Consulting_Broker__r.Name}"/></td>
+                <td class="tableRowBlueBottom25">Health &amp; Benefits Consultant</td>
+                <td class="tableRowBottom"><apex:outputText value="{!consultingSP.Health_Welfare_Consulting__r.Name}"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom25">Investment Consultants (DB)</td>
+                <td class="tableRowBottom"><apex:outputText value="{!consultingSP.Investment__r.Name}"/></td>
+                <td class="tableRowBlueBottom25">Investment Consultants (DC)</td>
+                <td class="tableRowBottom"><apex:outputText value="{!consultingSP.Investment_Consultant__r.Name}"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom25">AMAS/CTT</td>
+                <td class="tableRowBottom"><apex:outputText value="{!consultingSP.HR_M_A_Consulting__r.Name}"/></td>
+                <td class="tableRowBlueBottom25">Retirement Consultant (DB)</td>
+                <td class="tableRowBottom"><apex:outputText value="{!consultingSP.Retirement_Consultant__r.Name}"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom25">Talent Management</td>
+                <td class="tableRowBottom"><apex:outputText value="{!consultingSP.Reward__r.Name}"/></td>
+                <td class="tableRowBlueBottom25">DB Pension Admin</td>
+                <td class="tableRowBottom"><apex:outputText value="{!outsourcingSP.Defined_Benefit_Administrator__r.Name}"/>
+                    <div class="expiry" style="{!If(IsNull(outsourcingSP.Defined_Benefit_End_Date__c), 'display:none;' , 'display:visible;')}">
+                        <apex:outputText value="End Date: {0,date,MMM dd, yyyy}"><apex:param value="{!outsourcingSP.Defined_Benefit_End_Date__c}"/></apex:outputText>
+                    </div>
+                </td>
+            </tr>   
+            <tr>
+                <td class="tableRowBlueBottom25">DC Admin</td>
+                <td class="tableRowBottom"><apex:outputText value="{!outsourcingSP.Defined_Contribution_Administrator__r.Name}"/>
+                    <div class="expiry" style="{!If(IsNull(outsourcingSP.Defined_Contribution_End_Date__c), 'display:none;' , 'display:visible;')}">
+                        <apex:outputText value="End Date: {0,date,MMM dd, yyyy}"><apex:param value="{!outsourcingSP.Defined_Contribution_End_Date__c}"/></apex:outputText>
+                    </div>
+                </td>
+                <td class="tableRowBlueBottom25">H &amp; W Admin</td>
+                <td class="tableRowBottom"><apex:outputText value="{!outsourcingSP.Health_Welfare_Administrator__r.Name}"/>
+                    <div class="expiry" style="{!If(IsNull(outsourcingSP.Health_Welfare_End_Date__c), 'display:none;' , 'display:visible;')}">
+                        <apex:outputText value="End Date: {0,date,MMM dd, yyyy}"><apex:param value="{!outsourcingSP.Health_Welfare_End_Date__c}"/></apex:outputText>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom25">BPO HR</td>
+                <td class="tableRowBottom"><apex:outputText value="{!outsourcingSP.BPO_HR__r.Name}"/>
+                    <div class="expiry" style="{!If(IsNull(outsourcingSP.BPO_HR_End_Date__c), 'display:none;' , 'display:visible;')}">
+                        <apex:outputText value="End Date: {0,date,MMM dd, yyyy}"><apex:param value="{!outsourcingSP.BPO_HR_End_Date__c}"/></apex:outputText>
+                    </div>
+                </td>
+                <td class="tableRowBlueBottom25">HRIS</td>
+                <td class="tableRowBottom"><apex:outputText value="{!outsourcingSP.HRIS_System__c}"/>
+                    <div class="expiry" style="{!If(IsNull(outsourcingSP.HRIS_Contract_End_Date__c), 'display:none;' , 'display:visible;')}">
+                        <apex:outputText value="End Date: {0,date,MMM dd, yyyy}"><apex:param value="{!outsourcingSP.HRIS_Contract_End_Date__c}"/></apex:outputText>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom25">Payroll</td>
+                <td class="tableRowBottom"><apex:outputText value="{!outsourcingSP.Payroll__r.Name}"/>
+                    <div class="expiry" style="{!If(IsNull(outsourcingSP.Payroll_End_Date__c), 'display:none;' , 'display:visible;')}">
+                        <apex:outputText value="End Date: {0,date,MMM dd, yyyy}"><apex:param value="{!outsourcingSP.Payroll_End_Date__c}"/></apex:outputText>
+                    </div>
+                </td>
+                <td class="tableRowBlueBottom25">Pension Payroll</td>
+                <td class="tableRowBottom"><apex:outputText value="{!outsourcingSP.Pension_Payroll__r.Name}"/>
+                    <div class="expiry" style="{!If(IsNull(outsourcingSP.Pension_Payroll_Contract_End_Date__c), 'display:none;' , 'display:visible;')}">
+                        <apex:outputText value="End Date: {0,date,MMM dd, yyyy}"><apex:param value="{!outsourcingSP.Pension_Payroll_Contract_End_Date__c}"/></apex:outputText>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom25">Recruiting Services (RPO)</td>
+                <td class="tableRowBottom"><apex:outputText value="{!outsourcingSP.Recruiting_and_Staffing_Administrator__r.Name}"/>
+                    <div class="expiry" style="{!If(IsNull(outsourcingSP.Recruit_Staff_Admin_Contract_End_Date__c), 'display:none;' , 'display:visible;')}">
+                        <apex:outputText value="End Date: {0,date,MMM dd, yyyy}"><apex:param value="{!outsourcingSP.Recruit_Staff_Admin_Contract_End_Date__c}"/></apex:outputText>
+                    </div>
+                </td>
+                <td class="tableRowBlueBottom25">Retiree Medical Exchange</td>
+                <td class="tableRowBottom"><apex:outputText value="{!outsourcingSP.Retiree_Medical_Exchange__r.Name}"/>
+                    <div class="expiry" style="{!If(IsNull(outsourcingSP.Retiree_Medical_Exchange_Contract_End_Dt__c), 'display:none;' , 'display:visible;')}">
+                        <apex:outputText value="End Date: {0,date,MMM dd, yyyy}"><apex:param value="{!outsourcingSP.Retiree_Medical_Exchange_Contract_End_Dt__c}"/></apex:outputText>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom25">Advocacy</td>
+                <td class="tableRowBottom"><apex:outputText value="{!pointSolutionsSP.Advocacy_Services__r.Name}"/>
+                    <div class="expiry" style="{!If(IsNull(pointSolutionsSP.Advocacy_Services_Contract_Exp_Date__c), 'display:none;' , 'display:visible;')}">
+                        <apex:outputText value="End Date: {0,date,MMM dd, yyyy}"><apex:param value="{!pointSolutionsSP.Advocacy_Services_Contract_Exp_Date__c}"/></apex:outputText>
+                    </div>
+                </td>
+                <td class="tableRowBlueBottom25">Dependent Audit</td>
+                <td class="tableRowBottom"><apex:outputText value="{!pointSolutionsSP.Dependent_Audit_Services__r.Name}"/>
+                    <div class="expiry" style="{!If(IsNull(pointSolutionsSP.Dependent_Audit_ContractExpDate__c), 'display:none;' , 'display:visible;')}">
+                        <apex:outputText value="End Date: {0,date,MMM dd, yyyy}"><apex:param value="{!pointSolutionsSP.Dependent_Audit_ContractExpDate__c}"/></apex:outputText>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom25">Flexible Spending Account</td>
+                <td class="tableRowBottom"><apex:outputText value="{!pointSolutionsSP.Spending_Accounts_FSA__r.Name}"/>
+                    <div class="expiry" style="{!If(IsNull(pointSolutionsSP.SA_FSA_Contract_Exp_Date__c), 'display:none;' , 'display:visible;')}">
+                        <apex:outputText value="End Date: {0,date,MMM dd, yyyy}"><apex:param value="{!pointSolutionsSP.SA_FSA_Contract_Exp_Date__c}"/></apex:outputText>
+                    </div>
+                </td>
+                <td class="tableRowBlueBottom25">Your Total Rewards</td>
+                <td class="tableRowBottom"><apex:outputText value="{!pointSolutionsSP.Total_Rewards_Solution__r.Name}"/>
+                    <div class="expiry" style="{!If(IsNull(pointSolutionsSP.Total_Rewards_Solution_Contract_Exp_Date__c), 'display:none;' , 'display:visible;')}">
+                        <apex:outputText value="End Date: {0,date,MMM dd, yyyy}"><apex:param value="{!pointSolutionsSP.Total_Rewards_Solution_Contract_Exp_Date__c}"/></apex:outputText>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom25">Retirement Consultant (DC)</td>
+                <td class="tableRowBottom"><apex:outputText value="{!consultingSP.Retirement_Consultant_DC__r.Name}"/></td>
+                <td class="tableRowBlueBottom25">&nbsp;</td>
+                <td class="tableRowBottom">&nbsp;</td>
+            </tr>
+        </table>
+        
+        <table class="table1" style="{!If(region == 'EMEA' || region = 'UKI', 'display:visible;' , 'display:none;')}">
+            <tr>
+                <th class="tableTitle" colspan="4">Current Provider Information<br/></th>
+            </tr>
+            <tr>
+                <th class="tableHeadGray">Practice</th>
+                <th class="tableHeadGray">Current Provider</th>
+                <th class="tableHeadGray">Practice</th>
+                <th class="tableHeadGray">Current Provider</th>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom25">Actuary</td>
+                <td class="tableRowBottom"><apex:outputText value="{!consultingSP.Actuary_Pension_Company__r.Name}"/>
+                    <div class="expiry" style="{!If(IsNull(consultingSP.Actuary_Pension_Contract_End_Date__c), 'display:none;' , 'display:visible')}">
+                        <apex:outputText value="End Date: {0,date,MMM dd, yyyy}"><apex:param value="{!consultingSP.Actuary_Pension_Contract_End_Date__c}"/></apex:outputText>
+                    </div>
+                </td>
+                <td class="tableRowBlueBottom25">AMAS/CTT</td>
+                <td class="tableRowBottom"><apex:outputText value="{!consultingSP.HR_M_A_Consulting__r.Name}"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom25">Covenant Assessment Advisors</td>
+                <td class="tableRowBottom"><apex:outputText value="{!consultingSP.Covenant_Assessment_Advisors__r.Name}"/>
+                    <div class="expiry" style="{!If(IsNull(consultingSP.Covenant_Assess_Advisors_Contract_End_Dt__c), 'display:none;' , 'display:visible;')}">
+                        <apex:outputText value="End Date: {0,date,MMM dd, yyyy}"><apex:param value="{!consultingSP.Covenant_Assess_Advisors_Contract_End_Dt__c}"/></apex:outputText>
+                    </div>
+                </td>
+                <td class="tableRowBlueBottom25">Flexible Benefits - Consulting</td>
+                <td class="tableRowBottom"><apex:outputText value="{!consultingSP.FLEX_Benefits__r.Name}"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom25">Global Accounting</td>
+                <td class="tableRowBottom"><apex:outputText value="{!consultingSP.Global_Accounting__r.Name}"/></td>
+                <td class="tableRowBlueBottom25">Global Actuary</td>
+                <td class="tableRowBottom"><apex:outputText value="{!consultingSP.Global_Actuary__r.Name}"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom25">Global Benefits</td>
+                <td class="tableRowBottom"><apex:outputText value="{!consultingSP.Global_Benefits_Consulting_Broker__r.Name}"/></td>
+                <td class="tableRowBlueBottom25">Health &amp; Benefits Consultant</td>
+                <td class="tableRowBottom"><apex:outputText value="{!consultingSP.Health_Welfare_Consulting__r.Name}"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom25">International Retirement</td>
+                <td class="tableRowBottom"><apex:outputText value="{!consultingSP.International_Retirement_Consulting__r.Name}"/></td>
+                <td class="tableRowBlueBottom25">Talent Management</td>
+                <td class="tableRowBottom"><apex:outputText value="{!consultingSP.Reward__r.Name}"/></td>
+            </tr>   
+            <tr>
+                <td class="tableRowBlueBottom25">Investment Consultants (DB)</td>
+                <td class="tableRowBottom"><apex:outputText value="{!consultingSP.Investment__r.Name}"/></td>
+                <td class="tableRowBlueBottom25">Investment Consultants (DC)</td>
+                <td class="tableRowBottom"><apex:outputText value="{!consultingSP.Investment_Consultant__r.Name}"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom25">Retirement Consultant (DB)</td>
+                <td class="tableRowBottom"><apex:outputText value="{!consultingSP.Retirement_Consultant__r.Name}"/></td>
+                <td class="tableRowBlueBottom25">Retirement Consultant (DC)</td>
+                <td class="tableRowBottom"><apex:outputText value="{!consultingSP.Retirement_Consultant_DC__r.Name}"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom25">BPO HR</td>
+                <td class="tableRowBottom"><apex:outputText value="{!outsourcingSP.BPO_HR__r.Name}"/>
+                    <div class="expiry" style="{!If(IsNull(outsourcingSP.BPO_HR_End_Date__c), 'display:none;' , 'display:visible;')}">
+                        <apex:outputText value="End Date: {0,date,MMM dd, yyyy}"><apex:param value="{!outsourcingSP.BPO_HR_End_Date__c}"/></apex:outputText>
+                    </div>
+                </td>
+                <td class="tableRowBlueBottom25">Bundled Services</td>
+                <td class="tableRowBottom"><apex:outputText value="{!outsourcingSP.Bundled_Services__r.Name}"/></td>
+            </tr>
+            <tr>
+            <td class="tableRowBlueBottom25">DB Pension Admin</td>
+                <td class="tableRowBottom"><apex:outputText value="{!outsourcingSP.Defined_Benefit_Administrator__r.Name}"/>
+                    <div class="expiry" style="{!If(IsNull(outsourcingSP.Defined_Benefit_End_Date__c), 'display:none;' , 'display:visible;')}">
+                        <apex:outputText value="End Date: {0,date,MMM dd, yyyy}"><apex:param value="{!outsourcingSP.Defined_Benefit_End_Date__c}"/></apex:outputText>
+                    </div>
+                </td>
+                <td class="tableRowBlueBottom25">DC Pension Admin</td>
+                <td class="tableRowBottom"><apex:outputText value="{!outsourcingSP.Defined_Contribution_Administrator__r.Name}"/>
+                    <div class="expiry" style="{!If(IsNull(outsourcingSP.Defined_Contribution_End_Date__c), 'display:none;' , 'display:visible;')}">
+                        <apex:outputText value="End Date: {0,date,MMM dd, yyyy}"><apex:param value="{!outsourcingSP.Defined_Contribution_End_Date__c}"/></apex:outputText>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom25">Flexible Benefits – Outsourcing</td>
+                <td class="tableRowBottom"><apex:outputText value="{!outsourcingSP.Flex_Administration__r.Name}"/></td>
+                <td class="tableRowBlueBottom25">H &amp; W Admin</td>
+                <td class="tableRowBottom"><apex:outputText value="{!outsourcingSP.Health_Welfare_Administrator__r.Name}"/>
+                    <div class="expiry" style="{!If(IsNull(outsourcingSP.Health_Welfare_End_Date__c), 'display:none;' , 'display:visible;')}">
+                        <apex:outputText value="End Date: {0,date,MMM dd, yyyy}"><apex:param value="{!outsourcingSP.Health_Welfare_End_Date__c}"/></apex:outputText>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+            <td class="tableRowBlueBottom25">Payroll</td>
+                <td class="tableRowBottom"><apex:outputText value="{!outsourcingSP.Payroll__r.Name}"/>
+                    <div class="expiry" style="{!If(IsNull(outsourcingSP.Payroll_End_Date__c), 'display:none;' , 'display:visible;')}">
+                        <apex:outputText value="End Date: {0,date,MMM dd, yyyy}"><apex:param value="{!outsourcingSP.Payroll_End_Date__c}"/></apex:outputText>
+                    </div>
+                </td>
+                <td class="tableRowBlueBottom25">Pension Payroll</td>
+                <td class="tableRowBottom"><apex:outputText value="{!outsourcingSP.Pension_Payroll__r.Name}"/>
+                    <div class="expiry" style="{!If(IsNull(outsourcingSP.Pension_Payroll_Contract_End_Date__c), 'display:none;' , 'display:visible;')}">
+                        <apex:outputText value="End Date: {0,date,MMM dd, yyyy}"><apex:param value="{!outsourcingSP.Pension_Payroll_Contract_End_Date__c}"/></apex:outputText>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom25">Recruiting Services (RPO)</td>
+                <td class="tableRowBottom"><apex:outputText value="{!outsourcingSP.Recruiting_and_Staffing_Administrator__r.Name}"/>
+                    <div class="expiry" style="{!If(IsNull(outsourcingSP.Recruit_Staff_Admin_Contract_End_Date__c), 'display:none;' , 'display:visible;')}">
+                        <apex:outputText value="End Date: {0,date,MMM dd, yyyy}"><apex:param value="{!outsourcingSP.Recruit_Staff_Admin_Contract_End_Date__c}"/></apex:outputText>
+                    </div>
+                </td>
+                <td class="tableRowBlueBottom25">Advocacy</td>
+                <td class="tableRowBottom"><apex:outputText value="{!pointSolutionsSP.Advocacy_Services__r.Name}"/>
+                    <div class="expiry" style="{!If(IsNull(pointSolutionsSP.Advocacy_Services_Contract_Exp_Date__c), 'display:none;' , 'display:visible;')}">
+                        <apex:outputText value="End Date: {0,date,MMM dd, yyyy}"><apex:param value="{!pointSolutionsSP.Advocacy_Services_Contract_Exp_Date__c}"/></apex:outputText>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom25">Your Total Rewards</td>
+                <td class="tableRowBottom"><apex:outputText value="{!pointSolutionsSP.Total_Rewards_Solution__r.Name}"/>
+                    <div class="expiry" style="{!If(IsNull(pointSolutionsSP.Total_Rewards_Solution_Contract_Exp_Date__c), 'display:none;' , 'display:visible;')}">
+                        <apex:outputText value="End Date: {0,date,MMM dd, yyyy}"><apex:param value="{!pointSolutionsSP.Total_Rewards_Solution_Contract_Exp_Date__c}"/></apex:outputText>
+                    </div>
+                </td>
+                <td class="tableRowBlueBottom25">&nbsp;</td>
+                <td class="tableRowBottom">&nbsp;</td>
+            </tr>
+        </table>
+        <br/><br/>
+        
+         <table class="table1" style="{!If(region != 'Asia Pacific', 'display:visible;' , 'display:none;')}">
+         <tr>
+                <th class="tableTitle" colspan="2">Relationship Overview<br/></th>
+            </tr>
+            <tr>
+                <th class="tableHeadGray" colspan="2">Unique Financial or Contractual Arrangements with Client</th>
+            </tr>
+            <tr>
+                <td width="35%" class="tableRowBlueBottom">Contracts (MCA/ASA/MSA) Expiration Date</td>
+                <td width="66%" class="tableRowBottom15"><apex:outputText value="{0,date,MMM dd, yyyy}"><apex:param value="{!plan.MCA_ASA_MSA_Contract_Expiration_Date__c}"/></apex:outputText></td>
+            </tr>
+            <tr>
+                <td width="35%" class="tableRowBlueBottom">MCA/ASA/MSA Contract Comments</td>
+                <td width="66%" class="tableRowBottom15"><apex:outputText value="{!plan.MCA_ASA_MSA_Contract_Comments__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td width="35%" class="tableRowBlueBottom">Special Pricing Arrangements</td>
+                <td width="66%" class="tableRowBottom15"><apex:outputText value="{!plan.Special_Pricing_Arrangements__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td width="35%" class="tableRowBlueBottom">Balance of Trade Considerations</td>
+                <td width="66%" class="tableRowBottom15"><apex:outputText value="{!plan.Balance_of_Trade_Considerations__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td width="35%" class="tableRowBlueBottom">Other Relationships</td>
+                <td width="66%" class="tableRowBottom15"><apex:outputText value="{!plan.Other_Relationships__c}" escape="false"/></td>
+            </tr>
+        </table>
+        <br/><br/>
+        
+        <table class="table1" style="{!If(region == 'North America' || region == 'EMEA' || region == 'UKI', 'display:visible;' , 'display:none;')}">  
+            <tr>
+                <th class="tableTitle" colspan="6">Existing Relationships with Aon<br/></th>
+            </tr>
+        </table>
+        <table class="table1" style="{!If(region == 'North America' || region == 'EMEA' || region == 'UKI', 'display:visible;' , 'display:none;')}">  
+            <tr>
+                <th class="tableHeadGray" colspan="6">Existing Client Relationships with Aon (Business Client does with us)</th>
+            </tr>
+            <tr>
+                <td class="tableHeadLightGray">Business</td>
+                <td class="tableHeadLightGray">Practice(s)</td>
+                <td class="tableHeadLightGray">ARR/Revenue</td>
+                <td class="tableHeadLightGray">Aon Contact</td>
+                <td class="tableHeadLightGray">Client Contact</td>
+                <td class="tableHeadLightGray">Renewal Date and/or Comments</td>
+            </tr>
+            <tr>
+                <td class="tableRow"><apex:outputText value="{!plan.Existing_Business__c}" escape="false"/></td>
+                <td class="tableRow"><apex:outputText value="{!plan.Existing_Practices__c}" escape="false"/></td>
+                <td class="tableRow"><apex:outputText value="{!plan.Existing_ARR_Revenue__c}" escape="false"/></td>
+                <td class="tableRow"><apex:outputText value="{!plan.Existing_Aon_Contact__c}" escape="false"/></td>
+                <td class="tableRow"><apex:outputText value="{!plan.Existing_Client_Contact__c}" escape="false"/></td>
+                <td class="tableRow"><apex:outputText value="{!plan.Existing_Renewal_Date_Comments__c}" escape="false"/></td>
+            </tr>
+        </table>
+        <br/><br/>
+        
+        <table class="table1" style="{!If(region == 'North America', 'display:visible;' , 'display:none;')}">
+            <tr>
+                <th class="tableHeadGray" colspan="6">Opportunities: Current Client Opportunities with Aon</th>
+            </tr>
+            <tr>
+                <td class="tableHeadLightGray">Business</td>
+                <td class="tableHeadLightGray">Practice(s)</td>
+                <td class="tableHeadLightGray">ARR/Revenue</td>
+                <td class="tableHeadLightGray">Aon Contact</td>
+                <td class="tableHeadLightGray">Client Contact</td>
+                <td class="tableHeadLightGray">Renewal Date and/or Comments</td>
+            </tr>
+            <tr>
+                <td class="tableRow"><apex:outputText value="{!plan.Opportunities_Business__c}" escape="false"/></td>
+                <td class="tableRow"><apex:outputText value="{!plan.Opportunities_Practices__c}" escape="false"/></td>
+                <td class="tableRow"><apex:outputText value="{!plan.Opportunities_ARR_Revenue__c}" escape="false"/></td>
+                <td class="tableRow"><apex:outputText value="{!plan.Opportunities_Aon_Contact__c}" escape="false"/></td>
+                <td class="tableRow"><apex:outputText value="{!plan.Opportunities_Client_Contact__c}" escape="false"/></td>
+                <td class="tableRow"><apex:outputText value="{!plan.Opportunities_Renewal_Date_Comments__c}" escape="false"/></td>
+            </tr>
+        </table>
+    </div>
+    
+    <div class="div3">
+        <table cellspacing="0" class="table1">
+            <tr>
+                <th colspan="2" class="tableTitle">Client Promise Plan<br/></th>
+            </tr>
+        </table>
+        <table class="table1">
+            <tr>
+                <th class="tableHeadGray" colspan="3">Client Promise Results - {!csat.Year__c} Data</th>                
+            </tr>
+            <tr>
+                <td class="tableRowBlue">Overall Satisfaction Score</td>
+                <td class="tableRowBlue" style="{!If(csatSize > 0, 'display:visible;' , 'display:none;')}">{!csat.Overall_Satisfaction__c}</td>
+                <td class="tableRowBlue" style="{!If(csatSize > 0, 'display:none;' , 'display:visible;')}">&nbsp;</td>
+                <td class="tableRowBlue">&nbsp;</td>
+            </tr>
+            <tr>
+                <td class="tableRow">Net Promoter Score (NPS)</td>
+                <td class="tableRow" style="{!If(csatSize > 0, 'display:visible;' , 'display:none;')}">{!csat.Net_Promoter_Score__c}</td>
+                <td class="tableRow" style="{!If(csatSize > 0, 'display:none;' , 'display:visible;')}">&nbsp;</td>
+                <td class="tableRow">&nbsp;</td>
+            </tr>
+            <tr>
+                <td class="tableRowBlue">Number of Respondents</td>
+                <td class="tableRowBlue" style="{!If(csatSize > 0, 'display:visible;' , 'display:none;')}">
+                    <apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!csat.Number_of_Respondents__c}"/></apex:outputText>
+                </td>
+                <td class="tableRowBlue" style="{!If(csatSize > 0, 'display:none;' , 'display:visible;')}">&nbsp;</td>
+                <td class="tableRowBlue">&nbsp;</td>
+            </tr>
+            <tr style="{!If(region == 'North America', 'display:visible;' , 'display:none;')}">
+                <td class="tableRow">Client Performance and Risk Index (CPRI)</td>
+                <td class="tableRowRed" style="{!If(hroSize > 0 && renewal.CPRI_Total__c == 'Red', 'display:visible;' , 'display:none;')}">
+                    <apex:outputText value="{!renewal.CPRI_Total__c}"/>
+                </td>
+                <td class="tableRowYellow" style="{!If(hroSize > 0 && renewal.CPRI_Total__c == 'Yellow', 'display:visible;' , 'display:none;')}">
+                    <apex:outputText value="{!renewal.CPRI_Total__c}"/>
+                </td>
+                <td class="tableRowGreen" style="{!If(hroSize > 0 && renewal.CPRI_Total__c == 'Green', 'display:visible;' , 'display:none;')}">
+                    <apex:outputText value="{!renewal.CPRI_Total__c}"/>
+                </td>
+                <td class="tableRow" style="{!If(hroSize > 0, 'display:none;' , 'display:visible;')}">&nbsp;</td>
+                <td class="tableRow" style="{!If(hroSize > 0, 'display:visible;' , 'display:none;')}">
+                    <div class="expiry">As of {!renewal.Year__c} {!renewal.Quarter__c}</div>
+                </td>
+                <td class="tableRow" style="{!If(hroSize > 0, 'display:none;' , 'display:visible;')}">&nbsp;</td>
+            </tr>
+            <tr style="{!If(region == 'North America', 'display:visible;' , 'display:none;')}">
+                <td class="tableRowBlue">Last Enthusiastic Client Certificate (ECC)</td>
+                <td class="tableRowBlue" style="{!If(hroSize > 0, 'display:none;' , 'display:visible;')}">&nbsp;</td>
+                <td class="tableRowBlue" style="{!If(hroSize > 0, 'display:visible;' , 'display:none;')}">
+                    <apex:outputText value="{0,date,MMM dd, yyyy}"><apex:param value="{!renewal.Last_ECC_Date__c}"/></apex:outputText>
+                </td>
+                <td class="tableRowBlue" style="{!If(hroSize > 0, 'display:visible;' , 'display:none;')}">
+                    <div class="expiry">As of {!renewal.Year__c} {!renewal.Quarter__c}</div>
+                </td>
+                <td class="tableRowBlue" style="{!If(hroSize > 0, 'display:none;' , 'display:visible;')}">&nbsp;</td>
+            </tr>
+            <tr>
+                <td class="tableHeadGray">Our Client Promise Commitments</td>
+                <td class="tableHeadGray">Importance Score</td>
+                <td class="tableHeadGray">Performance Score</td>
+            </tr>
+            <tr>
+                <td class="tableRow">Partnership</td>
+                <td class="tableRow" style="{!If(csatSize > 0, 'display:visible;' , 'display:none;')}"><apex:outputText value="{!csat.Partnership_Importance__c}"/></td>
+                <td class="tableRow" style="{!If(csatSize > 0, 'display:none;' , 'display:visible;')}">&nbsp;</td>
+                <td class="tableRow" style="{!If(csatSize > 0, 'display:visible;' , 'display:none')}"><apex:outputText value="{!csat.Partnership_Performance__c}"/></td>
+                <td class="tableRow" style="{!If(csatSize > 0, 'display:none;' , 'display:visible;')}">&nbsp;</td>
+            </tr>
+            <tr>
+                <td class="tableRowBlue15">Expertise</td>
+                <td class="tableRowBlue15" style="{!If(csatSize > 0, 'display:visible;' , 'display:none;')}"><apex:outputText value="{!csat.Talent_Importance__c}"/></td>
+                <td class="tableRowBlue15" style="{!If(csatSize > 0, 'display:none;' , 'display:visible;')}">&nbsp;</td>
+                <td class="tableRowBlue15" style="{!If(csatSize > 0, 'display:visible;' , 'display:none')}"><apex:outputText value="{!csat.Talent_Performance__c}"/></td>
+                <td class="tableRowBlue15" style="{!If(csatSize > 0, 'display:none;' , 'display:visible;')}">&nbsp;</td>
+            </tr>
+            <tr>
+                <td class="tableRow">Innovation</td>
+                <td class="tableRow" style="{!If(csatSize > 0, 'display:visible;' , 'display:none;')}"><apex:outputText value="{!csat.Innovation_Importance__c}"/></td>
+                <td class="tableRow" style="{!If(csatSize > 0, 'display:none;' , 'display:visible;')}">&nbsp;</td>
+                <td class="tableRow" style="{!If(csatSize > 0, 'display:visible;' , 'display:none')}"><apex:outputText value="{!csat.Innovation_Performance__c}"/></td>
+                <td class="tableRow" style="{!If(csatSize > 0, 'display:none;' , 'display:visible;')}">&nbsp;</td>
+            </tr>
+            
+            <tr>
+                <td class="tableRowBlue15">Excellence</td>
+                <td class="tableRowBlue15" style="{!If(csatSize > 0, 'display:visible;' , 'display:none;')}"><apex:outputText value="{!csat.Excellence_Importance__c}"/></td>
+                <td class="tableRowBlue15" style="{!If(csatSize > 0, 'display:none;' , 'display:visible;')}">&nbsp;</td>
+                <td class="tableRowBlue15" style="{!If(csatSize > 0, 'display:visible;' , 'display:none')}"><apex:outputText value="{!csat.Excellence_Performance__c}"/></td>
+                <td class="tableRowBlue15" style="{!If(csatSize > 0, 'display:none;' , 'display:visible;')}">&nbsp;</td>
+            </tr>
+            <tr>
+                <td class="tableRowBottom">Results</td>
+                <td class="tableRowBottom" style="{!If(csatSize > 0, 'display:visible;' , 'display:none;')}"><apex:outputText value="{!csat.Results_Importance__c}"/></td>
+                <td class="tableRowBottom" style="{!If(csatSize > 0, 'display:none;' , 'display:visible;')}">&nbsp;</td>
+                <td class="tableRowBottom" style="{!If(csatSize > 0, 'display:visible;' , 'display:none')}"><apex:outputText value="{!csat.Results_Performance__c}"/></td>
+                <td class="tableRowBottom" style="{!If(csatSize > 0, 'display:none;' , 'display:visible;')}">&nbsp;</td>
+            </tr>
+            <tr>
+                <td class="tableHeadGray" colspan="3">Client Promise Tracker</td>
+            </tr>
+            <tr>
+                <td class="tableRow">Client Promise Required</td>
+                <td class="tableRow" colspan="2" style="{!If(csatSize > 0, 'display:visible;' , 'display:none;')}"><apex:outputText value="{!account.Client_Promise_Required__c}"/></td>
+            </tr>
+        </table>
+    </div>
+    
+    <div class="div3">
+        <table class="table1" style="{!If(region == 'North America', 'display:visible;' , 'display:none;')}">
+            <tr>
+                <th class="tableTitle" colspan="8">Results, Sales and Pipeline<br/></th>
+            </tr>
+        </table>
+        <table class="table1" style="{!If(region != 'North America', 'display:visible;' , 'display:none;')}">
+            <tr>
+                <th class="tableTitle" colspan="8">Sales and Pipeline<br/></th>
+            </tr>
+        </table>
+        <table class="table1" style="{!If(region == 'North America', 'display:visible;' , 'display:none;')}">
+                <tr>
+                <th class="tableHeadGray" colspan="8">Revenue, Sales &amp; Pipeline - US Data Only through {!financialYear} {!quarter}</th>
+            </tr>
+            <tr>
+                <td class="tableRowBottomRight">&nbsp;</td>
+                <td class="revRowBottom" align="center" colspan="2">Full Year Revenue</td>
+                <td class="revRowBottom" colspan="3" align="center">YTD Revenue</td>
+                <td class="tableRowBottomRight" align="center">YTD Sales</td>
+                <td class="tableRowBottomLightGray" align="center">Pipeline</td>
+            </tr>
+            <tr>
+                <td class="tableRow">&nbsp;</td>
+                <td class="tableRow" width="12%" align="right">{!prevPrevYear}</td>
+                <td class="tableRowRight" width="12%" align="right">{!prevYear}</td>
+                <td class="tableRow" width="12%" align="right">{!prevYear}</td>
+                <td class="tableRow" width="12%" align="right">{!financialYear}</td>
+                <td class="tableRowRight" width="12%" align="right">Growth</td>
+                <td class="tableRow" width="12%" align="right">FY Value</td>
+                <td class="tableRow" width="12%" align="right">FY Value</td>
+            </tr>
+    <tr>
+        <td class="tableRowBlue">COMM</td>
+        <td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PPY_Full_Year_Revenue_COMM__c}"/></apex:outputText></td>
+        <td class="revRowBlueRight"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Prior_Year_Revenue_COMM__c}"/></apex:outputText></td>
+        <td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PY_YTD_Revenue_COMM__c}"/></apex:outputText></td>
+        <td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Revenue_COMM__c}"/></apex:outputText></td>
+        <td class="revRowBlueRight">{!rsp.COMM_Growth__c}%</td>
+        <td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Sales_COMM__c}"/></apex:outputText></td>
+        <td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Pipeline_COMM__c}"/></apex:outputText></td>
+    </tr>
+    <tr>
+        <td class="tableRow">H&amp;B&#42;</td>
+        <td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PPY_Full_Year_Revenue_H_B__c}"/></apex:outputText></td>
+        <td class="revRowRight"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Prior_Year_Revenue_H_B__c}"/></apex:outputText></td>
+        <td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PY_YTD_Revenue_H_B__c}"/></apex:outputText></td>
+        <td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Revenue_H_B__c}"/></apex:outputText></td>
+        <td class="revRowRight">{!rsp.H_B_Growth__c}%</td>
+        <td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Sales_H_B__c}"/></apex:outputText></td>
+        <td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Pipeline_H_B__c}"/></apex:outputText></td>
+    </tr>
+    <tr>
+        <td class="tableRowBlue">RET</td>
+        <td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PPY_Full_Year_Revenue_RET__c}"/></apex:outputText></td>
+        <td class="revRowBlueRight"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Prior_Year_Revenue_RET__c}"/></apex:outputText></td>
+        <td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PY_YTD_Revenue_RET__c}"/></apex:outputText></td>
+        <td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Revenue_RET__c}"/></apex:outputText></td>
+        <td class="revRowBlueRight">{!rsp.RET_Growth__c}%</td>
+        <td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Sales_RET__c}"/></apex:outputText></td>
+        <td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Pipeline_RET__c}"/></apex:outputText></td>
+    </tr>
+    <tr>
+        <td class="tableRow">PRT</td>
+        <td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PPY_Full_Year_Revenue_C_T__c}"/></apex:outputText></td>
+        <td class="revRowRight"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PY_YTD_Revenue_C_T__c}"/></apex:outputText></td>
+        <td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PY_YTD_Revenue_C_T__c}"/></apex:outputText></td>
+        <td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Revenue_C_T__c}"/></apex:outputText></td>
+        <td class="revRowRight">{!rsp.C_T_Growth__c}%</td>
+        <td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Sales_C_T__c}"/></apex:outputText></td>
+        <td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Pipeline_C_T__c}"/></apex:outputText></td>
+    </tr>
+    <tr>
+        <td class="tableRowBlue">AMAS</td>
+        <td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PPY_Full_Year_Revenue_AMAS__c}"/></apex:outputText></td>
+        <td class="revRowBlueRight"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Prior_Year_Revenue_AMAS__c}"/></apex:outputText></td>
+        <td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PY_YTD_Revenue_AMAS__c}"/></apex:outputText></td>
+        <td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Revenue_AMAS__c}"/></apex:outputText></td>
+        <td class="revRowBlueRight">{!rsp.AMAS_Growth__c}%</td>
+        <td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Sales_AMAS__c}"/></apex:outputText></td>
+        <td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Pipeline_AMAS__c}"/></apex:outputText></td>
+    </tr>   
+    <tr>
+        <td class="tableRow">Global Benefits&#42;</td>
+        <td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PPY_Full_Year_Revenue_GBS__c}"/></apex:outputText></td>
+        <td class="revRowRight"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Prior_Year_Revenue_Global_Benefits__c}"/></apex:outputText></td>
+        <td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PY_YTD_Revenue_Global_Benefits__c}"/></apex:outputText></td>
+        <td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Revenue_Global_Benefits__c}"/></apex:outputText></td>
+        <td class="revRowRight">{!rsp.Global_Benefits_Growth__c}%</td>
+        <td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Sales_Global_Benefits__c}"/></apex:outputText></td>
+        <td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Pipeline_Global_Benefits__c}"/></apex:outputText></td>
+    </tr>
+    <tr>
+        <td class="tableRowBlue">Executive Benefits&#42;</td>
+        <td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PPY_Full_Year_Revenue_EXB__c}"/></apex:outputText></td>
+        <td class="revRowBlueRight"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Prior_Year_Revenue_Executive_Benefits__c}"/></apex:outputText></td>
+        <td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PY_YTD_Revenue_Executive_Benefits__c}"/></apex:outputText></td>
+        <td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Revenue_Executive_Benefits__c}"/></apex:outputText></td>
+        <td class="revRowBlueRight">{!rsp.Executive_Benefits_Growth__c}%</td>
+        <td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Sales_Executive_Benefits__c}"/></apex:outputText></td>
+        <td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Pipeline_Executive_Benefits__c}"/></apex:outputText></td>
+    </tr>   
+    <tr>
+        <td class="tableHeadGray">CNS Total</td>
+        <td class="revRowGray"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PPY_Full_Year_Revenue_CNS_Total__c}"/></apex:outputText></td>
+        <td class="revRowGrayRight"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Prior_Year_Revenue_CNS_Total__c}"/></apex:outputText></td>
+        <td class="revRowGray"><apex:outputText value="$ {0,number,###,###,###,###}"><apex:param value="{!rsp.PY_YTD_Revenue_CNS_Total__c}"/></apex:outputText></td>
+        <td class="revRowGray"><apex:outputText value="$ {0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Revenue_CNS_Total__c}"/></apex:outputText></td>
+        <td class="revRowGrayRight">{!rsp.CNS_Total_Growth__c}%</td>
+        <td class="revRowGray"><apex:outputText value="$ {0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Sales_CNS_Total__c}"/></apex:outputText></td>
+        <td class="revRowGray"><apex:outputText value="$ {0,number,###,###,###,###}"><apex:param value="{!rsp.Pipeline_CNS_Total__c}"/></apex:outputText></td>
+    </tr>   
+    <tr>
+        <td class="tableRow">LM Benefits Admin</td>
+        <td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PPY_Full_Year_Revenue_Ben_Admin__c}"/></apex:outputText></td>
+        <td class="revRowRight"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Prior_Year_Revenue_Ben_Admin__c}"/></apex:outputText></td>
+        <td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PY_YTD_Revenue_Ben_Admin__c}"/></apex:outputText></td>
+        <td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Revenue_Ben_Admin__c}"/></apex:outputText></td>
+        <td class="revRowRight">{!rsp.Ben_Admin_Growth__c}%</td>
+        <td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Sales_Ben_Admin__c}"/></apex:outputText></td>
+        <td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Pipeline_Ben_Admin__c}"/></apex:outputText></td>
+    </tr>
+    <tr>
+        <td class="tableRowBlue">Health Exchanges</td>
+        <td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PPY_Full_Year_Revenue_Exchanges__c}"/></apex:outputText></td>
+        <td class="revRowBlueRight"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Prior_Year_Revenue_Healthcare_Exchanges__c}"/></apex:outputText></td>
+        <td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PY_YTD_Revenue_Healthcare_Exchanges__c}"/></apex:outputText></td>
+        <td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Revenue_Healthcare_Exchanges__c}"/></apex:outputText></td>
+        <td class="revRowBlueRight">{!rsp.Healthcare_Exchanges_Growth__c}%</td>
+        <td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Sales_Healthcare_Exchanges__c}"/></apex:outputText></td>
+        <td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Pipeline_Healthcare_Exchanges__c}"/></apex:outputText></td>
+    </tr>
+    <tr>
+        <td class="tableRow">HRBPO</td>
+        <td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PPY_Full_Year_Revenue_HRBPO__c}"/></apex:outputText></td>
+        <td class="revRowRight"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Prior_Year_Revenue_HRBPO__c}"/></apex:outputText></td>
+        <td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PY_YTD_Revenue_HRBPO__c}"/></apex:outputText></td>
+        <td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Revenue_HRBPO__c}"/></apex:outputText></td>
+        <td class="revRowRight">{!rsp.HRBPO_Growth__c}%</td>
+        <td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Sales_HRBPO__c}"/></apex:outputText></td>
+        <td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Pipeline_HRBPO__c}"/></apex:outputText></td>
+    </tr>
+    <tr>
+        <td class="tableRowBlue">Enterprise Benefits</td>
+        <td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PPY_Full_Year_Revenue_Enterprise_Benefit__c}"/></apex:outputText></td>
+        <td class="revRowBlueRight"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PY_Full_Year_Revenue_Enterprise_Benefits__c}"/></apex:outputText></td>
+        <td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PY_YTD_Revenue_Enterprise_Benefits__c}"/></apex:outputText></td>
+        <td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Revenue_Enterprise_Benefits__c}"/></apex:outputText></td>
+        <td class="revRowBlueRight">{!rsp.Enterprise_Benefits_Growth__c}%</td>
+        <td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Sales_Enterprise_Benefits__c}"/></apex:outputText></td>
+        <td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Pipeline_Enterprise_Benefits__c}"/></apex:outputText></td>
+    </tr>
+    <tr>
+        <td class="tableRow">Absence Mgmt</td>
+        <td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PPY_Full_Year_Revenue_Absence_Mgmt__c}"/></apex:outputText></td>
+        <td class="revRowRight"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PY_Full_Year_Revenue_Absence_Mgmt__c}"/></apex:outputText></td>
+        <td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PY_YTD_Revenue_Absence_Mgmt__c}"/></apex:outputText></td>
+        <td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Revenue_Absence_Mgmt__c}"/></apex:outputText></td>
+        <td class="revRowRight">{!rsp.Absence_Mgmt_Growth__c}%</td>
+        <td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Sales_Absence_Mgmt__c}"/></apex:outputText></td>
+        <td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Pipeline_Absence_Mgmt__c}"/></apex:outputText></td>
+    </tr>
+    <tr>
+        <td class="tableRowBlue">Point Solutions</td>
+        <td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PPY_Full_Year_Revenue_Point_Solutions__c}"/></apex:outputText></td>
+        <td class="revRowBlueRight"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PY_Full_Year_Revenue_Point_Solutions__c}"/></apex:outputText></td>
+        <td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PY_YTD_Revenue_Point_Solutions__c}"/></apex:outputText></td>
+        <td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Revenue_Point_Solutions__c}"/></apex:outputText></td>
+        <td class="revRowBlueRight">{!rsp.Point_Solutions_Growth__c}%</td>
+        <td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Sales_Point_Solutions__c}"/></apex:outputText></td>
+        <td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Pipeline_Point_Solutions__c}"/></apex:outputText></td>
+    </tr>
+    <tr>
+        <td class="tableRow">RPO</td>
+        <td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PPY_Full_Year_Revenue_RPO__c}"/></apex:outputText></td>
+        <td class="revRowRight"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PY_Full_Year_Revenue_RPO__c}"/></apex:outputText></td>
+        <td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PY_YTD_Revenue_RPO__c}"/></apex:outputText></td>
+        <td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Revenue_RPO__c}"/></apex:outputText></td>
+        <td class="revRowRight">{!rsp.RPO_Growth__c}%</td>
+        <td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Sales_RPO__c}"/></apex:outputText></td>
+        <td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Pipeline_RPO__c}"/></apex:outputText></td>
+    </tr>
+    <tr>
+        <td class="tableHeadGray">HRO Total</td>
+        <td class="revRowGray"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PPY_Full_Year_Revenue_HRO_Total__c}"/></apex:outputText></td>
+        <td class="revRowGrayRight"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Prior_Year_Revenue_HRO_Total__c}"/></apex:outputText></td>
+        <td class="revRowGray"><apex:outputText value="$ {0,number,###,###,###,###}"><apex:param value="{!rsp.PY_YTD_Revenue_HRO_Total__c}"/></apex:outputText></td>
+        <td class="revRowGray"><apex:outputText value="$ {0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Revenue_HRO_Total__c}"/></apex:outputText></td>
+        <td class="revRowGrayRight">{!rsp.HRO_Total_Growth__c}%</td>
+        <td class="revRowGray"><apex:outputText value="$ {0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Sales_HRO_Total__c}"/></apex:outputText></td>
+        <td class="revRowGray"><apex:outputText value="$ {0,number,###,###,###,###}"><apex:param value="{!rsp.Pipeline_HRO_Total__c}"/></apex:outputText></td>
+    </tr>
+    <tr>
+        <th class="tableRowBottomLightGray">Grand Total</th>
+        <th class="revRowBottomMargin"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PPY_Full_Year_Revenue_Grand_Total__c}"/></apex:outputText></th>
+        <th class="revRowRightBottom"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Prior_Year_Revenue_Grand_Total__c}"/></apex:outputText></th>
+        <th class="revRowBottomMargin"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PY_YTD_Revenue_Grand_Total__c}"/></apex:outputText></th>
+        <th class="revRowBottomMargin"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Revenue_Grand_Total__c}"/></apex:outputText></th>
+        <th class="revRowRightBottom">{!rsp.Grand_Total_Growth__c}%</th>
+        <th class="revRowBottomMargin"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Sales_Grand_Total__c}"/></apex:outputText></th>
+        <th class="revRowBottomMargin"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Pipeline_Grand_Total__c}"/></apex:outputText></th>
+    </tr>
+    <tr>
+        <td class="tableNote" colspan="8">&#42; The sales and pipeline results for <b>H&amp;B</b>, <b>Global Benefits</b> and <b>Executive Benefits</b> reflect only those opportunities managed by an 
+        Aon Hewitt Account Executive and do not represent all ARS activity</td>
+    </tr>
+    </table>
+    <span style="{!If(region == 'North America', 'display:visible;' , 'display:none;')}"><br/><br/></span>
+
+        <table class="table1">
+            <tr>
+                <th class="tableHeadGray" width="80%">Current Open Opportunities</th>
+                <td class="tableHeadGrayDate" align="right"><apex:outputText value="As of {0,date,MMMM dd, yyyy}&nbsp;" escape="false"><apex:param value="{!today()}"/></apex:outputText></td>
+            </tr>
+        </table>
+        <apex:dataTable style="{!If(region != 'Asia Pacific', 'display:visible;' , 'display:none;')}" value="{!openList}" var="opp" cellpadding="0" cellspacing="2" rowClasses="tableRow,tableRowBlue" styleClass="table1" headerClass="tableHeadGrayCenter">
+            <apex:column styleClass="tableRow" headerValue="Opportunity Name">
+                <apex:outputText value="{!opp.Name}"/>
+            </apex:column>
+            <apex:column styleClass="revRow" headerValue="Value">
+                <apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!opp.Total_First_Year_Value__c}"/></apex:outputText>
+            </apex:column>
+            <apex:column styleClass="tableRow" headerValue="Stage">
+                <apex:outputText value="{!opp.StageName}"/>
+            </apex:column>
+            <apex:column styleClass="revRow" headerValue="Prob">
+                <apex:outputText value="{0,number,###}"><apex:param value="{!opp.Probability}"/></apex:outputText>%
+            </apex:column>
+            <apex:column styleClass="revRow" headerValue="Exp. Close">
+                <apex:outputText value="{0,date,MM/dd/yy}"><apex:param value="{!opp.CloseDate}"/></apex:outputText>
+            </apex:column>
+            <apex:column styleClass="tableRow" headerValue="Team">
+                <apex:outputText value="{!opp.SalesTeamCredits__c}"/>
+            </apex:column>
+            <apex:column styleClass="tableRow" headerValue="Current Provider">
+                <apex:outputText value="{!opp.Current_Provider_Reference__r.Name}"/>
+            </apex:column>
+        </apex:dataTable>
+        <table class="table1"><tr><td class="tableRowTop">&nbsp;</td></tr></table>
+        <br/>
+        
+        <table class="table1">
+            <tr>
+                <th class="tableHeadGray" width="80%">Closed Opportunities from Last 12 months</th>
+                <td class="tableHeadGrayDate" align="right"><apex:outputText value="As of {0,date,MMMM dd, yyyy}&nbsp;" escape="false"><apex:param value="{!today()}"/></apex:outputText></td>
+            </tr>
+        </table>
+        <apex:dataTable style="{!If(region != 'Asia Pacific', 'display:visible;' , 'display:none;')}" value="{!winList}" var="opp" cellpadding="0" cellspacing="2" rowClasses="tableRow,tableRowBlue" styleClass="table1" headerClass="tableHeadGrayCenter">
+            <apex:column styleClass="tableRow" headerValue="Opportunity Name">
+                <apex:outputText value="{!opp.Name}"/>
+            </apex:column>
+            <apex:column styleClass="revRow" headerValue="Value">
+                <apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!opp.Total_First_Year_Value__c}"/></apex:outputText>
+            </apex:column>
+            <apex:column styleClass="tableRow" headerValue="Stage">
+                <apex:outputText value="{!opp.StageName}"/>
+            </apex:column>
+            <apex:column styleClass="revRow" headerValue="LOI/Contract">
+                <apex:outputText value="{0,date,MM/dd/yy}"><apex:param value="{!opp.LOI_Contract_Date__c}"/></apex:outputText>
+            </apex:column>
+            <apex:column styleClass="tableRow" headerValue="Team">
+                <apex:outputText value="{!opp.SalesTeamCredits__c}"/>
+            </apex:column>
+            <apex:column styleClass="tableRow" headerValue="Chosen Provider">
+                <apex:outputText value="{!opp.Chosen_Provider_Reference__r.Name}"/>
+            </apex:column>
+            <apex:column styleClass="tableRow" headerValue="Reason">
+                <apex:outputText value="{!opp.Reason_Won_or_Lost__c}"/>
+            </apex:column>
+        </apex:dataTable>
+        <table class="table1"><tr><td class="tableRowTop">&nbsp;</td></tr></table>
+        <br/><br/>
+        
+        
+        <table class="table1">
+            <tr>
+                <th class="tableTitle" colspan="2">Internal and External Team<br/></th>
+            </tr>
+            <tr>
+                <th class="tableHeadGray" colspan="2">Aon Client Team Members</th>
+            </tr>
+        </table>
+        <apex:dataTable value="{!internalContactList}" var="iat" cellpadding="0" cellspacing="2" rowClasses="tableRow,tableRowBlue" styleClass="table1" headerClass="tableHeadGray">
+            <apex:column styleClass="tableRow" headerValue="Role" width="30%">
+                <apex:outputText value="{!iat.Contact_Role__c}"/>
+            </apex:column>
+            <apex:column styleClass="tableRow" headerValue="Name" width="70%">
+                <apex:outputText value="{!iat.Contact__r.Name}"/>
+            </apex:column>
+        </apex:dataTable>
+        <table class="table1"><tr><td class="tableRowTop">&nbsp;</td></tr></table>
+        <br/>
+        
+        <table class="table1">
+            <tr>
+                <th class="tableHeadGray">Key Client Contacts</th>
+            </tr>
+        </table>
+        <apex:dataTable value="{!contactList}" var="contact" cellpadding="0" cellspacing="2" rowClasses="tableRow,tableRowBlue" styleClass="table1" headerClass="tableHeadGray">
+            <apex:column styleClass="tableRow" headerValue="Functional Role">
+                <apex:outputText value="{!contact.FunctionalRole}"/>
+            </apex:column>
+            <apex:column styleClass="tableRow" headerValue="Name">
+                <apex:outputText value="{!contact.Name}"/>
+            </apex:column>
+            <apex:column styleClass="tableRow" headerValue="Job Level">
+                <apex:outputText value="{!contact.JobLevel}"/>
+            </apex:column>
+            <apex:column styleClass="tableRow" headerValue="Title">
+                <apex:outputText value="{!contact.Title}"/>
+            </apex:column>
+            <apex:column styleClass="tableRowCenter" headerValue="Satisfaction Score">
+                <apex:outputText value="{!contact.OverallScore}"/>
+            </apex:column>
+            <apex:column styleClass="tableRowCenter" headerValue="Likely to Engage Score">
+                <apex:outputText value="{!contact.EngageScore}"/>
+            </apex:column>
+            <apex:column styleClass="tableRowCenter" headerValue="Survey Date">
+                <apex:outputText value="{0,date,MM/dd/yy}"><apex:param value="{!contact.SurveyDate}"/></apex:outputText>
+            </apex:column>
+        </apex:dataTable>
+        <table class="table1"><tr><td class="tableRowTop">&nbsp;</td></tr></table>
+        <br/>
+        
+        <table class="table1">
+            <tr>
+                <th class="tableTitle" colspan="3">Attachments<span class="tableNote">&nbsp; must be printed out separately</span><br/></th>
+            </tr>
+        </table>
+        <apex:dataTable value="{!attachmentList}" var="attachment" cellpadding="0" cellspacing="2" rowClasses="tableRow,tableRowBlue" styleClass="table1" headerClass="tableHeadGray">
+            <apex:column styleClass="tableRow" headerValue="Name">
+                <apex:outputText value="{!attachment.Name}"/>
+            </apex:column>
+            <apex:column styleClass="tableRow" headerValue="Created Date">
+                <apex:outputText value="{0,date,dd-MM-yy}"><apex:param value="{!attachment.CreatedDate}"/></apex:outputText>
+            </apex:column>
+        </apex:dataTable>
+        <table class="table1"><tr><td class="tableRowTop">&nbsp;</td></tr></table>
+        <br/>
+        
+        <table class="table1">
+            <tr>
+                <th class="tableTitle" colspan="3">Notes<br/></th>
+            </tr>
+        </table>
+        <apex:dataTable value="{!noteList}" var="note" cellpadding="0" cellspacing="2" rowClasses="tableRow,tableRowBlue" styleClass="table1" headerClass="tableHeadGray">
+            <apex:column styleClass="tableRow" headerValue="Title">
+                <apex:outputText value="{!note.Title}"/>
+            </apex:column>
+            <apex:column styleClass="tableRow" headerValue="Body">
+                <apex:outputText value="{!note.Body}" escape="false"/>
+            </apex:column>
+            <apex:column styleClass="tableRow" headerValue="Created Date">
+                <apex:outputText value="{0,date,MM/dd/yy}"><apex:param value="{!note.CreatedDate}"/></apex:outputText>
+            </apex:column>
+        </apex:dataTable>
+        <table class="table1"><tr><td class="tableRowTop">&nbsp;</td></tr></table>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="apac" style="{!If(region == 'Asia Pacific', 'display:visible;', 'display:none;')}">
+    <div class="div2">
+        <table class="table1">
+            <tr>
+                <th class="tableTitle" colspan="4">Client Organizational Information<br/></th>
+            </tr>
+            <tr>
+                <td width="25%" class="tableRowBlueTop">Company Name</td>
+                <td width="25%" class="tableRowTop"><apex:outputText value="{!account.Legal_Name__c}"/></td>
+                <td width="25%" class="tableRowBlueTop">Global Employees</td>
+                <td width="25%" class="tableRowTop"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!account.NumberOfEmployees}"/></apex:outputText></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueTop">Client ID</td>
+                <td class="tableRowTop"><apex:outputText value="{!account.CRM_ID__c}"/></td>
+                <td class="tableRowBlueTop">Local Employees</td>
+                <td class="tableRowTop"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!account.DB_Employee_Here__c}"/></apex:outputText></td>
+            </tr>
+            <tr>
+                <td width="20%" class="tableRowBlueTop">Industry</td>
+                <td width="30%" class="tableRowTop"><apex:outputText value="{!account.Industry}"/></td>
+                <td class="tableRowBlueTop">Current FY Revenue</td>
+                <td class="tableRowTop"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!account.AnnualRevenue}"/></apex:outputText></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueTop">Company Website</td>
+                <td class="tableRowTop">{!account.Website}</td>
+                <td class="tableRowBlueTop">Current FY Net Income</td>
+                <td class="tableRowTop"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!account.Net_Income__c}"/></apex:outputText></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueTop">Ownership Structure</td>
+                <td class="tableRowTop"><apex:outputText value="{!account.Ownership}"/></td>
+                <td class="tableRowBlueTop">Fiscal Year End</td>
+                <td class="tableRowTop"><apex:outputText value="{!account.Fiscal_Year_End_Month__c}"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueTopBottom">HQ Country Location</td>
+                <td class="tableRowTopBottom"><apex:outputText value="{!account.SDO_Billing_Country_Name__c}"/></td>
+                <td class="tableRowBlueTopBottom">DB Assets in Plan</td>
+                <td class="tableRowTopBottom"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!account.DB_Assets_in_Plan__c}"/></apex:outputText></td>
+            </tr>
+        </table>
+        <br/><br/>
+        
+       <table class="table1">
+            <tr>
+                <th class="tableHeadGray">Address Information</th>
+            </tr>
+            <tr>
+                <td class="tableRow">{!account.BillingStreet}</td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueTop">{!account.BillingCity} &nbsp; {!account.BillingState} &nbsp; {!account.BillingPostalCode}</td>
+            </tr>
+            <tr>
+                <td class="tableRowTopBottom">{!account.BillingCountry}</td>
+            </tr>
+        </table>
+        <br/><br/>
+        
+        <table class="table1">
+            <tr>
+                <th class="tableHeadGray">Aligned Executives</th>
+            </tr>
+        </table>
+        <apex:dataTable value="{!alignedExecList}" var="iat" cellpadding="0" cellspacing="2" rowClasses="tableRow,tableRowBlue" styleClass="table1" headerClass="tableHeadGray">
+            <apex:column styleClass="tableRow" width="30%">
+                <apex:outputText value="{!iat.Role}"/>
+            </apex:column>
+            <apex:column styleClass="tableRow" width="70%">
+                <apex:outputText value="{!iat.Name}"/>
+            </apex:column>
+        </apex:dataTable>
+        <table class="table1"><tr><td class="tableRowTop">&nbsp;</td></tr></table>
+        <br/>
+        
+        <table class="table1">
+            <tr>
+                <th class="tableHeadGray">Account Segmentation</th>
+            </tr>
+        </table>
+        <apex:dataTable value="{!segmentList}" var="segment" cellpadding="0" cellspacing="2" rowClasses="tableRow,tableRowBlue" styleClass="table1" headerClass="tableHeadGray">
+            <apex:column styleClass="tableRow" headerValue="Country">
+                <apex:outputText value="{!segment.Country__c}"/>
+            </apex:column>
+            <apex:column styleClass="tableRow" headerValue="Segment">
+                <apex:outputText value="{!segment.Segment__c}"/>
+            </apex:column>
+        </apex:dataTable>
+        <table class="table1"><tr><td class="tableRowTop">&nbsp;</td></tr></table>
+        <br/>
+        
+        <table class="table1">
+            <tr>
+                <th class="tableHeadGray">Client At Risk</th>
+            </tr>
+        </table>
+        <table class="table1">
+            <tr>
+                <td width="20%" class="tableRowBlueBottom">Line of Business</td>
+                <td class="tableRowBottom"><apex:outputText value="{!account.Client_at_Risk_Line_of_Business__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom">Reason</td>
+                <td class="tableRowBottom"><apex:outputText value="{!account.Client_at_Risk_Reason__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom">Comments</td>
+                <td class="tableRowBottom"><apex:outputText value="{!account.Client_at_Risk_Comments__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom">Revenue at Risk</td>
+                <td class="tableRowBottom">
+                    {!account.CurrencyIsoCode} &nbsp;<apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!account.Client_at_Risk_Revenue_at_Risk__c}"/></apex:outputText>
+                </td>
+            </tr>
+        </table>
+        <br/><br/>        
+        
+        <table class="table1">
+            <tr>
+                <th class="tableHeadGray" colspan="4">Key Competitors</th>
+            </tr>
+            <tr>
+                <td class="tableRowBottom" colspan="4">{!account.Key_Competitors__c}</td>
+            </tr>
+        </table>
+        <br/><br/>
+        
+        <table class="table1">
+            <tr>
+                <th class="tableHeadGray" colspan="4">Recent Newsworthy Events</th>
+            </tr>
+            <tr>
+                <td class="tableRowBottom" colspan="4"><apex:outputText value="{!plan.Recent_News_Worthy_Events__c}" escape="false"/></td>
+            </tr>
+        </table>
+        <br/><br/><br/>
+        
+        <table class="table1" cellspacing="0">
+            <tr>
+                <th class="tableTitle" colspan="2">Business Analysis<br/></th>
+            </tr>
+            <tr>
+                <th class="tableHeadGray">Key Business Strategies</th>
+                <td class="tableHeadGrayDate" align="right"><apex:outputText value="As of {0,date,dd-MMMM-yyyy}&nbsp;" escape="false"><apex:param value="{!plan.LastModifiedDate}"/></apex:outputText></td>
+            </tr>
+        </table>
+        <apex:dataTable value="{!keyBusinessStrategies}" var="business_strategy" cellpadding="2" cellspacing="2" rowClasses="tableRow,tableRowBlue" styleClass="table1" headerClass="tableHeadGray">
+            <apex:column >
+                <apex:outputText value="{!business_strategy}" escape="false"/>
+            </apex:column>
+        </apex:dataTable>
+        <table class="table1"><tr><td class="tableRowTop">&nbsp;</td></tr></table>
+        <br/><br/>
+
+        <table class="table1" cellspacing="0">
+            <tr>
+                <th class="tableHeadGray">Key People Strategies</th>
+                <td class="tableHeadGrayDate" align="right"><apex:outputText value="As of {0,date,dd-MMMM-yyyy}&nbsp;" escape="false"><apex:param value="{!plan.LastModifiedDate}"/></apex:outputText></td>
+            </tr>
+        </table>
+        <apex:dataTable value="{!keyHRGoals}" var="hr_goal" cellpadding="2" cellspacing="2" rowClasses="tableRow,tableRowBlue" styleClass="table1" headerClass="tableHeadGray">
+            <apex:column >
+                <apex:outputText value="{!hr_goal}" escape="false"/>
+            </apex:column>
+        </apex:dataTable>
+        <table class="table1"><tr><td class="tableRowTop">&nbsp;</td></tr></table>
+        <br/>
+        
+        <table class="table1" cellspacing="0">
+            <tr>
+                <th class="tableHeadGray">Aon Strategic Client Plan</th>
+                <td class="tableHeadGrayDate" align="right"><apex:outputText value="As of {0,date,dd-MMMM-yyyy}&nbsp;" escape="false"><apex:param value="{!plan.LastModifiedDate}"/></apex:outputText></td>
+            </tr>
+        </table>
+        <table class="table1">
+            <tr>
+                <td width="15%" class="tableRowBlueBottom">Situation</td>
+                <td width="85%" class="tableRowBottom15"><apex:outputText value="{!plan.Situation__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom">Opportunities</td>
+                <td class="tableRowBottom15"><apex:outputText value="{!plan.Opportunities__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom">Walls (Barriers)</td>
+                <td class="tableRowBottom15"><apex:outputText value="{!plan.Barriers__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom">Solutions</td>
+                <td class="tableRowBottom15"><apex:outputText value="{!plan.Solutions__c}" escape="false"/></td>
+            </tr>
+        </table>
+        <br/><br/>
+        
+        <table class="table1">
+         <tr>
+                <th class="tableTitle" colspan="2">Relationship Overview<br/></th>
+            </tr>
+            <tr>
+                <th class="tableHeadGray" colspan="2">Unique Financial or Contractual Arrangements with Client</th>
+            </tr>
+            <tr>
+                <td width="35%" class="tableRowBlueBottom">Contracts (MCA/ASA/MSA) Expiration Date</td>
+                <td width="66%" class="tableRowBottom15"><apex:outputText value="{0,date,dd-MMM-yyyy}"><apex:param value="{!plan.MCA_ASA_MSA_Contract_Expiration_Date__c}"/></apex:outputText></td>
+            </tr>
+            <tr>
+                <td width="35%" class="tableRowBlueBottom">MCA/ASA/MSA Contract Comments</td>
+                <td width="66%" class="tableRowBottom15"><apex:outputText value="{!plan.MCA_ASA_MSA_Contract_Comments__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td width="35%" class="tableRowBlueBottom">Special Pricing Arrangements</td>
+                <td width="66%" class="tableRowBottom15"><apex:outputText value="{!plan.Special_Pricing_Arrangements__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td width="35%" class="tableRowBlueBottom">Balance of Trade Considerations</td>
+                <td width="66%" class="tableRowBottom15"><apex:outputText value="{!plan.Balance_of_Trade_Considerations__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td width="35%" class="tableRowBlueBottom">Other Relationships</td>
+                <td width="66%" class="tableRowBottom15"><apex:outputText value="{!plan.Other_Relationships__c}" escape="false"/></td>
+            </tr>
+        </table>
+        <br/><br/>
+        
+        
+        <table cellspacing="0" class="table1">
+            <tr>
+                <th colspan="2" class="tableTitle">Client Promise Plan<br/></th>
+            </tr>
+        </table>
+        
+        <table class="table1">
+            <tr>
+                <th class="tableHeadGray" colspan="3">Client Promise Tracker</th>
+                <td class="tableHeadGrayDate" align="right"><apex:outputText value="{!If(account.Client_Promise_Required__c, 'Client Promise Required', 'Client Promise Not Required')} &nbsp;" escape="false"/></td>
+            </tr>
+             <tr>
+                <td width="30%" class="tableRowBlue">Discovery Meetings Completed</td>
+                <td width="10%" class="tableRow"><apex:outputText value="{!If(plan.Discover_Meeting_Completed__c, 'Yes', 'No')}"/></td>
+                <td width="30%" class="tableRowBlue">Discover Meeting Types and Dates</td>
+                <td class="tableRow"><apex:outputText value="{!plan.Discover_Meeting_Types_And_Dates__c}"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueTop">Deliver Meetings Completed</td>
+                <td class="tableRowTop"><apex:outputText value="{!If(plan.Deliver_Meetings_Completed__c, 'Yes', 'No')}"/></td>
+                <td class="tableRowBlueTop">Deliver Meeting Types and Dates</td>
+                <td class="tableRowTop"><apex:outputText value="{!plan.Deliver_Meeting_Types_And_Dates__c}"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueTop">Exec Sponsor Meetings Completed</td>
+                <td class="tableRowTop"><apex:outputText value="{!If(plan.Executive_Sponsor_Meetings_Completed__c, 'Yes', 'No')}"/></td>
+                <td class="tableRowBlueTop">Exec Sponsor Meeting Types and Dates</td>
+                <td class="tableRowTop"><apex:outputText value="{!plan.Exec_Sponsor_Meeting_Types_And_Dates__c}"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueTop">Client Plan Created</td>
+                <td class="tableRowTop"><apex:outputText value="{!If(plan.Client_Plan_Completed__c, 'Yes', 'No')}"/></td>
+                <td class="tableRowBlueTop">Client Promise Completion Dates</td>
+                <td class="tableRowTop"><apex:outputText value="{!plan.Client_Promise_Completion_Date__c}"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueTopBottom">Client Satisfaction Survey Completed</td>
+                <td class="tableRowTopBottom"><apex:outputText value="{!If(plan.Client_Satisfaction_Survey_Completed__c, 'Yes', 'No')}"/></td>
+                <td class="tableRowBlueTopBottom">Client Promise Score</td>
+                <td class="tableRowTopBottom"><apex:outputText value="{0,number,##}%"><apex:param value="{!plan.Client_Promise_Score__c}"/></apex:outputText></td>
+            </tr>
+        </table>
+        <br/><br/>
+        
+        <table class="table1">
+            <tr>
+                <th class="tableHeadGray">Client Promise Results</th>
+                <th class="tableHeadGray">{!lastYear}</th>
+                <th class="tableHeadGray">{!currYear}</th>
+            </tr>
+            <tr>
+                <td class="tableRowBlue">Net Promoter Score (NPS)</td>
+                <td class="tableRowBlue">{!cssMap['PYlikelihood']}</td>
+                <td class="tableRowBlue">{!cssMap['CYlikelihood']}</td>
+            </tr>
+            <tr>
+                <td class="tableRow">Overall Satisfaction Score</td>
+                <td class="tableRow">{!cssMap['PYsatisfaction']}</td>
+                <td class="tableRow">{!cssMap['CYsatisfaction']}</td>
+            </tr>
+            <tr>
+                <td class="tableRowBlue">Number of Respondents</td>
+                <td class="tableRowBlue">
+                    <apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!lastYearCssSize}"/></apex:outputText>
+                </td>
+                <td class="tableRowBlue">
+                    <apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!currYearCssSize}"/></apex:outputText>
+                </td>
+            </tr>
+            <tr>
+                <td class="tableHeadGray">Our Client Promise Commitments</td>
+                <td class="tableHeadGray">&nbsp;</td>
+                <td class="tableHeadGray">&nbsp;</td>
+            </tr>
+            <tr>
+                <td class="tableRow">Partnership</td>
+                <td class="tableRow">{!cssMap['PYpartnership']}</td>
+                <td class="tableRow">{!cssMap['CYpartnership']}</td>
+            </tr>
+            <tr>
+                <td class="tableRow">Expertise</td>
+                <td class="tableRow">{!cssMap['PYtalent']}</td>
+                <td class="tableRow">{!cssMap['CYtalent']}</td>
+            </tr>
+            <tr>
+                <td class="tableRowBlue15">Innovation</td>
+                <td class="tableRowBlue15">{!cssMap['PYinnovation']}</td>
+                <td class="tableRowBlue15">{!cssMap['CYinnovation']}</td>
+            </tr>
+            <tr>
+                <td class="tableRowBlue15">Excellence</td>
+                <td class="tableRowBlue15">{!cssMap['PYexcellence']}</td>
+                <td class="tableRowBlue15">{!cssMap['CYexcellence']}</td>
+            </tr>
+            <tr>
+                <td class="tableRowBottom">Results</td>
+                <td class="tableRowBottom">{!cssMap['PYresults']}</td>
+                <td class="tableRowBottom">{!cssMap['CYresults']}</td>
+            </tr>
+        </table>
+        <br/><br/>
+        
+
+        <table class="table1" cellspacing="0">
+            <tr>
+                <th class="tableHeadGray">What Client Promise Means to Your Client</th>
+                <td class="tableHeadGrayDate" align="right"><apex:outputText value="As of {0,date,dd-MMMM-yyyy}&nbsp;" escape="false"><apex:param value="{!plan.LastModifiedDate}"/></apex:outputText></td>
+            </tr>
+        </table>
+        <table class="table1">
+            <tr>
+                <td width="15%" class="tableRowBlueBottom">Partnership</td>
+                <td width="85%" class="tableRowBottom15"><apex:outputText value="{!plan.Partnership__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom">Expertise</td>
+                <td class="tableRowBottom15"><apex:outputText value="{!plan.Talent__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom">Innovation</td>
+                <td class="tableRowBottom15"><apex:outputText value="{!plan.Innovation__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom">Excellence</td>
+                <td class="tableRowBottom15"><apex:outputText value="{!plan.Excellence__c}" escape="false"/></td>
+            </tr>
+             <tr>
+                <td class="tableRowBlueBottom">Results</td>
+                <td class="tableRowBottom15"><apex:outputText value="{!plan.Results__c}" escape="false"/></td>
+            </tr>
+        </table>
+        
+        <br/><br/>
+        <!-- Added by Devesh panwar Case # 00262422 -->
+         <table class="table1" cellspacing="0">
+            <tr>
+                <th class="tableHeadGray">Promises Action Plan – What are this team’s actions to deliver on our goals for Go To Market?</th>
+                <td class="tableHeadGrayDate" align="right"><apex:outputText value="As of {0,date,MMMM dd, yyyy}&nbsp;" escape="false"><apex:param value="{!plan.LastModifiedDate}"/></apex:outputText></td>
+            </tr>
+        </table>        
+        <table class="table1">
+            <tr>
+                <td width="20%" class="tableRowBlueBottom">Partnership Action</td>
+                <td width="80%" class="tableRowBottom15"><apex:outputText value="{!plan.Partnership_Action__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom">Expertise Action</td>
+                <td class="tableRowBottom15"><apex:outputText value="{!plan.Expertise_Action__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom">Innovation</td>
+                <td class="tableRowBottom15"><apex:outputText value="{!plan.Innovation_Plan__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom">Excellence</td>
+                <td class="tableRowBottom15"><apex:outputText value="{!plan.Excellence_Plan__c}" escape="false"/></td>
+            </tr>
+             <tr>
+                <td class="tableRowBlueBottom">Results</td>
+                <td class="tableRowBottom15"><apex:outputText value="{!plan.Results_Plan__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom">Partnership Action</td>
+                <td class="tableRowBottom15"><apex:outputText value="{!plan.Partnership_Action_Plan__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom">Expertise Action</td>
+                <td class="tableRowBottom15"><apex:outputText value="{!plan.Expertise_Action_Plan__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom">Innovation Action</td>
+                <td class="tableRowBottom15"><apex:outputText value="{!plan.Innovation_Action_Plan__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueBottom">Excellence Action</td>
+                <td class="tableRowBottom15"><apex:outputText value="{!plan.Excellence_Action_Plan__c}" escape="false"/></td>
+            </tr>
+             <tr>
+                <td class="tableRowBlueBottom">Results Action</td>
+                <td class="tableRowBottom15"><apex:outputText value="{!plan.Results_Action_Plan__c}" escape="false"/></td>
+            </tr>
+        </table>
+       <!-- Added by Devesh panwar till here --> 
+        
+        <br/><br/>
+
+        <apex:dataTable value="{!activityList}" var="activity" cellpadding="2" cellspacing="2" rowClasses="tableRow,tableRowBlue15" styleClass="table1" headerClass="tableHeadGray">
+            <apex:column headerValue="Relationship Meeting" headerClass="tableHeadGray">
+                <apex:outputText value="{!activity.myActivity.Type}"/>
+            </apex:column>
+            <apex:column headerValue="Assigned To" headerClass="tableHeadGray">
+                <apex:outputText value="{!activity.myActivity.Owner}"/>
+            </apex:column>
+            <apex:column headerValue="Subject" headerClass="tableHeadGray">
+                <apex:outputText value="{!activity.myActivity.Subject}"/>
+            </apex:column>
+            <apex:column headerValue="Date" headerClass="tableHeadGray">
+                <apex:outputText value="{0,date,dd-MMM-yyyy}"><apex:param value="{!activity.myActivity.ActivityDate}"/></apex:outputText>
+            </apex:column>
+        </apex:dataTable>
+        <br/><br/>
+        
+        <table class="table1">
+            <tr>
+                <th class="tableTitle" colspan="6">Cross Sale/Referrals<br/></th>
+            </tr>
+        </table>
+        <apex:dataTable value="{!xsaleList}" var="task" cellpadding="2" cellspacing="2" rowClasses="tableRow,tableRowBlue15" styleClass="table1" headerClass="tableHeadGray">
+            <apex:column headerValue="Subject" headerClass="tableHeadGray">
+                <apex:outputText value="{!task.Subject}"/>
+            </apex:column>
+            <apex:column headerValue="Assigned To" headerClass="tableHeadGray">
+                <apex:outputText value="{!task.Owner.Name}"/>
+            </apex:column>
+            <apex:column headerValue="Date" headerClass="tableHeadGray">
+                <apex:outputText value="{0,date,dd-MMM-yyyy}"><apex:param value="{!task.ActivityDate}"/></apex:outputText>
+            </apex:column>
+            <apex:column headerValue="Status" headerClass="tableHeadGray">
+                <apex:outputText value="{!task.Status}"/>
+            </apex:column>
+        </apex:dataTable>
+        <table class="table1"><tr><td class="tableRowTop">&nbsp;</td></tr></table>
+        <br/><br/>
+
+        <table class="table1">
+            <tr>
+                <th class="tableTitle" colspan="8">Sales and Pipeline<br/></th>
+            </tr>
+        </table>
+        <table class="table1">
+            <tr>
+                <th class="tableHeadGray" width="80%">Current Open Opportunities</th>
+                <td class="tableHeadGrayDate" align="right"><apex:outputText value="As of {0,date,MMMM dd, yyyy}&nbsp;" escape="false"><apex:param value="{!today()}"/></apex:outputText></td>
+            </tr>
+        </table>
+        
+        <apex:dataTable value="{!openList}" var="opp" cellpadding="0" cellspacing="2" rowClasses="tableRow,tableRowBlue" styleClass="table1" headerClass="tableHeadGrayCenter">
+            <apex:column styleClass="tableRowCenter" headerValue="Opportunity Name">
+                <apex:outputText value="{!opp.Name}"/>
+            </apex:column>
+            <apex:column styleClass="tableRowCenter" headerValue="Opportunity Owner">
+                <apex:outputText value="{!opp.Owner.Name}"/>
+            </apex:column>
+            <apex:column styleClass="tableRowCenter" headerValue="Owner's Practice">
+                <apex:outputText value="{!opp.Owner.Reporting_Practice__c}"/>
+            </apex:column>
+            <apex:column styleClass="tableRowCenter" headerValue="Total Opp First Year Value">
+                {!opp.CurrencyIsoCode} &nbsp;<apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!opp.Total_First_Year_Value__c}"/></apex:outputText>
+            </apex:column>
+            <apex:column styleClass="tableRowCenter" headerValue="Stage">
+                <apex:outputText value="{!opp.StageName}"/>
+            </apex:column>
+            <apex:column styleClass="tableRowCenter" headerValue="Prob">
+                <apex:outputText value="{0,number,###}"><apex:param value="{!opp.Probability}"/></apex:outputText>%
+            </apex:column>
+            <apex:column styleClass="tableRowCenter" headerValue="Exp. Close">
+                <apex:outputText value="{0,date,dd-MM-yy}"><apex:param value="{!opp.CloseDate}"/></apex:outputText>
+            </apex:column>
+        </apex:dataTable>
+        <table class="table1"><tr><td class="tableRowTop">&nbsp;</td></tr></table>
+        <br/>
+        
+        <table class="table1">
+            <tr>
+                <th class="tableHeadGray" width="80%">Closed Opportunities from Last 12 months</th>
+                <td class="tableHeadGrayDate" align="right"><apex:outputText value="As of {0,date,MMMM dd, yyyy}&nbsp;" escape="false"><apex:param value="{!today()}"/></apex:outputText></td>
+            </tr>
+        </table>
+        <apex:dataTable value="{!winList}" var="opp" cellpadding="0" cellspacing="2" rowClasses="tableRow,tableRowBlue" styleClass="table1" headerClass="tableHeadGrayCenter">
+            <apex:column styleClass="tableRowCenter" headerValue="Opportunity Name">
+                <apex:outputText value="{!opp.Name}"/>
+            </apex:column>
+            <apex:column styleClass="tableRowCenter" headerValue="Opportunity Owner">
+                <apex:outputText value="{!opp.Owner.Name}"/>
+            </apex:column>
+            <apex:column styleClass="tableRowCenter" headerValue="Owner's Practice">
+                <apex:outputText value="{!opp.Owner.Reporting_Practice__c}"/>
+            </apex:column>
+            <apex:column styleClass="tableRowCenter" headerValue="Total Opp First Year Value">
+                {!opp.CurrencyIsoCode} &nbsp;<apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!opp.Total_First_Year_Value__c}"/></apex:outputText>
+            </apex:column>
+            <apex:column styleClass="tableRowCenter" headerValue="Stage">
+                <apex:outputText value="{!opp.StageName}"/>
+            </apex:column>
+            <apex:column styleClass="tableRowCenter" headerValue="Close Date">
+                <apex:outputText value="{0,date,dd-MM-yy}"><apex:param value="{!opp.Opportunity_Closed_Date__c}"/></apex:outputText>
+            </apex:column>
+            <apex:column styleClass="tableRowCenter" headerValue="Chosen Provider">
+                <apex:outputText value="{!opp.Chosen_Provider_Reference__r.Name}"/>
+            </apex:column>
+            <apex:column styleClass="tableRowCenter" headerValue="Reason">
+                <apex:outputText value="{!opp.Reason_Won_or_Lost__c}"/>
+            </apex:column>
+        </apex:dataTable>
+        <table class="table1"><tr><td class="tableRowTop">&nbsp;</td></tr></table>
+        <br/><br/>
+        
+        
+        <table class="table1">
+            <tr>
+                <th class="tableTitle" colspan="2">Internal and External Team<br/></th>
+            </tr>
+            <tr>
+                <th class="tableHeadGray" colspan="2">Aon Client Team Members</th>
+            </tr>
+        </table>
+        <apex:dataTable value="{!internalContactList}" var="iat" cellpadding="0" cellspacing="2" rowClasses="tableRow,tableRowBlue" styleClass="table1" headerClass="tableHeadGray">
+            <apex:column styleClass="tableRow" headerValue="Role" width="40%">
+                <apex:outputText value="{!iat.Contact_Role__c}"/>
+            </apex:column>
+            <apex:column styleClass="tableRow" headerValue="Name" width="60%">
+                <apex:outputText value="{!iat.Contact__r.Name}"/>
+            </apex:column>
+        </apex:dataTable>
+        <table class="table1"><tr><td class="tableRowTop">&nbsp;</td></tr></table>
+        <br/>
+        
+        <table class="table1">
+            <tr>
+                <th class="tableHeadGray">Key Client Contacts</th>
+            </tr>
+        </table>
+        <apex:dataTable value="{!contactList}" var="contact" cellpadding="0" cellspacing="2" rowClasses="tableRow,tableRowBlue" styleClass="table1" headerClass="tableHeadGray">
+            <apex:column styleClass="tableRow" headerValue="Functional Role" width="30%">
+                <apex:outputText value="{!contact.FunctionalRole}"/>
+            </apex:column>
+            <apex:column styleClass="tableRow" headerValue="Name" width="10%">
+                <apex:outputText value="{!contact.Name}"/>
+            </apex:column>
+            <apex:column styleClass="tableRow" headerValue="Job Level">
+                <apex:outputText value="{!contact.JobLevel}"/>
+            </apex:column>
+            <apex:column styleClass="tableRow" headerValue="Title">
+                <apex:outputText value="{!contact.Title}"/>
+            </apex:column>
+            <apex:column styleClass="tableRowCenter" headerValue="Satisfaction Score">
+                <apex:outputText value="{!contact.OverallScore}"/>
+            </apex:column>
+            <apex:column styleClass="tableRowCenter" headerValue="Likely to Engage Score">
+                <apex:outputText value="{!contact.EngageScore}"/>
+            </apex:column>
+            <apex:column styleClass="tableRowCenter" headerValue="Survey Date">
+                <apex:outputText value="{0,date,MM/dd/yy}"><apex:param value="{!contact.SurveyDate}"/></apex:outputText>
+            </apex:column>
+        </apex:dataTable>
+        <table class="table1"><tr><td class="tableRowTop">&nbsp;</td></tr></table>
+        <br/>
+
+        <table class="table1">
+            <tr>
+                <th class="tableTitle" colspan="3">Attachments<span class="tableNote">&nbsp; must be printed out separately</span><br/></th>
+            </tr>
+        </table>        
+        <apex:dataTable value="{!attachmentList}" var="attachment" cellpadding="0" cellspacing="2" rowClasses="tableRow,tableRowBlue" styleClass="table1" headerClass="tableHeadGray">
+            <apex:column styleClass="tableRow" headerValue="Title">
+                <apex:outputText value="{!attachment.Name}"/>
+            </apex:column>
+            <apex:column styleClass="tableRow" headerValue="Created By">
+                <apex:outputText value="{!attachment.CreatedBy.Name}"/>
+            </apex:column>
+            <apex:column styleClass="tableRow" headerValue="Created Date">
+                <apex:outputText value="{0,date,dd-MM-yy}"><apex:param value="{!attachment.CreatedDate}"/></apex:outputText>
+            </apex:column>
+        </apex:dataTable>
+        <table class="table1"><tr><td class="tableRowTop">&nbsp;</td></tr></table>
+        <br/>
+        
+        <table class="table1">
+            <tr>
+                <th class="tableTitle" colspan="3">Notes<br/></th>
+            </tr>
+        </table>
+        <apex:dataTable value="{!noteList}" var="note" cellpadding="0" cellspacing="2" rowClasses="tableRow,tableRowBlue" styleClass="table1" headerClass="tableHeadGray">
+            <apex:column styleClass="tableRow" headerValue="Title">
+                <apex:outputText value="{!note.Title}"/>
+            </apex:column>
+            <apex:column styleClass="tableRow" headerValue="Body">
+                <apex:outputText value="{!note.Body}" escape="false"/>
+            </apex:column>
+            <apex:column styleClass="tableRow" headerValue="Created Date">
+                <apex:outputText value="{0,date,dd-MM-yy}"><apex:param value="{!note.CreatedDate}"/></apex:outputText>
+            </apex:column>
+        </apex:dataTable>
+        <table class="table1"><tr><td class="tableRowTop">&nbsp;</td></tr></table>
+    </div>
+</div>
+</apex:page>

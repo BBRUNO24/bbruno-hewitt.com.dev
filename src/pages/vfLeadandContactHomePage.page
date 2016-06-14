@@ -1,0 +1,86 @@
+<apex:page controller="ctlr_LeadandContactHomePage" id="thePage" showheader="false">
+    <html>
+        <body>
+        <BR/>
+            <table width= '100%' border = '1' cellspacing ='0' cellspadding = '0'>
+                <col width="39%" />
+                <col width="39%" />
+                <col width="22%" />
+                <tr>
+                
+                    <tr bgcolor="gray">
+                        <th ><font color = "white"> My Leads less than 90 days</font></th>
+                        <th ><font color = "white">My Leads greater than 90 days</font> </th>
+                        <th><font color = "white">My Contacts for Review </font></th>
+                    </tr>
+                    <tr>
+                        <td>                         
+                            <apex:dataTable value="{!NewerLeads}" var="newerlead" id="newerlead" border="1" cellspacing="0" cellpadding="0" rendered="{!ShowNewLeadTable}" width="100%">                               
+                                <apex:column >
+                                    <apex:facet name="header">Lead</apex:facet>                                
+                                    <apex:outputlink value="/{!newerlead.ID}" target="_blank">{!newerlead.Contact__r.Full_Name__c}</apex:outputlink> 
+                                </apex:column>
+                                <apex:column >
+                                    <apex:facet name="header">Status</apex:facet>                                
+                                    <apex:outputLabel value="{!newerlead.Status__c}"></apex:outputLabel> 
+                                </apex:column>
+                                <apex:column >
+                                    <apex:facet name="header">Campaign</apex:facet>                                
+                                    <apex:outputlink value="/{!newerlead.Marketing_Campaign_Source__c}" target="_blank">{!newerlead.Marketing_Campaign_Source__r.Name }</apex:outputlink>
+                                </apex:column>                                                                     
+                            </apex:dataTable>                               
+                            <br/>
+                            <!--Code Change Begin For Case No.00128188, By AashimaA. Below report link has been changed so that all open Marketing and Sales Leads are generated in report-->
+                            <apex:outputlink value="/00Oa0000008Wog0" target="_blank" rendered="{!ShowNewLeadTable}" >View more</apex:outputlink>                             
+                            <!--Code Change End For Case No.00128188, By AashimaA-->
+                            <apex:pageMessage summary="There is no Lead for you." severity="info" strength="1" rendered="{!newleadmessage}"/>
+                        </td>                        
+                                
+                                
+                        <td>
+                            <apex:datatable value="{!OlderLeads}" var="olderlead" id="olderlead"  border="1" cellspacing="0" cellpadding="0" rendered="{!ShowoldLeadTable}" width="100%" >
+                                <apex:column >
+                                    <apex:facet name="header">Lead</apex:facet>
+                                    <apex:outputlink value="/{!olderlead.ID}" target="_blank">{!olderlead.Contact__r.Full_Name__c}</apex:outputlink>
+                                </apex:column>   
+                                <apex:column >
+                                    <apex:facet name="header">Status</apex:facet>
+                                    <apex:outputLabel value="{!olderlead.Status__c}"></apex:outputLabel> 
+                                </apex:column>
+                                <apex:column >
+                                    <apex:facet name="header">Campaign</apex:facet>
+                                    <apex:outputlink value="/{!olderlead.Marketing_Campaign_Source__c}" target="_blank">{!olderlead.Marketing_Campaign_Source__r.Name }</apex:outputlink> 
+                                </apex:column>                            
+                            </apex:datatable>
+                            <br/>
+                            <!--Code Change Begin For Case No.00128188, By AashimaA. Below report link has been changed so that all Marketing and Sales neglected Leads are generated in report-->
+                            <apex:outputlink value="/00Oa0000008Wog5" target="_blank" rendered="{!ShowoldLeadTable}">View more</apex:outputlink>
+                             <!--Code Change End For Case No.00128188, By AashimaA-->
+                            <apex:pageMessage summary="There is no Lead for you." severity="info" strength="1" rendered="{!oldleadmessage}"/>
+                                    
+                        </td>
+                        
+                        <td>
+                            <apex:datatable value="{!activecontacts}" var="activecontact" id="activecontact"  border="1" cellspacing="0" cellpadding="0"  rendered="{!showActiveContacts}" width="100%">
+                            
+                                <apex:column >
+                                    <apex:facet name="header">Contact</apex:facet>
+                                    <apex:outputlink value="/{!activecontact.ID}" target="_blank" >{!activecontact.name}</apex:outputlink>
+                                </apex:column>  
+                                <apex:column >
+                                    <apex:facet name="header">Account</apex:facet>
+                                    <apex:outputlink value="/{!activecontact.accountid}" target="_blank" >{!activecontact.Account.name}</apex:outputlink>
+                                </apex:column>  
+                            
+                            </apex:datatable>
+                            <br/>
+                            <apex:outputlink value="/00O30000007NyUe" target="_blank" rendered="{!showActiveContacts}">View more</apex:outputlink>
+                                    
+                            <apex:pageMessage summary="There is no Contact for you to review." severity="info" strength="1" rendered="{!contactmessage}"/>
+                        </td>
+                    </tr> 
+                </tr>
+            </table>
+        </body>
+    </html>
+</apex:page>

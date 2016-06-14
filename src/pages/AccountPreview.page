@@ -1,0 +1,74 @@
+<apex:page standardController="Account" extensions="ctrl_AccountPreview" showHeader="false" action="{!init}" >
+	
+	<!-- page variables -->
+    <apex:variable var="lblAccountDetails" value="Account Details" />
+    <apex:variable var="lblBtnCloseWindow" value="Close Window" />
+    <apex:variable var="lblContacts" value="Contacts" />
+    <apex:variable var="lblOpportunities" value="Opportunities" />
+    <apex:variable var="lblProducts" value="Product / Service Name" />
+    <apex:variable var="msgConfirm" value="You will lose all data entered.   Click OK to Close this Window or click on Cancel to View the Data." />
+	
+	<!-- javascript -->
+	<script>
+        function confirmCancel() {
+        	var isCancel = confirm("{!msgConfirm}");
+        	if (isCancel) return true;  
+        		return false;
+        }  
+        function closeWindow() {
+        	window.close();
+        } 
+    </script>
+    
+    <!-- presentation -->
+	<apex:form >
+    	<apex:pageBlock title="{!lblAccountDetails}" mode="detail">
+    		<apex:pageBlockButtons >
+        		<apex:commandButton value="{!lblBtnCloseWindow}"  onclick="closeWindow();"  />
+        	</apex:pageBlockButtons>
+           	<apex:pageBlockSection title="{!lblAccountDetails}" columns="2">
+            	<apex:outputField value="{!previewAccount.name}"/>
+            	<apex:outputField value="{!previewAccount.ACW_Client_Type__c}"/>
+                <apex:outputField value="{!previewAccount.BillingStreet}"/>
+                <apex:outputField value="{!previewAccount.BillingCity}"/>
+                <apex:outputField value="{!previewAccount.BillingState}"/>
+                <apex:outputField value="{!previewAccount.BillingPostalCode}"/>
+                <apex:outputField value="{!previewAccount.BillingCountry}"/>
+                <apex:outputField value="{!previewAccount.DunsNumber}"/>
+                <apex:outputField value="{!previewAccount.Owner.name}"/>
+                <apex:outputField value="{!previewAccount.Owner.Email}"/>
+           	</apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+ 
+	<apex:pageBlock title="{!lblContacts}">
+  	 	<apex:pageBlockTable value="{!previewAccount.contacts}" var="item">
+			<apex:column value="{!item.LastName}"/>
+			<apex:column value="{!item.FirstName}"/>
+			<apex:column value="{!item.Phone}"/>
+			<apex:column value="{!item.Email}"/>
+			<apex:column value="{!item.Title}"/>
+			<apex:column value="{!item.Owner_Full_Name__c}"/>
+			<apex:column value="{!item.Owner_Email__c}"/>
+    	</apex:pageBlockTable>
+	</apex:pageBlock>
+	
+	<apex:pageBlock title="{!lblOpportunities}">
+  	 	<apex:pageBlockTable value="{!previewAccount.Opportunities}" var="item">
+			<apex:column value="{!item.Name}"/>
+			<apex:column value="{!item.Amount}"/>
+			<apex:column value="{!item.CloseDate}"/>
+			<apex:column value="{!item.StageName}"/>
+			<apex:column value="{!item.Owner.Name}"/>
+			<apex:column value="{!item.Owner.Email}"/>
+    	</apex:pageBlockTable>
+	</apex:pageBlock>
+	
+	<apex:pageBlock title="{!lblProducts}">
+  	 	<apex:pageBlockTable value="{!accntOpptnityItemList}" var="item">
+			<apex:column value="{!item.PricebookEntry.Name}"/>
+			<apex:column value="{!item.Practice__c}"/>
+			<apex:column value="{!item.TotalPrice}"/>
+    	</apex:pageBlockTable>
+	</apex:pageBlock>
+</apex:page>

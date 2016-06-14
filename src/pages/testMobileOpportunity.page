@@ -1,0 +1,41 @@
+<apex:page id="page" controller="ctlr_testMobileOpportunity" showHeader="false" sidebar="false" applyHtmlTag="false" applyBodyTag="false" docType="html-5.0" cache="false">    
+<html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">    
+
+	<head>
+	    <c:MobileOpportunityHeader />
+	</head>   
+
+	<body>
+	<apex:outputPanel layout="block" id="Bryan">
+		{!tabToShow}
+	</apex:outputPanel>
+		<!-- <apex:form id="mobileOpp"> -->
+		<!-- REQUIRED SLDS WRAPPER -->
+        <div class="slds"> 
+        	<!-- NOTIFICATION TOAST -->
+            <c:SLDS_Toast id="toastComponent" toast="{!toast}" tabToShow="{!tabToShow}"> </c:SLDS_Toast>
+            <!-- / NOTIFICATION TOAST -->
+            <!-- TABS -->  
+            <div class="slds-tabs--default">
+            	<c:MobileOpportunityTabs id="tabsComponent" tabToShow="{!tabToShow}" activeTab="{!activeTab}" inactiveTab="{!inactiveTab}" showSalesCredit="{!showSalesCredit}" />
+            </div>
+            <!-- TAB 1 OPPORTUNITY -->
+            <c:MobileOpportunityOppTab id="opportunityComponent" parentOpportunity="{!opp}" tab="{!tabToShow}" toast="{!toast}" />
+          	<!-- / TAB 1 OPPORTUNITY -->
+
+            <!-- TAB 2 PRODUCTS --> 
+           <!-- <c:MobileOpportunityProductTab id="productsComponent" opp="{!opp}" tabToShow="{!tabToShow}" toast="{!toast}" /> -->
+            <!-- / TAB 2 PRODUCTS -->
+
+            <!-- TAB 3 SALES CREDIT -->
+            <apex:outputPanel id="salesCreditPanel" layout="block">
+                <apex:outputPanel id="salesCreditContainer" layout="block" rendered="{!tabToShow = 'SalesCredit'}">
+                    <!-- <c:MobileOpportunitySalesCredit id="salesCreditComponent" tabToShow="{!tabToShow}" toast="{!toast}" parentOpportunity="{!opp}"/> -->
+                </apex:outputPanel>
+            </apex:outputPanel>
+            <!-- / TAB 3 SALES CREDIT -->            
+        </div>
+        <!-- </apex:form> -->
+	</body>
+</html>
+</apex:page>

@@ -1,0 +1,23 @@
+<apex:page standardController="Account">
+    <apex:form >
+        <apex:pageBlock title="Account Detail">
+            <apex:pageBlockSection >
+                <apex:outputField value="{!Account.Legal_Name__c}"/>
+                <apex:outputField value="{!Account.OwnerId}"/>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+        
+        <apex:pageBlock title="Client Plan">
+            <apex:pageBlockButtons >
+                <apex:commandButton action="{!URLFOR($Action.Annual_Account_Plan__c.New)}" value="New Client Plan"/>
+            </apex:pageBlockButtons>
+            <apex:pageBlockTable value="{!Account.Annual_Account_Plan__r}" var="aap">
+                <apex:column headerValue="Name">
+                    <apex:outputLink value="{!URLFOR($Action.Annual_Account_Plan__c.View, aap.Id)}">{!aap.RecordType.Name} for {!aap.Account_Plan_Year__c}
+                    </apex:outputLink>
+                </apex:column>
+                <apex:column value="{!aap.Account_Plan_Year__c}"/>
+            </apex:pageBlockTable>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

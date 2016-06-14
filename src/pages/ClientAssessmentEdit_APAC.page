@@ -1,0 +1,99 @@
+<apex:page standardController="Client_Assessment_Survey__c">
+    <apex:pageMessages />
+    <script>
+        function setFocus() {
+            document.getElementById('theFirst').focus()
+        }
+    </script>
+    <script language="javascript">
+        <body onload="setFocus()">
+    </script>
+    <apex:form >
+        <apex:pageBlock title="Client Assessment Survey" mode="edit">
+            <apex:pageBlockButtons >
+            <apex:commandButton action="{!save}" value="Save"/>
+            <apex:commandButton action="{!cancel}" value="Cancel"/>
+            </apex:pageBlockButtons>
+        <apex:pageBlockSection title="Client Assessment Information" collapsible="false" columns="2">
+            <apex:outputField value="{!Client_Assessment_Survey__c.Account__c}"/>
+            <apex:pageBlockSectionItem />
+            <apex:inputField value="{!Client_Assessment_Survey__c.Year__c}"  required="true"/>
+            <apex:inputField id="theFirst" value="{!Client_Assessment_Survey__c.Quarter__c}"  required="true"/>
+        </apex:pageBlockSection>
+        <apex:pageBlockSection title="Survey Response Definitions" collapsible="false" columns="1">
+            <html>
+                <body>
+                    <b>For Questions Related to Services</b>
+                    <ul style="list-style-type: circle;">
+                    	<li><b>Not Viable</b>: No opportunity viable for this client</li>
+                        <li><b>Recent Loss</b>: No longer Lead Provider or Recent Loss</li> 
+                        <li><b>No Activity or N/A</b>: No current opportunity</li>
+                        <li><b>Opportunity In SFDC</b>: Qualified opportunity exists in SFDC</li>
+                        <li><b>Partially Penetrated</b>: Use for consulting services when doing some work, not lead provider</li>
+                        <li><b>Lead Provider</b>: Considered by client as the primary provider of service</li>
+                    </ul>
+                    <b>For Client Relationship Questions</b>
+                    <ul style="list-style-type: circle;">
+                        <li><b>Green</b>: Client feedback is positive and is likely to renew services</li> 
+                        <li><b>Yellow</b>: Some concern, new influencer role, or acquisition/divestiture that may put our work at risk</li>
+                        <li><b>Red</b>: Client is at risk. Very negative relationship, may be unsatisfied, new influencer role that doesn’t like AH or has strong competitor relationship</li>
+                    </ul>
+                </body>
+            </html>
+        </apex:pageBlockSection>
+        <apex:pageBlockSection title="Performance & Talent" collapsible="true" columns="2">
+            <apex:inputField value="{!Client_Assessment_Survey__c.Performance_and_Organisation__c}" required="true"/>            
+            <apex:inputField value="{!Client_Assessment_Survey__c.Talent_and_Engagement_Consulting__c}" required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Engagement_Surveys__c}" required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Best_Employers__c}" required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Leadership_Consulting__c}" required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Selection_and_Assessment__c}" required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.HRE__c}" required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Sales_Force_Effectiveness__c}" required="true"/>
+        </apex:pageBlockSection>
+        <apex:pageBlockSection title="Performance & Rewards" columns="2">
+            <apex:inputField value="{!Client_Assessment_Survey__c.Broad_Based_Compensation__c}" required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Productivity_and_Performance_Measurement__c}" required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Executive_Compensation__c}" required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Total_Rewards__c}" required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Job_Evaluation__c}" required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Sales_Compensation__c}" required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Pay_Strategy_Pay_Design__c}" required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Remuneration_Review__c}" required="true"/>
+        </apex:pageBlockSection>
+        <apex:pageBlockSection title="Retirement" columns="2">
+            <apex:inputField value="{!Client_Assessment_Survey__c.Actuarial_Services__c}" required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Retirement_Plan_Consulting__c}" required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Retirement_Plan_Administration__c}" required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Accounting_Services__c}" required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Financial_Planning__c}" required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Investment_Consulting__c}" required="true"/>
+        </apex:pageBlockSection>
+        <apex:pageBlockSection title="Health & Benefits" columns="2">
+            <apex:inputField value="{!Client_Assessment_Survey__c.Group_Insurance__c}" required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Corporate_Health__c}" required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Personal_Accident__c}" required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Corporate_Travel__c}" required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Expat_or_Non_Resident_Medical__c}" required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Life_Disability_Consulting__c}" required="true"/>
+        </apex:pageBlockSection>
+        <apex:pageBlockSection title="Other" columns="2">
+            <apex:inputField value="{!Client_Assessment_Survey__c.Mergers_Acquisitions__c}" required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Global_Benefits_Brokerage__c}" required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Workers_Compensation__c}" required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Workforce_Risk__c}" required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Workday_Implementation_Services__c}" required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Cornerstone_OnDemand_Services__c}" required="true"/>
+        </apex:pageBlockSection>
+        <apex:pageBlockSection title="Relationship Status Ratings" columns="2">
+            <!-- The following line changed for case #135733 -->
+            <apex:inputText value="{!Client_Assessment_Survey__c.Overall_Relationship_Status__c}" disabled="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Consulting_Relationship_Status__c}" required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Outsourcing_Relationship_Status__c}" required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.ARS_Relationship__c}" required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Risks__c}"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Opportunities__c}"/>
+        </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

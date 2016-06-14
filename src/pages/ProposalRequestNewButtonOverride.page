@@ -1,0 +1,7 @@
+<apex:page standardController="Proposal_Request__c" extensions="ctlr_ProposalRequestNewButtonOverride" action="{!init}">
+    <apex:pageMessage summary="{!errorMessage}" severity="error" strength="3" />
+    <br/>
+    <apex:form >
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<apex:commandButton action="{!returnBack}" value="Return"></apex:commandButton>
+    </apex:form>
+</apex:page>

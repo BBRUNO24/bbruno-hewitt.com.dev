@@ -1,0 +1,100 @@
+<apex:page standardController="Client_Assessment_Survey__c">
+    <apex:pageMessages />
+    <script>
+        function setFocus() {
+            document.getElementById('theFirst').focus()
+        }
+    </script>
+    <script language="javascript">
+        <body onload="setFocus()">
+    </script>
+    <apex:form >
+        <apex:pageBlock title="Client Assessment Survey" mode="edit">
+            <apex:pageBlockButtons >
+            <apex:commandButton action="{!save}" value="Save"/>
+            <apex:commandButton action="{!cancel}" value="Cancel"/>
+            </apex:pageBlockButtons>
+        <apex:pageBlockSection title="Client Assessment Information" collapsible="false" columns="2">
+            <apex:outputField value="{!Client_Assessment_Survey__c.Account__c}"/>
+            <apex:pageBlockSectionItem />
+            <apex:inputField value="{!Client_Assessment_Survey__c.Year__c}"  required="true"/>
+            <apex:inputField id="theFirst" value="{!Client_Assessment_Survey__c.Quarter__c}"  required="true"/>
+        </apex:pageBlockSection>
+        <apex:pageBlockSection title="Survey Response Definitions" collapsible="false" columns="1">
+            <html>
+                <body>
+                    <b>For Questions Related to Services</b>
+                    <ul style="list-style-type: circle;">
+                        <li><b>Recent Loss</b>: No longer Lead Provider or Recent Loss</li> 
+                        <li><b>No Activity or N/A</b>: No current opportunity</li>
+                        <li><b>Opportunity In SFDC</b>: Qualified opportunity exists in SFDC</li>
+                        <li><b>Partially Penetrated</b>: Use for consulting services when doing some work, not lead provider</li>
+                        <li><b>Lead Provider</b>: Considered by client as the primary provider of service</li>
+                    </ul>
+                    <b>For Client Relationship Questions</b>
+                    <ul style="list-style-type: circle;">
+                        <li><b>Green</b>: Client feedback is positive and is likely to renew services</li> 
+                        <li><b>Yellow</b>: Some concern, new influencer role, or acquisition/divestiture that may put our work at risk</li>
+                        <li><b>Red</b>: Client is at risk. Very negative relationship, may be unsatisfied, new influencer role that doesn’t like AH or has strong competitor relationship</li>
+                    </ul>
+                </body>
+            </html>
+        </apex:pageBlockSection>
+        <apex:pageBlockSection title="Healthcare Activity" collapsible="true" columns="2">
+            <apex:inputField value="{!Client_Assessment_Survey__c.H_B_Consulting__c}"  required="true"/>            
+            <apex:inputField value="{!Client_Assessment_Survey__c.H_W_Admin__c}"  required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Absence_Mgmt__c}"  required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Exchanges__c}"  required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Advocacy__c}"  required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Dependent_Verification__c}"  required="true"/>        
+            <apex:inputField value="{!Client_Assessment_Survey__c.Spending_Acct_Admin__c}"  required="true"/>
+        </apex:pageBlockSection>
+        <apex:pageBlockSection title="Retirement Activity" columns="2">
+            <apex:inputField value="{!Client_Assessment_Survey__c.Actuarial__c}"  required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Investment__c}"  required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.DB_Admin__c}"  required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.DC_Admin__c}"  required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Advisory__c}"  required="true"/>
+        </apex:pageBlockSection>
+        <apex:pageBlockSection title="Compensation & Talent Activity" columns="2">
+            <apex:inputField value="{!Client_Assessment_Survey__c.Compensation__c}"  required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Engagement__c}"  required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Selection_Assessment__c}"  required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Talent_Acquisition_Solutions__c}"  required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.HRE__c}"  required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Leadership__c}"  required="true"/>
+        </apex:pageBlockSection>
+        <apex:pageBlockSection title="Other Activity" columns="2">
+            <apex:inputField value="{!Client_Assessment_Survey__c.Communications__c}"  required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.AMAS_M_A__c}"  required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Global_Benefits_Brokerage__c}"  required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.BPO__c}"  required="true"/>
+        </apex:pageBlockSection>
+        <apex:pageBlockSection title="Relationship Status Ratings" columns="2">
+            <!--  The following line changed for case #135733 -->
+            <apex:inputText value="{!Client_Assessment_Survey__c.Overall_Relationship_Status__c}"  disabled="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Consulting_Relationship_Status__c}"  required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Outsourcing_Relationship_Status__c}"  required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.ARS_Relationship__c}"  required="true"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Risks__c}"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Opportunities__c}"/>
+        </apex:pageBlockSection>
+        <apex:pageBlockSection title="Account Plan - You may store the document in the Notes & Attachments section" columns="1">
+            <apex:inputField value="{!Client_Assessment_Survey__c.Is_CY_Account_Plan_On_File__c}"/>
+        </apex:pageBlockSection>
+            <apex:pageBlockSection title="US Eligible Employee Count" columns="2">
+            <apex:inputField value="{!Client_Assessment_Survey__c.Active_DB_Ret_PPTS__c}"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Active_DC_Ret_PPTS__c}"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.Active_Health_Care_PPTS__c}"/>
+        </apex:pageBlockSection>
+        <apex:pageBlockSection title="Service Provider" columns="2">
+            <apex:inputField value="{!Client_Assessment_Survey__c.DB_Administrator__c}"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.DB_Contract_End_Date__c}"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.DC_Administrator__c}"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.DC_Contract_End_Date__c}"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.HW_Administrator__c}"/>
+            <apex:inputField value="{!Client_Assessment_Survey__c.HW_Contract_End_Date__c}"/>
+        </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

@@ -1,0 +1,16 @@
+<apex:component >
+	<apex:attribute name="tabToShow" description="" type="String" required="true" />
+	<apex:attribute name="activeTab" description="" type="String" required="true" />
+	<apex:attribute name="inactiveTab" description="" type="String" required="true" />
+	<apex:attribute name="showSalesCredit" description="" type="Boolean" required="true" />
+    <apex:outputPanel id="tabsPanel" layout="block">
+        <ul class="slds-tabs--default__nav" role="tablist">
+            <li id="tabOpportunity" class="{!IF(tabToShow = 'Opportunity', activeTab , inactiveTab)}" title="Item One" role="presentation"><a class="slds-tabs--default__link" href="#void" role="tab" tabindex="0" aria-selected="true" aria-controls="tab-default-1" id="tab-default-1__item">Opportunity</a></li>
+            <li id="tabProducts" class="{!IF(tabToShow = 'Products', activeTab , inactiveTab)}" title="Item Two" role="presentation"><a class="slds-tabs--default__link" 
+            href="#void" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-default-2" id="tab-default-2__item">Products</a></li>
+            <li id="tabSalesCredit" class="{!IF(tabToShow = 'SalesCredit', activeTab , inactiveTab)}" title="Item Two" role="presentation">
+                <apex:outputLink id="tab-default-3__item" styleClass="slds-tabs--default__link" value="#void" rendered="{!showSalesCredit}">Sales Credit</apex:outputLink>
+            </li>
+        </ul>
+    </apex:outputPanel>
+</apex:component>

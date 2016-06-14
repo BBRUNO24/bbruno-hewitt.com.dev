@@ -1,0 +1,11 @@
+<apex:page standardcontroller="Sales_Credit__c" extensions="closedApprovedSalesCred_Edit_Del" action="{!del}">
+
+        <apex:form >
+        <apex:pageBlock rendered="{!IF(closedApprovedCheck == true, true, false)}">
+        <apex:pageMessage summary="You cannot delete this Opportunity because it is AC Closed Approved Opportunity." severity="Warning" strength="3" />
+        <apex:pageMessages />
+        <apex:commandButton action="{!ret}" value="Return to Opportunity" id="theButton1"/> 
+        </apex:pageBlock> 
+             
+        </apex:form>
+</apex:page>

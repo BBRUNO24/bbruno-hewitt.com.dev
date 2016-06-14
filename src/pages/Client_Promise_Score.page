@@ -1,0 +1,45 @@
+<apex:page standardController="Account" extensions="ctlr_ClientPromiseScore">
+    <style>
+        td.twenty{background-color:#FF0000; border:none}
+        td.forty{background-color:#F76541; border:none}
+        td.sixty{background-color:#FFFF00; border:none}
+        td.eighty{background-color:#B1FB17; border:none}
+        td.hundred{background-color:#00FF00; border:none}
+        td.grey{background-color:#DDDDDD; border:none}    
+    </style>
+    
+    <script>
+        var iScore = {!score};
+        document.write('<table style="border: 1px solid white; border-collapse:collapse;">');
+        document.write('<tr>');
+        for(var i=0; i<100; i+=5) {
+            if(iScore <= 20) {
+                if( i < iScore )
+                    document.write('<td class="twenty" nowrap="nowrap">&nbsp;</td>');
+                else
+                    document.write('<td class="grey" nowrap="nowrap">&nbsp;</td>');
+            } else if (iScore <= 40) {
+                if( i < iScore )
+                    document.write('<td class="forty" nowrap="nowrap">&nbsp;</td>');
+                else
+                    document.write('<td class="grey" nowrap="nowrap">&nbsp;</td>');
+            } else if (iScore <= 60) {
+                if( i < iScore )
+                    document.write('<td class="sixty" nowrap="nowrap">&nbsp;</td>');
+                else
+                    document.write('<td class="grey" nowrap="nowrap">&nbsp;</td>');
+            } else if (iScore <= 80) {
+                if( i < iScore )
+                    document.write('<td class="eighty" nowrap="nowrap">&nbsp;</td>');
+                else
+                    document.write('<td class="grey" nowrap="nowrap">&nbsp;</td>');
+            } else {
+                if( i < iScore )
+                    document.write('<td class="hundred" nowrap="nowrap">&nbsp;</td>');
+                else
+                    document.write('<td class="grey" nowrap="nowrap">&nbsp;</td>');
+            }
+        }
+        document.write('<td nowrap="nowrap">&nbsp;&nbsp;' + iScore + '%&nbsp;&nbsp;</td></tr></table>');
+    </script>
+</apex:page>

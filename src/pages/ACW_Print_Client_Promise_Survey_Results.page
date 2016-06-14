@@ -1,0 +1,53 @@
+<apex:page standardController="Aon_Consulting_Client_Promise_Survey__c" renderAs="PDF">
+<table border="0" >
+<tr>
+<td align="left" width="400"><apex:image url="https://www.clicktools.com/dashboard/org/aon1/images/aon_logo.gif"/></td>
+<td align="right" width="300"><apex:image url="https://www.clicktools.com/dashboard/org/dev/images/cpstamp20.jpg"/></td>
+</tr>
+</table>
+
+<table>
+<tr><td><b><span style="font-size:20.0pt"><apex:outputLabel value="Client Promise Assessment" rendered="{!IF(Aon_Consulting_Client_Promise_Survey__c.Contact__r.Preferred_Language__c!='French',true,false)}"/></span></b></td></tr>
+<tr><td><b><span style="font-size:20.0pt"><apex:outputLabel value="Enquête Engagement Client" rendered="{!IF(Aon_Consulting_Client_Promise_Survey__c.Contact__r.Preferred_Language__c=='French',true,false)}"/></span></b></td></tr>
+
+<tr><td>&nbsp;</td></tr>
+
+
+
+<tr><td><b><apex:outputLabel value="Contact Name: " rendered="{!IF(Aon_Consulting_Client_Promise_Survey__c.Contact__r.Preferred_Language__c!='French',true,false)}"/>
+<apex:outputLabel value="Nom du Contact : " rendered="{!IF(Aon_Consulting_Client_Promise_Survey__c.Contact__r.Preferred_Language__c=='French',true,false)}"/></b>
+<apex:outputText value="{!Aon_Consulting_Client_Promise_Survey__c.Contact__r.Name}"/></td></tr>
+
+<tr><td><b><apex:outputLabel value="Account Name: " rendered="{!IF(Aon_Consulting_Client_Promise_Survey__c.Contact__r.Preferred_Language__c!='French',true,false)}"/>
+<apex:outputLabel value="Nom du Compte : " rendered="{!IF(Aon_Consulting_Client_Promise_Survey__c.Contact__r.Preferred_Language__c=='French',true,false)}"/></b>
+<apex:outputText value="{!Aon_Consulting_Client_Promise_Survey__c.Contact__r.Account.Name}"/></td></tr>
+
+<tr><td>&nbsp;</td></tr>
+
+<tr><td  align="justify"><apex:outputLabel value="Votre opinion est essentielle pour guider nos choix de solutions, de services et d’investissement.  Nous nous engageons fermement à effectuer les changements nécessaires à un meilleur service.  Merci par avance du temps que vous voudrez bien consacrer à cette enquête ; elle ne devrait vous prendre que cinq minutes." rendered="{!IF(Aon_Consulting_Client_Promise_Survey__c.Contact__r.Preferred_Language__c=='French',true,false)}"/></td></tr>
+<tr><td>&nbsp;</td></tr>
+
+</table>
+
+<table>
+<tr><td><b><apex:outputLabel value="1. How likely would you be to recommend Aon to a friend or colleague?" rendered="{!IF(Aon_Consulting_Client_Promise_Survey__c.Contact__r.Preferred_Language__c!='French',true,false)}"/></b></td></tr>
+<tr><td><b><apex:outputLabel value="1. Seriez-vous prêt à recommander Aon à un proche ou un confrère?" rendered="{!IF(Aon_Consulting_Client_Promise_Survey__c.Contact__r.Preferred_Language__c=='French',true,false)}"/></b></td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td align="justify"><apex:outputText value="{!Aon_Consulting_Client_Promise_Survey__c.X1_How_like_would_you_reco_to_a_colleag__c}"/></td></tr>
+
+<tr><td>&nbsp;</td></tr>
+
+<tr><td><b><apex:outputLabel value="2. What is the primary reason for the score you just gave us?" rendered="{!IF(Aon_Consulting_Client_Promise_Survey__c.Contact__r.Preferred_Language__c!='French',true,false)}"/></b></td></tr>
+<tr><td><b><apex:outputLabel value="2. Quelle est la raison principale de cette note?" rendered="{!IF(Aon_Consulting_Client_Promise_Survey__c.Contact__r.Preferred_Language__c=='French',true,false)}"/></b></td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td align="justify"><apex:outputText value="{!Aon_Consulting_Client_Promise_Survey__c.X2_What_is_the_prim_reas_for_the_score__c}"/></td></tr>
+
+<tr><td>&nbsp;</td></tr>
+
+<tr><td><b><apex:outputLabel value="3. What are your benefits, rewards, and talent goals for the year?" rendered="{!IF(Aon_Consulting_Client_Promise_Survey__c.Contact__r.Preferred_Language__c!='French',true,false)}"/></b></td></tr>
+<tr><td><b><apex:outputLabel value="3. Quels sont vos avantages, les récompenses et les objectifs du talent pour l'année?" rendered="{!IF(Aon_Consulting_Client_Promise_Survey__c.Contact__r.Preferred_Language__c=='French',true,false)}"/></b></td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td align="justify"><apex:outputText value="{!Aon_Consulting_Client_Promise_Survey__c.X3_What_are_your_benefits_rewards_goals__c}"/></td></tr>
+
+<tr><td>&nbsp;</td></tr>
+</apex:page>

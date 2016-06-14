@@ -1,0 +1,217 @@
+<apex:page standardController="Limitation_of_Liability__c">
+    <apex:pageMessages />
+    <apex:form >
+     <apex:pageBlock title="Limitation of Liability" id="thePageBlock" mode="edit">
+            <apex:pageBlockButtons >
+            <apex:commandButton action="{!save}" value="Save"/>
+            <apex:commandButton action="{!cancel}" value="Cancel"/>
+            </apex:pageBlockButtons>
+        <apex:pageBlockSection title="" collapsible="false" columns="2">
+        <apex:outputField value="{!Limitation_of_Liability__c.Account_lol__c}"/>
+                        <apex:pageBlockSectionItem />
+        </apex:pageBlockSection>
+        <apex:pageBlockSection title="Limitation of Liability" collapsible="false" columns="1">
+            <html>
+                <body>
+                    <b>Defined</b>
+                    <ul style="list-style-type: circle;">
+                        <li>This provision limits Aon Hewitt’s liability with respect to the services provided under a client agreement. Aon Hewitt’s standard limitation of liability is capped at the annual fees as documented under a client contract. Any modification to standard liability language, including increasing the cap above 1x annual fees, requires additional approvals from the Law Department, business leadership and Finance. </li> 
+                    </ul>
+                    <b>Instructions</b>
+                    <ul style="list-style-type: circle;">
+                        <li>Below are three streams of questions related to Consulting's and Outsourcing's Limitation of Liability provisions on client contracts.  Account Owners are to answer the questions for each segment to indicate if the contracts within that segment contain limitation language to cap our liability or if an exception approval was obtained.</li> 
+                        <li style="color:red;">Note: Only one Limitation of Liability record can be saved per account.  If a Limitation of Liability record already exists for this account please record your updates on the existing record.</li>
+                    </ul>
+                </body>
+            </html>
+        </apex:pageBlockSection>
+        <apex:actionRegion >
+            <apex:pageBlockSection title="Retirement Consulting  Services" columns="1">
+                <!--<apex:actionStatus startText="applying value..." id="status"/>-->
+                <apex:pageblockSectionItem dataStyle="text-align:left; width: 15%; max-width: 15%;">
+                    <apex:outputLabel value="Is this a Retirement Client? (Note that, for this purpose, outsourcing services provided through the Consulting practice (e.g., DB Calc or PenProPlus) should be treated as consulting services.)"/>                        
+                    <apex:inputField value="{!Limitation_of_Liability__c.Is_this_a_Retirement_client__c}">
+                        <apex:actionSupport event="onchange" rerender="thePageBlock"/>
+                    </apex:inputField>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="1" rendered="{!Limitation_of_Liability__c.Is_this_a_Retirement_client__c == 'Yes'}">
+                <apex:pageblockSectionItem dataStyle="text-align:left; width: 15%; max-width: 15%;">
+                    <apex:outputLabel value="Do we have a master consulting agreement (MCA) or master services agreement (MSA) in place with this client?" />                    
+                    <apex:inputField value="{!Limitation_of_Liability__c.MCA_MSA_Retirement__c}" required="true">
+                        <apex:actionSupport event="onchange" rerender="thePageBlock"/>
+                    </apex:inputField>
+                </apex:pageblockSectionItem>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="1" rendered="{!Limitation_of_Liability__c.MCA_MSA_Retirement__c == 'Yes'}">
+                <apex:pageblockSectionItem dataStyle="text-align:left; width: 15%; max-width: 15%;">
+                    <apex:outputLabel value="Does that master agreement contain a limitation of liability such that our liability is capped (either at a specific amount or a multiple of fees)?" />                    
+                    <apex:inputField value="{!Limitation_of_Liability__c.MCA_MSA_contain_LOL_Ret__c}" required="true">
+                        <apex:actionSupport event="onchange" rerender="thePageBlock"/>
+                    </apex:inputField>
+                </apex:pageblockSectionItem>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="1" rendered="{!Limitation_of_Liability__c.MCA_MSA_contain_LOL_Ret__c == 'No'}">
+                <apex:pageblockSectionItem dataStyle="text-align:left; width: 15%; max-width: 15%;">
+                    <apex:outputLabel value="For a master agreement with uncapped liability, was business/legal leadership consulted and was approval obtained?" />                    
+                    <apex:inputField value="{!Limitation_of_Liability__c.approval_obtained_ret1__c}" required="true">
+                        <apex:actionSupport event="onchange" rerender="thePageBlock"/>
+                    </apex:inputField>
+                </apex:pageblockSectionItem>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="1" rendered="{!Limitation_of_Liability__c.approval_obtained_ret1__c == 'No'}">
+                <apex:pageblockSectionItem dataStyle="text-align:left; width: 15%; max-width: 15%;">
+                    <apex:outputLabel value="For a master agreement with uncapped liability, does the agreement contemplate services of a fiduciary nature (e.g., investment consulting services) for which we are incapable of limiting our liability?" />                    
+                    <apex:inputField value="{!Limitation_of_Liability__c.fiduciary_nature_ret__c}" required="true">
+                        <apex:actionSupport event="onchange" rerender="thePageBlock"/>
+                    </apex:inputField>
+                </apex:pageblockSectionItem>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="1" rendered="{!Limitation_of_Liability__c.MCA_MSA_Retirement__c == 'No' || Limitation_of_Liability__c.MCA_MSA_contain_LOL_Ret__c == 'Yes' || Limitation_of_Liability__c.approval_obtained_ret1__c == 'Yes' || Limitation_of_Liability__c.fiduciary_nature_ret__c == 'Yes' || Limitation_of_Liability__c.fiduciary_nature_ret__c == 'No'}">
+                <apex:pageblockSectionItem dataStyle="text-align:left; width: 15%; max-width: 15%;">
+                    <apex:outputLabel value="Do we have any individual consulting agreements that are not bound by an MCA/MSA (short form or express agreements, job arrangement letters, letter agreements, services agreements, etc.) in place with this client?" />                    
+                    <apex:inputField value="{!Limitation_of_Liability__c.agreements_with_client_ret__c}" required="true">
+                        <apex:actionSupport event="onchange" rerender="thePageBlock"/>
+                    </apex:inputField>
+                </apex:pageblockSectionItem>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="1" rendered="{!Limitation_of_Liability__c.agreements_with_client_ret__c == 'Yes'}">
+                <apex:pageblockSectionItem dataStyle="text-align:left; width: 15%; max-width: 15%;">
+                    <apex:outputLabel value="Do those agreements, letters, etc. contain limitations of liability such that our liability is capped (either at a specific amount or a multiple of fees)?" />                    
+                    <apex:inputField value="{!Limitation_of_Liability__c.agreements_contain_LOL_ret__c}" required="true">
+                        <apex:actionSupport event="onchange" rerender="thePageBlock"/>
+                    </apex:inputField>
+                </apex:pageblockSectionItem>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="1" rendered="{!Limitation_of_Liability__c.agreements_contain_LOL_ret__c == 'No'}">
+                <apex:pageblockSectionItem dataStyle="text-align:left; width: 15%; max-width: 15%;">
+                    <apex:outputLabel value="For agreements, letters, etc. with uncapped liability, was business/legal leadership consulted and was approval obtained?" />                    
+                    <apex:inputField value="{!Limitation_of_Liability__c.approval_obtained_ret2__c}" required="true">
+                        <apex:actionSupport event="onchange" rerender="thePageBlock"/>
+                    </apex:inputField>
+                </apex:pageblockSectionItem>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="1" rendered="{!Limitation_of_Liability__c.approval_obtained_ret2__c == 'No'}">
+                <apex:pageblockSectionItem dataStyle="text-align:left; width: 15%; max-width: 15%;">
+                    <apex:outputLabel value="For any agreement with uncapped liability, does the agreement contemplate services of a fiduciary nature (e.g., investment consulting services) for which we are incapable of limiting our liability?" />                    
+                    <apex:inputField value="{!Limitation_of_Liability__c.fiduciary_nature_ret2__c}" required="true">
+                        <apex:actionSupport event="onchange" rerender="thePageBlock"/>
+                    </apex:inputField>
+                </apex:pageblockSectionItem>
+            </apex:pageBlockSection>           
+        </apex:actionRegion>
+        
+        <apex:actionRegion >
+            <apex:pageBlockSection title="PRT and Communication Services" columns="1">
+                <!--<apex:actionStatus startText="applying value..." id="status"/>-->
+                <apex:pageblockSectionItem dataStyle="text-align:left; width: 15%; max-width: 15%;">
+                    <apex:outputLabel value="Is this a PRT or Communication client? (Note that, for this purpose, outsourcing services provided through the Consulting practice (e.g., DB Calc or PenProPlus) should be treated as consulting services.)"/>                        
+                    <apex:inputField value="{!Limitation_of_Liability__c.PRT_or_Communication_client__c}">
+                        <apex:actionSupport event="onchange" rerender="thePageBlock"/>
+                    </apex:inputField>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>  
+            <apex:pageBlockSection columns="1" rendered="{!Limitation_of_Liability__c.PRT_or_Communication_client__c == 'Yes'}">
+                <apex:pageblockSectionItem dataStyle="text-align:left; width: 15%; max-width: 15%;">
+                    <apex:outputLabel value="Do we have a master consulting agreement (MCA) or master services agreement (MSA) in place with this client?" />                    
+                    <apex:inputField value="{!Limitation_of_Liability__c.MCA_MSA_PRT_Comm__c}" required="true">
+                        <apex:actionSupport event="onchange" rerender="thePageBlock"/>
+                    </apex:inputField>
+                </apex:pageblockSectionItem>
+            </apex:pageBlockSection>     
+            <apex:pageBlockSection columns="1" rendered="{!Limitation_of_Liability__c.MCA_MSA_PRT_Comm__c == 'Yes'}">
+                <apex:pageblockSectionItem dataStyle="text-align:left; width: 15%; max-width: 15%;">
+                    <apex:outputLabel value="Does that master agreement contain a limitation of liability such that our liability is capped (either at a specific amount or a multiple of fees)?" />                    
+                    <apex:inputField value="{!Limitation_of_Liability__c.MCA_MSA_contain_LOL_PRT__c}" required="true">
+                        <apex:actionSupport event="onchange" rerender="thePageBlock"/>
+                    </apex:inputField>
+                </apex:pageblockSectionItem>
+            </apex:pageBlockSection> 
+            <apex:pageBlockSection columns="1" rendered="{!Limitation_of_Liability__c.MCA_MSA_contain_LOL_PRT__c == 'No'}">
+                <apex:pageblockSectionItem dataStyle="text-align:left; width: 15%; max-width: 15%;">
+                    <apex:outputLabel value="For a master agreement with uncapped liability, was business/legal leadership consulted and was approval obtained?" />                    
+                    <apex:inputField value="{!Limitation_of_Liability__c.approval_obtained_PRT1__c}" required="true">
+                        <apex:actionSupport event="onchange" rerender="thePageBlock"/>
+                    </apex:inputField>
+                </apex:pageblockSectionItem>
+            </apex:pageBlockSection> 
+            <apex:pageBlockSection columns="1" rendered="{!Limitation_of_Liability__c.approval_obtained_PRT1__c == 'No'}">
+                <apex:pageblockSectionItem dataStyle="text-align:left; width: 15%; max-width: 15%;">
+                    <apex:outputLabel value="For a master agreement with uncapped liability, does the agreement contemplate services of a fiduciary nature (e.g., investment consulting services) for which we are incapable of limiting our liability?" />                    
+                    <apex:inputField value="{!Limitation_of_Liability__c.fiduciary_nature_PRT__c}" required="true">
+                        <apex:actionSupport event="onchange" rerender="thePageBlock"/>
+                    </apex:inputField>
+                </apex:pageblockSectionItem>
+            </apex:pageBlockSection> 
+            <apex:pageBlockSection columns="1" rendered="{!Limitation_of_Liability__c.MCA_MSA_PRT_Comm__c == 'No' || Limitation_of_Liability__c.MCA_MSA_contain_LOL_PRT__c == 'Yes' || Limitation_of_Liability__c.approval_obtained_PRT1__c == 'Yes' || Limitation_of_Liability__c.fiduciary_nature_PRT__c == 'Yes' || Limitation_of_Liability__c.fiduciary_nature_PRT__c == 'No'}">
+                <apex:pageblockSectionItem dataStyle="text-align:left; width: 15%; max-width: 15%;">
+                    <apex:outputLabel value="Do we have any individual consulting agreements (short form or express agreements, job arrangement letters, letter agreements, services agreements, etc.) in place with this client?" />                    
+                    <apex:inputField value="{!Limitation_of_Liability__c.agreements_with_client_PRT__c}" required="true">
+                        <apex:actionSupport event="onchange" rerender="thePageBlock"/>
+                    </apex:inputField>
+                </apex:pageblockSectionItem>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="1" rendered="{!Limitation_of_Liability__c.agreements_with_client_PRT__c == 'Yes'}">
+                <apex:pageblockSectionItem dataStyle="text-align:left; width: 15%; max-width: 15%;">
+                    <apex:outputLabel value="Do those agreements, letters, etc. contain limitations of liability such that our liability is capped (either at a specific amount or a multiple of fees)?" />                    
+                    <apex:inputField value="{!Limitation_of_Liability__c.agreements_contain_LOL_PRT__c}" required="true">
+                        <apex:actionSupport event="onchange" rerender="thePageBlock"/>
+                    </apex:inputField>
+                </apex:pageblockSectionItem>
+            </apex:pageBlockSection> 
+            <apex:pageBlockSection columns="1" rendered="{!Limitation_of_Liability__c.agreements_contain_LOL_PRT__c == 'No'}">
+                <apex:pageblockSectionItem dataStyle="text-align:left; width: 15%; max-width: 15%;">
+                    <apex:outputLabel value="For agreements, letters, etc. with uncapped liability, was business/legal leadership consulted and was approval obtained?" />                    
+                    <apex:inputField value="{!Limitation_of_Liability__c.approval_obtained_PRT2__c}" required="true">
+                        <apex:actionSupport event="onchange" rerender="thePageBlock"/>
+                    </apex:inputField>
+                </apex:pageblockSectionItem>
+            </apex:pageBlockSection> 
+            <apex:pageBlockSection columns="1" rendered="{!Limitation_of_Liability__c.approval_obtained_PRT2__c == 'No'}">
+                <apex:pageblockSectionItem dataStyle="text-align:left; width: 15%; max-width: 15%;">
+                    <apex:outputLabel value="For any agreement with uncapped liability, does the agreement contemplate services of a fiduciary nature (e.g., investment consulting services) for which we are incapable of limiting our liability?" />                    
+                    <apex:inputField value="{!Limitation_of_Liability__c.fiduciary_nature_PRT2__c}" required="true">
+                        <apex:actionSupport event="onchange" rerender="thePageBlock"/>
+                    </apex:inputField>
+                </apex:pageblockSectionItem>
+            </apex:pageBlockSection>
+        </apex:actionRegion>
+        
+        <apex:actionRegion >
+            <apex:pageBlockSection title="Outsourcing Services" columns="1">
+                <!--<apex:actionStatus startText="applying value..." id="status"/>-->
+                <apex:pageblockSectionItem dataStyle="text-align:left; width: 15%; max-width: 15%;">
+                    <apex:outputLabel value="Is this an Outsourcing client? (Note that, for this purpose, outsourcing services provided through the Consulting practice (e.g., DB Calc or PenProPlus) should be treated as consulting services.)"/>                        
+                    <apex:inputField value="{!Limitation_of_Liability__c.Outsourcing_client__c}">
+                        <apex:actionSupport event="onchange" rerender="thePageBlock"/>
+                    </apex:inputField>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="1" rendered="{!Limitation_of_Liability__c.Outsourcing_client__c == 'Yes'}">
+                <apex:pageblockSectionItem dataStyle="text-align:left; width: 15%; max-width: 15%;">
+                    <apex:outputLabel value="Do our outsourcing services agreements contain limitations of liability such that our liability is capped (either at a specific amount or a multiple of fees)?" />                    
+                    <apex:inputField value="{!Limitation_of_Liability__c.agreements_contain_LOL_OS__c}" required="true">
+                        <apex:actionSupport event="onchange" rerender="thePageBlock"/>
+                    </apex:inputField>
+                </apex:pageblockSectionItem>
+            </apex:pageBlockSection> 
+            <apex:pageBlockSection columns="1" rendered="{!Limitation_of_Liability__c.agreements_contain_LOL_OS__c == 'No' && Limitation_of_Liability__c.Outsourcing_client__c == 'Yes'}">
+                <apex:pageblockSectionItem dataStyle="text-align:left; width: 15%; max-width: 15%;">
+                    <apex:outputLabel value="For any agreement with uncapped liability, was business/legal leadership consulted and was approval obtained?" />                    
+                    <apex:inputField value="{!Limitation_of_Liability__c.approval_obtained_OS__c}" required="true">
+                        <apex:actionSupport event="onchange" rerender="thePageBlock"/>
+                    </apex:inputField>
+                </apex:pageblockSectionItem>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="1" rendered="{!Limitation_of_Liability__c.approval_obtained_OS__c == 'No' && Limitation_of_Liability__c.agreements_contain_LOL_OS__c == 'No' && Limitation_of_Liability__c.Outsourcing_client__c == 'Yes'}">
+                <apex:pageblockSectionItem dataStyle="text-align:left; width: 15%; max-width: 15%;">
+                    <apex:outputLabel value="For any agreement with uncapped liability, does the agreement contemplate services of a fiduciary nature (e.g., advisory services) for which we are incapable of limiting our liability?" />                    
+                    <apex:inputField value="{!Limitation_of_Liability__c.fiduciary_nature_OS__c}" required="true">
+                        <apex:actionSupport event="onchange" rerender="thePageBlock"/>
+                    </apex:inputField>
+                </apex:pageblockSectionItem>
+            </apex:pageBlockSection>
+        </apex:actionRegion>
+      </apex:pageBlock>  
+    </apex:form>
+</apex:page>

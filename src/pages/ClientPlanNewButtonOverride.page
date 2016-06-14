@@ -1,0 +1,8 @@
+<apex:page standardController="Annual_Account_Plan__c" extensions="ctlr_ClientPlanNewButtonOverride" action="{!init}">
+    <apex:variable var="errorMessage" value="No Client Plan Record Type Exists for the Global Region tied to this Account. Contact your local Sales Operations team for further assistance." />
+    <apex:pageMessage summary="{!errorMessage}" severity="error" strength="3" />
+    <br/>
+    <apex:form >
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<apex:commandButton action="{!returnBack}" value="Return"></apex:commandButton>
+    </apex:form>
+</apex:page>

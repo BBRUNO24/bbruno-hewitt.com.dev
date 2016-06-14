@@ -1,0 +1,143 @@
+<apex:page controller="Adoption" sidebar="false">
+  <apex:stylesheet value="{!URLFOR($Resource.LightningDesignSystem, 'assets/styles/salesforce-lightning-design-system-vf.css')}"/>
+  <apex:includeScript value="{!URLFOR($Resource.Adoption, 'js/main.js')}"/>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script> 
+  <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+  <style>
+      .shorter{
+        padding: 15px 24px 0px !important;
+      }
+      .slds-grid--frame{
+        height: 100% !important;
+        min-height: 800px;
+        padding-bottom: 250px;
+        width: 100% !important;
+      }
+      .oRight{
+         padding: 0px !important;
+       }
+       .noSidebarCell{
+        padding: 0px !important;
+       }
+       .slds-card__body{
+        background-color: #fff;
+       }
+  </style>
+  <div class="slds" id="app">
+  </div>
+  <script type="text/javascript">
+      window.staticUrl = "{!URLFOR($Resource.LightningDesignSystem)}";
+      window.userOptions = {!userOptions};
+      window.globalUserOptions = {!globalUserOptions};
+      window.globalCountryOptions = {!globalCountryOptions};
+      /*google.charts.load('current', {'packages':['geochart', 'calendar']});
+      google.charts.setOnLoadCallback(drawCharts);
+      var conn = new jsforce.Connection({ accessToken: '{!$API.Session_Id}' });
+
+      var App = {
+        dashboards: [],
+        store: {},
+        region: '',
+        draw: function (forceChange) {
+          var self = this;
+          this.dashboards.forEach(function(dashboard){
+            if(!dashboard.isDrawn || forceChange){
+              dashboard.draw(self.region, self.store);
+            }
+          });
+        },
+        register: function(dashboard) {
+          this.dashboards.push(dashboard);
+        }
+      };
+
+      var Dashboard = function() {
+        this.isDrawn = false;
+        this.draw = function (argument) {
+          // body...
+        }
+      }
+
+      function drawCharts(){
+        fetchCountryData();
+        fetchCityData();
+        fetchLoginData();
+      }
+
+      function fetchLoginData(){
+        conn.query('SELECT COUNT(Id)cnt, DAY_ONLY(LoginTime)day FROM LoginHistory GROUP BY DAY_ONLY(LoginTime)', function(err, res) {
+          console.log(err);
+          console.log(res);
+          drawCalendar(res.records);
+        });
+      }
+
+      function fetchCountryData(){
+        conn.query('SELECT COUNT(Id)cnt, CountryIso FROM LoginGeo WHERE CreatedDate = THIS_WEEK GROUP BY CountryIso', function(err, res) {
+          drawCountryMap(res.records);
+        });
+      }
+
+      function fetchCityData(){
+        conn.query('SELECT COUNT(Id)cnt, City FROM LoginGeo WHERE CreatedDate = THIS_WEEK GROUP BY City', function(err, res) {
+          drawRegionsMap(res.records);
+        });
+      }
+
+      function drawCalendar(data){
+        var mapped = data.map(function(d) {
+          var parts = d.day.split("-");
+          return [new Date(parts[0], parts[1] - 1, parts[2]), d.cnt];
+        });
+        var dataTable = new google.visualization.DataTable();
+        dataTable.addColumn({ type: 'date', id: 'day' });
+        dataTable.addColumn({ type: 'number', id: 'cnt' });
+        dataTable.addRows(mapped);
+        console.log(mapped);
+
+        var chart = new google.visualization.Calendar(document.getElementById('calendar_basic'));
+
+        var options = {
+          title: "Logins by Day"
+        };
+
+        chart.draw(dataTable, options);
+      }
+      
+      function drawRegionsMap(data) {
+        var mapped = data.map(function(d) {
+          return [d.City, d.cnt];
+        });
+        
+        mapped.unshift(['City', 'Logins']);
+        var data = google.visualization.arrayToDataTable(mapped);
+
+        var options = {
+          region: 'US',
+          title: "Logins by City",
+          displayMode: 'markers',
+          colorAxis: {colors: ['green', 'blue']},
+          enableRegionInteractivity: true
+        };
+
+        var chart = new google.visualization.GeoChart(document.getElementById('regions_div'));
+        chart.draw(data, options);
+      }
+      function drawCountryMap(data) {
+        var mapped = data.map(function(d) {
+          return [d.CountryIso, d.cnt];
+        });
+        mapped.unshift(['Country', 'Logins']);
+
+        var data = google.visualization.arrayToDataTable(mapped);
+
+        var options = {
+          title: "Logins by Country"
+        };
+
+        var chart = new google.visualization.GeoChart(document.getElementById('country_div'));
+
+        chart.draw(data, options);
+      }*/
+    </script>
+</apex:page>

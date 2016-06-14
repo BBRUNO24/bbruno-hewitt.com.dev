@@ -1,0 +1,16 @@
+<apex:page standardController="Revenue_Sales_Pipeline__c">
+        <head>
+                <style type="text/css">
+                .tableHead {
+                        font: Garamond, Georgia, serif;
+                        font-size:13.0pt;
+                        font-weight: bold;
+                        border-style: none;
+                        color: #FFFFFF;
+                        background-color: #FF0000;
+                        height: 20px
+                }
+                </style>
+        </head>
+        <div align="center" class="tableHead">This Page Reflects EMEA Data Only</div>
+</apex:page>

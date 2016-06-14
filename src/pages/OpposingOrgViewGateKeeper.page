@@ -1,0 +1,7 @@
+<apex:page controller="ctlr_OpposingOrgViewGateKeeper" action="{!checkAccountTeamMembership}">
+	
+	<apex:variable var="errorMessage" value="Please ensure you are a member of the account team before attempting to access the ARS View" />
+	
+	<apex:pageMessage summary="{!errorMessage}" severity="error" strength="3" />
+	
+</apex:page>

@@ -1,0 +1,438 @@
+<apex:page showHeader="true" standardStylesheets="false" sidebar="false" applyHtmlTag="true" applyBodyTag="false" docType="html-5.0" controller="OpportunityEditController">    
+
+<html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">    
+
+<head>
+  <title>Edit: {!opportunity.Name}</title>
+  <apex:stylesheet value="{!URLFOR($Resource.LightningDesignSystem, 'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+  <apex:includeScript value="{!URLFOR($Resource.jQueryUI, 'jquery-ui-1.11.4/external/jquery/jquery.js')}"/>
+  <apex:includeScript value="{!URLFOR($Resource.jQueryUI, 'jquery-ui-1.11.4/jquery-ui.min.js')}"/>
+</head>    
+
+<body>    
+  <apex:form id="opportunityForm"> 
+  <!-- REQUIRED SLDS WRAPPER -->
+    <div class="slds" >
+      <apex:outputPanel layout="none" id="toasts">
+        <c:SLDS_Toast toast="{!toast}"> </c:SLDS_Toast>
+      </apex:outputPanel>    
+      <!-- MASTHEAD -->
+      <div class="slds-page-header" role="banner">
+        <div class="slds-grid">
+          <div class="slds-col slds-has-flexi-truncate">
+            <div class="slds-media slds-media--center slds-no-space slds-grow">
+              <div class="slds-media__figure">
+                <c:SLDS_SVG styleClass="slds-icon slds-icon-standard-user" path="assets/icons/standard-sprite/svg/symbols.svg#user" ></c:SLDS_SVG>
+              </div>
+              <div class="slds-media__body">
+                <p class="slds-text-heading--label">Record Type</p>
+                <h1 class="slds-page-header__title slds-m-right--small slds-truncate slds-align-middle" title="{!opportunity.Name}">{!opportunity.Name}</h1>
+              </div>
+            </div>
+          </div>
+          <div class="slds-col slds-no-flex slds-grid slds-align-bottom">
+            <div class="slds-button-group" role="group">
+              <button class="slds-button slds-button--neutral">Save</button>
+              <button class="slds-button slds-button--neutral">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slds-grid slds-m-top--small">
+        <div class="slds-col--padded">
+          <div class="slds-wizard" role="navigation">
+            <ol class="slds-wizard__list">
+              <apex:repeat value="{!steps.steps}" var="step">
+                <li class="slds-wizard__item {!IF(step.num <= steps.currentStep.num,'slds-is-active','')} ">
+                  <a href="javascript:void(0);" class="slds-wizard__link">
+                    <span class="slds-wizard__marker"></span>
+                    <span class="slds-wizard__label slds-text-heading--label slds-truncate">{!step.name}</span>
+                  </a>
+                </li>
+              </apex:repeat>
+            </ol>
+            <span class="slds-wizard__progress" style="z-index: 0;">
+              <span class="slds-wizard__progress-bar" style="width:{!steps.stepPercent}%;"></span>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="slds-grid slds-m-top--small slds-grid--align-spread">
+        <div class="slds-col">
+          <apex:commandLink action="{!priorStep}" 
+            value="Back" 
+            id="priorStepLink" 
+            reRender="opportunityForm"
+            onclick="startSpinner();"
+            oncomplete="endSpinner();"
+            styleClass="slds-button slds-button--neutral slds-not-selected"
+            rendered="{!steps.currentStep.num > 0}"/>
+        </div>
+        <div class="slds-col slds-text-align--center">
+          <div class="slds-text-heading--medium">{!steps.currentStep.name}</div>
+          <div class="slds-text-heading--label">{!steps.currentStep.descript}</div>
+        </div>
+        <div class="slds-col">
+          <apex:commandLink action="{!nextStep}" 
+            value="Next" 
+            id="nextStepLink" 
+            reRender="opportunityForm"
+            onclick="startSpinner();"
+            oncomplete="endSpinner();"
+            styleClass="slds-button slds-button--neutral slds-not-selected"
+            rendered="{!steps.currentStep.num < 4}"/>
+        </div>
+      </div>
+      <!-- / MASTHEAD -->    
+      <div id="content" class="slds-m-top--small">
+        <!-- PRIMARY CONTENT WRAPPER -->
+        <apex:pageBlock rendered="{!steps.currentStep.num == 0}" id="contacts" mode="maindetail">
+          <div class="slds-grid slds-m-top--small">
+            <div class="slds-col--padded slds-size--1-of-2">
+              <div class="slds-card">
+                <div class="slds-card__header slds-grid">
+                  <div class="slds-media slds-media--center slds-has-flexi-truncate">
+                    <div class="slds-media__figure">
+                      <c:SLDS_SVG styleClass="slds-icon slds-icon-standard-contact slds-icon--small" path="assets/icons/standard-sprite/svg/symbols.svg#contact" ></c:SLDS_SVG>
+                    </div>
+                    <div class="slds-media__body slds-truncate">
+                      <a href="javascript:void(0);" class="slds-text-link--reset">
+                        <span class="slds-text-heading--small">Available Contacts ({!contactManager.contacts.size})</span>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <div class="slds-card__body">
+                  <table class="slds-table slds-table--bordered slds-max-medium-table--stacked-horizontal">
+                    <thead>
+                      <tr class="slds-text-heading--label">
+                        <th class="">
+                        </th>
+                        <th scope="col" title="Contact Name">
+                          <div class="slds-truncate">Contact Name</div>
+                        </th>
+                        <th scope="col" title="Contact Role">
+                          <div class="slds-truncate">Contact Email</div>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <apex:repeat value="{!contactManager.contacts}" var="cw">
+                        <tr class="slds-hint-parent">
+                          <td class="" data-label="Select Row">
+                            <apex:commandLink action="{!cw.addToContactRoles}" 
+                              value="Add" 
+                              id="nextStepLink" 
+                              reRender="toasts, contacts"
+                              onclick="startSpinner();"
+                              oncomplete="endSpinner();"
+                              styleClass="slds-button slds-button--neutral slds-not-selected"/>
+                          </td>
+                          <td data-label="Contact Name" title="{!cw.contact.Name}">
+                            <div class="slds-truncate">{!cw.contact.Name}</div>
+                          </td>
+                          <td data-label="Contact Email" title="{!cw.contact.Email}">
+                            <div class="slds-truncate">{!cw.contact.Email}</div>
+                          </td>
+                        </tr>
+                      </apex:repeat>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="slds-card__footer">
+                </div>
+              </div>
+            </div>
+            <div class="slds-col--padded slds-size--1-of-2">
+              <div class="slds-card">
+                <div class="slds-card__header slds-grid">
+                  <div class="slds-media slds-media--center slds-has-flexi-truncate">
+                    <div class="slds-media__figure">
+                      <c:SLDS_SVG styleClass="slds-icon slds-icon-standard-contact slds-icon--small" path="assets/icons/standard-sprite/svg/symbols.svg#contact" ></c:SLDS_SVG>
+                    </div>
+                    <div class="slds-media__body slds-truncate">
+                      <a href="javascript:void(0);" class="slds-text-link--reset">
+                        <span class="slds-text-heading--small">Opportunity Contacts ({!contactManager.contactRolesFiltered.size})</span>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <apex:outputPanel layout="none" rendered="{!contactManager.contactRolesFiltered.size == 0}">
+                  <div class="slds-card__body slds-text-align--center">No Contact Roles Selected</div>
+                </apex:outputPanel>
+                <apex:outputPanel layout="none" rendered="{!contactManager.contactRolesFiltered.size != 0}">
+                  <div class="slds-card__body">
+                    <table class="slds-table slds-table--bordered slds-max-medium-table--stacked-horizontal">
+                      <thead>
+                        <tr class="slds-text-heading--label">
+                          <th>
+                          </th>
+                          <th scope="col" title="Contact Name">
+                            <div class="slds-truncate">Contact Name</div>
+                          </th>
+                          <th scope="col" title="Contact Role">
+                            <div class="slds-truncate">Contact Role</div>
+                          </th>
+                          <th scope="col" title="Contact Role">
+                            <div class="slds-truncate">Primary</div>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <apex:repeat value="{!contactManager.contactRolesFiltered}" var="contactWrapper">
+                          <tr class="slds-hint-parent">
+                            <td data-label="Select Row">
+                            </td>
+                            <td data-label="Contact Name" title="{!contactWrapper.contact.Name}">
+                              <div class="slds-truncate">{!contactWrapper.contact.Name}</div>
+                            </td>
+                            <td data-label="Contact Email" title="{!contactWrapper.contactRole.Role}">
+                              <c:LexInputField sObject="{!contactWrapper.contactRole}" Field="Role" showLabel="false"></c:LexInputField>
+                            </td>
+                            <td class="" data-label="Select Row">
+                              <apex:commandLink action="{!contactWrapper.makePrimaryContact}" 
+                                value="Make Primary" 
+                                id="nextStepLink" 
+                                reRender="toasts, contacts"
+                                onclick="startSpinner();"
+                                oncomplete="endSpinner();"
+                                styleClass="slds-button slds-button--neutral slds-not-selected"
+                                rendered="{!contactWrapper.contactRole.IsPrimary == false}"/>
+                                <apex:outputText rendered="{!contactWrapper.contactRole.IsPrimary != false}">
+                                  Primary Contact
+                                </apex:outputText>
+                            </td>
+                          </tr>
+                        </apex:repeat>
+                      </tbody>
+                    </table>
+                  </div>
+                </apex:outputPanel>
+                <div class="slds-card__footer">
+                </div>
+              </div>
+            </div>
+
+          </div>   
+        </apex:pageBlock>
+        <apex:pageBlock rendered="{!steps.currentStep.num == 1}" id="details" mode="maindetail">
+          <div class="slds-grid slds-m-top--small">
+            <div class="slds-col">
+              <apex:repeat value="{!sections}" var="section" id="sectionLoop">
+                <h3 class="slds-section-title--divider slds-m-top--medium">{!section.Name}</h3>
+                <div class="slds-grid">
+                  <apex:repeat value="{!section.layout}" var="column" id="columnLoop" >
+                    <div class="slds-col--padded slds-size--1-of-{!section.columnsSize}">
+                      <apex:repeat value="{!column.fields}" var="f" id="fieldLoop">
+                        <c:LexInputField sObject="{!opportunity}" Field="{!f.fieldName}" ></c:LexInputField>
+                      </apex:repeat>
+                    </div>
+                  </apex:repeat>
+                </div>
+              </apex:repeat>
+            </div>
+          </div>
+        </apex:pageBlock>
+        <apex:pageBlock rendered="{!steps.currentStep.num == 2}" id="products" mode="maindetail">
+          <div class="slds-grid slds-m-top--medium">
+            <div class="slds-col--padded">
+              <div class="slds-text-heading--small">Pricebook:
+                <div class="slds-text-heading--medium"> {!productsController.standardPriceBook.Name}</div>
+              </div>
+            </div>
+          </div>
+          <div class="slds-grid slds-m-top--medium">
+            <div class="slds-col--padded">
+              <div class="slds-panel slds-grid slds-grid--vertical slds-nowrap slds-is-editing">
+                <div class="slds-form--stacked slds-grow slds-scrollable--y">
+                  <div class="slds-panel__section slds-has-divider--bottom">
+                    <div class="slds-media slds-tile">
+                      <div class="slds-media__figure">
+                        <label class="slds-checkbox" for="completed">
+                          <input name="checkbox" type="checkbox" id="completed" />
+                          <span class="slds-checkbox--faux"></span>
+                        </label>
+                      </div>
+                      <div class="slds-media__body">
+                        <p class="tile__title slds-truncate slds-text-heading--small"><a href="javascript:void(0);">Follow up on &#x27;15 contact</a></p>
+                        <div class="slds-tile__detail slds-text-body--small">
+                          <p class="slds-truncate">Jun 18</p>
+                          <div class="slds-button-group slds-m-top--small" role="group">
+                            <button class="slds-button slds-button--neutral slds-grow">Edit</button>
+                            <button class="slds-button slds-button--neutral slds-grow">Follow Up</button>
+                            <button class="slds-button slds-button--neutral slds-grow">Delete</button>
+                            <button class="slds-button slds-button--icon-border-filled">
+                              <svg aria-hidden="true" class="slds-button__icon">
+                                <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#down"></use>
+                              </svg>
+                              <span class="slds-assistive-text">More Actions</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="slds-panel__section">
+                    <h3 class="slds-text-heading--small slds-m-bottom--medium">Task Information</h3>
+                    <div class="slds-form-element">
+                      <label class="slds-form-element__label" for="text-input-01">Subject</label>
+                      <div class="slds-form-element__control">
+                        <input class="slds-input" id="text-input-01" value="Follow up on &#x27;15 Contract" />
+                      </div>
+                    </div>
+                    <div class="slds-form-element">
+                      <label class="slds-form-element__label" for="date-input-01">Due Date</label>
+                      <div class="slds-form-element__control">
+                        <input class="slds-input" id="date-input-01" value="6/18/16" />
+                      </div>
+                    </div>
+                    <div class="slds-form-element slds-lookup slds-has-selection" data-select="single" data-scope="single" data-typeahead="false">
+                      <label class="slds-form-element__label" for="text-input-02">Assigned To</label>
+                      <div class="slds-form-element__control">
+                        <div class="slds-pill_container slds-show">
+                          <span class="slds-pill">
+                            <span class="slds-icon_container slds-icon-standard-avatar slds-pill__icon_container">
+                              <svg aria-hidden="true" class="slds-icon">
+                                <use xlink:href="/assets/icons/standard-sprite/svg/symbols.svg#avatar"></use>
+                              </svg>
+                              <span class="slds-assistive-text">Person</span>
+                            </span><a href="javascript:void(0);" class="slds-pill__label" title="Jason Dewar">Jason Dewar</a>
+                            <button class="slds-button slds-button--icon slds-pill__remove">
+                              <svg aria-hidden="true" class="slds-button__icon">
+                                <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
+                              </svg>
+                              <span class="slds-assistive-text">Remove</span>
+                            </button>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="slds-form-element slds-lookup slds-has-selection" data-select="single" data-scope="single" data-typeahead="false">
+                      <label class="slds-form-element__label" for="text-input-03">Name</label>
+                      <div class="slds-form-element__control">
+                        <div class="slds-pill_container slds-show">
+                          <span class="slds-pill">
+                            <span class="slds-icon_container slds-icon-standard-avatar slds-pill__icon_container">
+                              <svg aria-hidden="true" class="slds-icon">
+                                <use xlink:href="/assets/icons/standard-sprite/svg/symbols.svg#avatar"></use>
+                              </svg>
+                              <span class="slds-assistive-text">Person</span>
+                            </span><a href="javascript:void(0);" class="slds-pill__label" title="Adam Choi">Adam Choi</a>
+                            <button class="slds-button slds-button--icon slds-pill__remove">
+                              <svg aria-hidden="true" class="slds-button__icon">
+                                <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
+                              </svg>
+                              <span class="slds-assistive-text">Remove</span>
+                            </button>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="slds-form-element slds-lookup slds-has-selection" data-select="single" data-scope="single" data-typeahead="false">
+                      <label class="slds-form-element__label" for="text-input-04">Related To</label>
+                      <div class="slds-form-element__control">
+                        <div class="slds-pill_container slds-show">
+                          <span class="slds-pill">
+                            <span class="slds-icon_container slds-icon-standard-account slds-pill__icon_container">
+                              <svg aria-hidden="true" class="slds-icon">
+                                <use xlink:href="/assets/icons/standard-sprite/svg/symbols.svg#account"></use>
+                              </svg>
+                              <span class="slds-assistive-text">Account</span>
+                            </span><a href="javascript:void(0);" class="slds-pill__label" title="Tesla Cloudhub + Anypoint Connectors">Tesla Cloudhub + Anypoint Connectors</a>
+                            <button class="slds-button slds-button--icon slds-pill__remove">
+                              <svg aria-hidden="true" class="slds-button__icon">
+                                <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
+                              </svg>
+                              <span class="slds-assistive-text">Remove</span>
+                            </button>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="slds-form-element">
+                      <label class="slds-form-element__label" for="text-input-05">Comments</label>
+                      <div class="slds-form-element__control">
+                        <textarea class="slds-textarea" id="text-input-05">Adam was open to doing more business in the 4th quarter. Follow up with marketing demo and email templates.</textarea>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="slds-panel__section">
+                    <h3 class="slds-text-heading--small slds-m-bottom--medium">Additional Information</h3>
+                    <div class="slds-form-element">
+                      <label class="slds-form-element__label" for="non-text-input-01">Status</label>
+                      <div class="slds-form-element__control">
+                        <div class="slds-select_container">
+                          <select class="slds-select" id="non-text-input-01">
+                            <option>Not Started</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="slds-form-element">
+                      <label class="slds-form-element__label" for="non-text-input-02">Priority</label>
+                      <div class="slds-form-element__control">
+                        <div class="slds-select_container">
+                          <select class="slds-select" id="non-text-input-02">
+                            <option>Normal</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="slds-panel__actions slds-has-divider--top">
+                  <div class="slds-grid slds-grid--align-center x-small-buttons--horizontal">
+                    <button class="slds-button slds-button--neutral" type="button">Cancel</button>
+                    <button class="slds-button slds-button--brand" type="button">Save</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </apex:pageBlock>
+        <apex:pageBlock rendered="{!steps.currentStep.num == 3}" id="revenue" mode="maindetail">
+          <div class="slds-grid slds-m-top--medium">
+            <div class="slds-col">
+              <p> revenue </p>
+            </div>
+          </div>
+        </apex:pageBlock>
+      </div>
+      <!-- / PRIMARY CONTENT WRAPPER -->    
+      <div id="spinner" class="slds-hide">
+        <div class="slds-grid slds-grid--vertical-align-center slds-grid--align-center" style="min-height: 450px;">
+          <div class="slds-col--padded">
+            <div class="slds-spinner_container">
+              <div class="slds-spinner--brand slds-spinner slds-spinner--large" aria-hidden="false" role="alert">
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- / REQUIRED SLDS WRAPPER -->    
+  </apex:form>
+  <script type="text/javascript">
+    var i = "{!practices}";
+    var showSpinner = false;
+    var jq$;  
+    jQuery(document).ready(function($){
+      jq$ = $;
+    });
+    function startSpinner(){
+      console.log('Start Spinner');
+      var $spinner = jq$('#spinner').addClass('slds-show').removeClass('slds-hide');
+      var $content = jq$('#content').addClass('slds-hide').removeClass('slds-show');
+    }
+    function endSpinner(){
+      console.log('Ending Spinner');
+      var $spinner = jq$('#spinner').addClass('slds-hide').removeClass('slds-show');
+      var $content = jq$('#content').addClass('slds-show').removeClass('slds-hide');
+    }
+  </script>
+</body>
+</html>
+</apex:page>

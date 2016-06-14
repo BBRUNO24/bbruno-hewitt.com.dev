@@ -1,0 +1,12 @@
+<apex:page standardController="OpportunityLineItem" extensions="ctrl_OpportunityProductRedirectPage" showheader="false" sidebar="false">
+<!-- This page is used just for redirection to Opportunity Page -->
+<script>
+
+  window.onload = function() {
+            var retURL = "{!RevenueSchedulePage}";
+            if(retURL != '') {
+                window.open(retURL, '_parent');
+            }
+        }
+</script>
+</apex:page>

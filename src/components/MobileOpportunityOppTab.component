@@ -1,0 +1,144 @@
+<apex:component controller="ctlr_MobileOpportunityOpp" >
+<apex:attribute name="tab" description="" type="String" required="true" assignTo="{!tabToShow}" />
+<apex:attribute name="parentOpportunity" description="" type="Opportunity" required="true" assignTo="{!opp}" />
+<apex:attribute name="toast" description="" type="SLDS_Toast" required="true" assignTo="{!myToast}"/>
+<apex:form id="testingFormForREAL">
+    <script>
+        function rerenderStageFieldsJS(domRef) {
+            var selectedValue = domRef.options[domRef.selectedIndex].value;
+            rerenderStageFieldsAF(selectedValue);
+        }
+    </script>
+    <apex:actionFunction name="rerenderStageFieldsAF" action="{!rerenderStageFields}" rerender="proposeSolutionPanel,closeWonPanel" status="rerenderingStageFields" >
+        <apex:param name="oppStageTemp" assignTo="{!selectedOpportunityStage}" value="" />
+    </apex:actionFunction>
+</apex:form>    
+<apex:form id="opportunityForm">
+<apex:outputPanel id="opportunityPanel" layout="block">
+    <apex:outputPanel id="opportunityContainter" layout="block" rendered="{!tabToShow = 'Opportunity'}">
+    <div id="tab-default-1" class="slds-tabs__content slds-tabs--default__content slds-show" role="tabpanel" aria-labelledby="tab-default-1__item">
+         <!-- PRIMARY CONTENT WRAPPER -->
+        <div class="myapp">
+
+            <!-- CREATE NEW OPPORTUNITY -->
+            <div aria-labelledby="newaopportunityform">
+            
+                <!-- BOXED AREA -->
+                <fieldset class="slds-box slds-theme--default slds-container--small">
+                    <legend id="newaccountform" class="slds-text-heading--medium slds-p-vertical--medium">Add a new Opportunity</legend>
+                        
+                        <!-- OPPORTUNITY NAME -->
+                        <c:LexInputField sObject="{!opp}" Field="Name" required="true"></c:LexInputField>
+                        <!-- / OPPORTUNITY NAME -->
+
+                        <!-- ACCOUNT LOOKUP -->
+                        <c:LexInputField sObject="{!opp}" Field="AccountId" ></c:LexInputField>
+                        <!-- / ACCOUNT LOOKUP -->
+
+                        <!-- STAGE NAME -->
+                        <apex:outputPanel layout="block" styleClass="slds-form-element" id="divPicklist" >
+                            <label class="slds-form-element__label" for="stageName">Stage</label>
+                            <div class="slds-form-element__control">
+                                <apex:inputField id="stageName" value="{!opp.StageName}" styleclass="slds-select" required="true"  onChange="rerenderStageFieldsJS(this); return false;"></apex:inputField>
+                            </div>
+                            <apex:actionStatus id="rerenderingStageFields">
+                                <apex:facet name="start">
+                                    <apex:image value="/img/loading.gif"/>                                                    
+                                </apex:facet>
+                                <apex:facet name="stop"/>
+                            </apex:actionStatus>
+                        </apex:outputPanel>                     
+                        <!-- / STAGE NAME -->
+
+                        <!-- PROBABILITY -->
+                        <c:LexInputField sObject="{!opp}" Field="Probability" required="true"></c:LexInputField>
+                        <!-- / PROBABILITY -->
+
+                        <!-- CLOSE DATE -->
+                        <c:LexInputField sObject="{!opp}" Field="CloseDate" required="true"></c:LexInputField>
+                        <!-- / CLOSE DATE -->
+
+                        <!-- PROPOSE SOLUTION STAGE FIELDS -->
+                        <apex:outputPanel id="proposeSolutionPanel" layout="block">
+                            <apex:outputPanel id="proposeSoluitonFields" layout="block" rendered="{!opp.StageName = 'Propose Solution'}">
+                                <c:LexInputField sobject="{!opp}" Field="Current_Provider_Reference__c" required="true"></c:LexInputField>
+                                <div styleClass="slds-form-element" >
+                                    <apex:outputPanel styleClass="requiredInput" layout="block" id="proposeCompetitor" >
+                                        <div class="requiredInput"> 
+                                            <div class="requiredBlock"></div>
+                                             <apex:actionRegion >
+                                                <label class="slds-form-element__label" for="selPicklist">Competitor</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:selectList size="4" id="proposeCompetitorOptions" value="{!opp.Competitor__c}" styleClass="slds-select" multiselect="true">
+                                                        <apex:selectOptions value="{!competitorOptions}" />
+                                                        
+                                                    </apex:selectList>
+                                                </div>
+                                            </apex:actionRegion>
+                                        </div>
+                                    </apex:outputPanel>
+                                </div>
+                            </apex:outputPanel>
+                        </apex:outputPanel>
+                        <!-- / PROPOSE SOLUTION STAGE FIELDS -->
+
+                        <!-- CLOSE WON STAGE FIELDS -->
+                        <apex:outputPanel id="closeWonPanel" layout="block">
+                            <apex:outputPanel id="closedWonFields" layout="block" rendered="{!opp.StageName = 'Closed Won'}">
+                                <c:LexInputField sobject="{!opp}" Field="Current_Provider_Reference__c" required="true"></c:LexInputField>
+                                 <div styleClass="slds-form-element" >
+                                    <apex:outputPanel styleClass="requiredInput" layout="block" id="closedWonCompetitor" >
+                                        <div class="requiredInput"> 
+                                            <div class="requiredBlock"></div>
+                                             <apex:actionRegion >
+                                                <label class="slds-form-element__label" for="selPicklist">Competitor</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:selectList size="4" id="closeWonCompetitorOptions" value="{!opp.Competitor__c}" styleClass="slds-select" multiselect="true">
+                                                        <apex:selectOptions value="{!competitorOptions}" />
+                                                        
+                                                    </apex:selectList>
+                                                </div>
+                                            </apex:actionRegion>
+                                        </div>
+                                    </apex:outputPanel>
+                                </div>
+                                <c:LexInputField sobject="{!opp}" Field="Reason_Won_or_Lost__c" required="true"></c:LexInputField>
+                                <c:LexInputField sobject="{!opp}" Field="Chosen_Provider_Reference__c" required="true"></c:LexInputField>
+                            </apex:outputPanel>
+                        </apex:outputPanel>
+                        <!-- / CLOSED WON STAGE FIELDS -->
+
+
+                        <!-- DESCRIPTION -->
+                       <!--  <apex:outputPanel id="description">
+                            <c:LexInputField sObject="{!opp}" Field="Description"></c:LexInputField>
+                        </apex:outputPanel> -->
+                        <!-- / DESCRIPTION -->              
+
+                        <!-- NEXT STEP -->
+                      <!--   <apex:outputPanel id="nextStep">
+                            <c:LexInputField sObject="{!opp}" Field="NextStep"></c:LexInputField>
+                        </apex:outputPanel> -->
+                        <!-- / NEXT STEP -->
+
+                        <!-- APPROVER NAME -->
+                        <!-- <apex:outputPanel id="approverName">
+                            <c:LexInputField sObject="{!opp}" Field="Approver_Name__c"></c:LexInputField>
+                        </apex:outputPanel> -->
+                        <!-- / APPROVER NAME --> 
+
+                        <apex:outputPanel >
+                            <apex:commandButton id="bthSaveProducts" action="{!goToProducts}" value="Save & Next" styleClass="slds-button slds-button--brand slds-m-top--medium" reRender=" tabsPanel, productsPanel, opportunityPanel, practice, toastContainer, Bryan" />
+                        </apex:outputPanel>
+                         
+                    <!-- / CREATE NEW OPPORTUNITY FORM -->
+
+                </fieldset>
+                <!-- / BOXED AREA -->
+            </div>
+        </div>
+    </div>
+    </apex:outputPanel>
+</apex:outputPanel>    
+</apex:form>
+</apex:component>

@@ -1,0 +1,93 @@
+<apex:component controller="ctlr_MobileOpportunitySalesCredit" allowDML="true">
+<apex:attribute name="tabToShow" description="" type="String" required="true" />
+<apex:attribute name="parentOpportunity" description="" type="Opportunity" required="true" assignTo="{!opp}"/>
+<apex:attribute name="toast" description="" type="SLDS_Toast" required="true" assignTo="{!myToast}"/>
+<form id="salesCreditForm">
+    <div id="tab-default-1" class="slds-tabs__content slds-tabs--default__content slds-show" role="tabpanel" aria-labelledby="tab-default-1__item">
+         <!-- PRIMARY CONTENT WRAPPER -->
+        <div class="myapp">
+            <!-- <apex:form id="salesCreditForm"> -->
+                <!-- CREATE SALES CREDIT -->
+                <div aria-labelledby="newaopportunityform">
+                
+                    <!-- BOXED AREA -->
+                    <fieldset class="slds-box slds-theme--default slds-container--small">
+                        <legend id="newaccountform" class="slds-text-heading--medium slds-p-vertical--medium">Sales Team/Credit</legend>
+
+                        <apex:outputPanel id="salesCreditInputPanel" layout="block">
+                            <!-- CREDIT RECIPIENT -->
+                            <c:LexInputField sObject="{!salesCredit}" Field="Credit_Recipient__c" required="true"></c:LexInputField>
+                            <!-- / CREDIT RECIPIENT -->
+
+                            <!-- RELATIONSHIP MGMT CREDIT -->
+                            <c:LexInputField sObject="{!salesCredit}" Field="Dual_Initiation_Credit__c" required="true"></c:LexInputField>
+                            <!-- / RELATIONSHIP MGMT CREDIT -->
+
+                            <!-- SALES ASSIST CREDIT -->
+                            <c:LexInputField sObject="{!salesCredit}" Field="Sales_Assist_Credit__c" required="true"></c:LexInputField>
+                            <!-- / SALES ASSIST CREDIT -->
+
+                            <!-- SALES CREDIT (PRACTICE/SE) -->
+                            <c:LexInputField sObject="{!salesCredit}" Field="Sales_Credit__c" required="true"></c:LexInputField>
+                            <!--/ SALES CREDIT (PRACTICE/SE) -->
+
+                            <apex:pageBlock id="salesCreditButtons">
+                                <apex:outputPanel >
+                                    <apex:commandButton value="Add Credit" action="{!addSalesCredit}" styleClass="slds-button slds-button--brand slds-m-top--medium" reRender="creditList, toastContainer, salesCreditInputPanel" />       
+                                </apex:outputPanel>
+                            </apex:pageBlock>     
+                       	</apex:outputPanel>
+                        <br />
+                        <div class="slds-card">
+                            <header class="slds-card__header slds-grid">
+                              <div class="slds-col slds-media slds-media--center">
+                                <div class="slds-media__figure">
+                                <!-- FOR SOME REASON THIS BREAKS THE RERENCER ON ADDING OPPORTUNITY -->
+                                  <!-- <svg aria-hidden="true" class="slds-icon slds-icon-standard-contact slds-icon--small">
+                                    <use xlink:href="{!URLFOR($Resource.SLDS0122, 'assets/icons/standard-sprite/svg/symbols.svg#product')}"></use>
+                                  </svg> -->
+                                </div>
+                                <div class="slds-media__body">
+                                  <h3 class="slds-text-heading--small">Added Credits</h3>
+                                </div>
+                              </div>
+                            </header>
+
+                            <!-- CARD BODY = TABLE -->
+                            <section class="slds-card__body">
+                              <div class="slds-scrollable--x">
+                                <apex:outputPanel id="creditList" layout="block">
+                                    <table class="slds-table slds-table--bordered slds-max-medium-table--stacked-horizontal">
+                                      <thead>
+                                        <tr class="slds-no-hover">
+                                          <th class="slds-text-heading--label slds-size--1-of-4" scope="col">Name</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        <apex:repeat var="sc"  value="{!addedSalesCredit}">
+                                            <tr class="slds-hint-parent">
+                                                <td class="slds-size--1-of-4" data-label="Name">{!sc.Name}</td>
+                                            </tr>
+
+                                        </apex:repeat>                                                            
+                                      </tbody>
+
+                                    </table>
+                                </apex:outputPanel>
+                              </div>
+                            </section>
+                            <!-- / CARD BODY = SECTION + TABLE -->
+                            <a href="/{!opp.Id}" id="continueToOppLink" class="slds-button slds-button--brand slds-m-top--medium">Continue to Opportunity</a>
+                            <!-- <apex:outputLink value="/{!opp.Id}" id="continueToOppLink" styleClass="slds-button slds-button--brand slds-m-top--medium">Continue to Opportunity</apex:outputLink> -->
+                           
+                        </div>
+
+                    </fieldset>
+                    <!-- / BOXED AREA -->
+                </div>
+                <!-- / CREATE SALES CREDIT -->
+            <!-- </apex:form> -->
+        </div>
+    </div>
+</form>
+</apex:component>

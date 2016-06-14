@@ -1,0 +1,169 @@
+<apex:page standardcontroller="Case" extensions="ctlr_CreateCaseCommentChatter" showHeader="false" docType="html-5.0" cache="true">
+    <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <script type='text/javascript' src='/canvas/sdk/js/publisher.js'/>
+    <apex:includeScript value="{!URLFOR($Resource.JqueryMobile, 'jquery-2.0.3.min.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.JqueryMobile, 'jquery.mobile-1.3.2.min.js')}"/>
+    
+      <style>          
+        .th-groups {
+        background-color: rgba(0,0,0,0.07);
+        text-align: left;
+        }
+        .th-groups th {
+        background-color: rgba(0,0,0,0.07);
+        text-align: left;
+        }
+        .ui-table-columntoggle-btn  {
+               display: none;
+           }           
+           .totalRow{
+                background-color:#cde1ef;
+                border-color:#cde1ef;    
+            }  
+        .avoid-clicks {
+           pointer-events: none;
+           
+         } 
+         .allow-clicks {
+           pointer-events: auto;           
+         } 
+
+    </style>
+    <script type="text/javascript">
+            /* Removes the 300ms delay for click event */
+            window.addEventListener('load', function () {
+                //FastClick.attach(document.body);
+            }, false);
+        
+    </script>
+    <script>
+        /* Removes inputtext issue of autofocus*/
+        window.onkeydown = function(e){
+           var $focused = $(':focus');
+           window.focus();
+           $focused.focus();
+        };
+         // Post completed?
+        $("#inner-editor").focus();
+         
+        if ("{!lastError}" === "ok") {
+            Sfdc.canvas.publisher.publish({name: "publisher.close", payload:{ refresh:"true"}});
+           
+            sforce.one.navigateToSObject("{!parent.id}");
+         }
+             
+        Sfdc.canvas.publisher.subscribe({name: "publisher.setupPanel", onData:function(e) {
+        }});
+        
+        Sfdc.canvas.publisher.subscribe({name: "publisher.showPanel", onData:function(e) {
+            Sfdc.canvas.publisher.publish({name: "publisher.setValidForSubmit", payload:"true"});
+        }});  
+        
+        Sfdc.canvas.publisher.subscribe({name: "publisher.post", onData:function(e) {
+           
+            var uploadID = document.getElementById("uploadID").innerHTML;
+            var upload = document.getElementById(uploadID);
+      
+            upload.click();
+
+         }}); 
+
+         $( "target" ).click(function() {
+         $("other").blur();
+        });
+        
+         $( "other" ).click(function() {
+         $("target").blur();
+         });
+      
+        function createComments(){
+           showicon();
+           var thiscaseId='{!parent.id}';
+           var thisCommenttext=document.getElementById('{!$Component.form.theComment}').value;                         
+           if (document.getElementById('{!$Component.form.isPublished}').value) {
+               var thisIsPublished='True';                         
+            } else {
+               var thisIsPublished='False';                         
+            }
+           //var thisIsPublished=document.getElementById('{!$Component.form.isPublished}').value;                         
+           //
+         Visualforce.remoting.Manager.invokeAction(            
+            '{!$RemoteAction.ctlr_CreateCaseCommentChatter.createComment}',
+             thiscaseId, thisCommenttext, thisIsPublished,
+            function(result, event){               
+                if(event.status){
+                    if(result=="Success"){
+                        if( (typeof sforce.one != 'undefined') && (sforce != null) ) {
+                            // Salesforce1 navigation
+                             Sfdc.canvas.publisher.publish({name: "publisher.close", payload:{ refresh:"true"}});
+                             sforce.one.navigateToSObject('{!parent.id}');
+                        }else window.location.href = '{!URLFOR($Action.Case.View, Case.id)}';
+                } else if (event.type === 'exception'){
+                    console.log(result);
+                    alert('Exception occured while creating Case' )
+                } else {
+                    // unexpected problem...
+                }
+              }
+
+          });
+       }
+       function showicon(){
+       $('.ui-loader').show();
+       $('.ui-corner-all').show();
+       $('.ui-body-a').show();
+       $('.ui-loader-default').show();
+       $('.ui-icon').show();
+       $('.ui-icon-loading').show();
+     }       
+        $( document ).ready(function() {
+            var editor = document.getElementById("{!$Component.form.theComment}");          
+             editor.focus();
+             });  
+    </script>
+    </head>
+    <body>
+    
+    <div data-role="page" class="avoid-clicks">
+
+    <div data-role="body">
+        
+        <apex:form id="form">
+
+            <div id="target" class="allow-clicks needsclick Commentb"><apex:outputLabel value="Comment" for="theComment" /><apex:inputField value="{!theComment.CommentBody}" style="width:500px;height:92px;margin-top:4px;" id="theComment"/></div>
+            <div class="allow-clicks"><apex:outputLabel value="Public" for="isPublished" /><apex:inputField value="{!theComment.IsPublished}" id="isPublished"/></div>
+            <div style="display:none"><apex:commandButton value="Create Comment" id="theButton"  onclick="createComments(); return true;"/></div>
+            <div id="uploadID" style="display:none">{!$Component.form.theButton}</div>
+            <div id="commentBodyId" style="display:none">{!$Component.form.theComment}</div>
+
+        <div  id="other">
+            <table data-role="table" data-mode="columntoggle" >
+                <thead data-role="header" ><tr ><th >Last Case Comment</th></tr></thead>
+                <apex:repeat value="{!oldComments}" var="oldcom">     
+                    <tbody>
+                        <tr class="totalRow"><td><apex:outputText value="{!oldcom.CreatedBy.Name}"/></td></tr>
+                        <tr class="totalRow"><td><apex:outputText value="{!oldcom.CreatedDate}"/></td></tr>
+                        <tr><td><apex:outputText value="{!oldcom.CommentBody}"/></td></tr>
+                    </tbody>
+                 </apex:repeat> 
+            </table>  
+            </div>
+            <div id="myCommand" style="display:none" class="allow-clicks"><apex:commandButton value="Submit" id="desktopButton" action="{!createComment}" style="position:fixed;bottom:0px;right:0px;padding:5px 10px; border-color:#6C8049;
+        font-size:13px; font-weight:bold; line-height:20px;background-color:#8AB22B;background-image:none;color:#FFFFFF;"/></div>
+
+    <script>
+        var uagent = navigator.userAgent;
+         if(uagent.indexOf("iPhone") == -1 && uagent.indexOf("Android") == -1) {
+             var e = document.getElementById("myCommand");
+              e.style.display = 'inline';
+         }
+          
+    </script>     
+
+    </apex:form>  
+    </div>
+    </div>   
+    </body>
+
+</apex:page>

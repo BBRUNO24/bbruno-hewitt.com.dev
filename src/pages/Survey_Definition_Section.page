@@ -1,0 +1,16 @@
+<apex:page standardController="Client_Assessment_Survey__c">
+<html>
+    <body>
+        <ul style="list-style-type: circle;">
+            <li><b>Recent Loss</b>: No longer Lead Provider or Recent Loss</li> 
+            <li><b>No Activity or N/A</b>: No current opportunity</li>
+            <li><b>Opportunity In SFDC</b>: Qualified opportunity exists in SFDC</li>
+            <li><b>Partially Penetrated</b>: Use for consulting services when doing some work, not lead provider</li>
+            <li><b>Lead Provider</b>: Considered by client as the primary provider of service</li>
+            <li><b>Green</b>: Client feedback is positive and is likely to renew services</li> 
+            <li><b>Yellow</b>: Some concern, new influencer role, or acquisition/divestiture that may put our work at risk</li>
+            <li><b>Red</b>: Client is at risk. Very negative relationship, may be unsatisfied, new influencer role that doesn’t like AH or has strong competitor relationship</li>
+        </ul>
+    </body>
+</html>
+</apex:page>

@@ -1,0 +1,4 @@
+<apex:page standardController="Opportunity_Maintenance_Task__c">
+    <apex:variable var="errorMessage" value="You do not have access to perform this action. Please contact your local Sales Operations Team." />
+    <apex:pageMessage summary="{!errorMessage}" severity="error" strength="3" />
+</apex:page>

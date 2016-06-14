@@ -1,0 +1,27 @@
+<apex:page standardController="Client_Assessment_Survey__c" extensions="ctlr_ClientTrackerCAS">
+    <apex:form >
+        <apex:pageBlock >
+            <apex:pageBlockButtons rendered="{!If(planExists, true , false)}">
+                <apex:commandButton value="Edit Client Promise Data" rendered="{!If(planExists, true , false)}" onClick="window.parent.location = '/{!plan.Id}/e?retURL=/{!cas.Id}'"/>
+            </apex:pageBlockButtons>
+            
+            <apex:pageBlockSection collapsible="false" columns="2" rendered="{!If(planExists, true , false)}">
+                <apex:outputField value="{!plan.Discover_Meeting_Completed__c}"/>
+                <apex:outputField value="{!plan.Discover_Meeting_Types_And_Dates__c}"/>
+                <apex:outputField value="{!plan.Deliver_Meetings_Completed__c}"/>
+                <apex:outputField value="{!plan.Deliver_Meeting_Types_And_Dates__c}"/>
+                <apex:outputField value="{!plan.Executive_Sponsor_Meetings_Completed__c}"/>
+                <apex:outputField value="{!plan.Exec_Sponsor_Meeting_Types_And_Dates__c}"/>
+                <apex:outputField value="{!plan.Client_Plan_Completed__c}"/>
+                <apex:outputField value="{!plan.Client_Promise_Completion_Date__c}"/>
+                <apex:outputField value="{!plan.Client_Satisfaction_Survey_Completed__c}"/>
+                <apex:outputField value="{!plan.Client_Promise_Score__c}"/>
+                
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection collapsible="false" columns="2" rendered="{!If(planExists, false , true)}">
+                <apex:outputText value="No Client Plan exists for {!cas.Account__r.Name} for {!cas.Year__c}"/>
+            </apex:pageBlockSection>            
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

@@ -1,0 +1,79 @@
+<apex:component controller="ctrl_MultiSelectPickList"  >
+    <apex:attribute name="Label" type="String" description="Label for the picklist" assignTo="{!Label}" required="True"/>
+    <apex:attribute name="AvailableList" type="SelectOption[]" description="Available List from the Page" assignTo="{!AllOptions}" required="True"/>    
+    <apex:attribute name="ChosenList" type="SelectOption[]" description="Chosen List from the Page" assignTo="{!selectedOptions}" required="True"/>         
+    <script type="text/javascript"> 
+        // A method to change the title displayed on selection of the select option  
+        function changeTitle(obj)
+        {
+            var selected = new Array();
+            for (var i = 0; i < obj.options.length; i++)
+            {
+                if (obj.options[ i ].selected)
+                {
+                    selected.push(obj.options[ i ].value);
+                }
+            }
+            obj.title = selected;
+        }
+                 
+        // A method to support select operation         
+        function selection()
+        {         
+            selection();   
+        }        
+
+        // A method to support de-select operation         
+        function deselection() 
+        {            
+            deselection();        
+        }    
+    </script>
+    <style>
+    div.pickList div.apexp div.secondaryPalette
+    {
+        background-color: #ffffff;
+        border-color: #ffffff;
+    }
+    
+    .bPageBlock .detailList th, .bPageBlock .detailList td.btnBlock {
+        vertical-align: middle;
+    }
+    
+    .bPageBlock .pbBody {
+        
+        padding: 0px 0px 0px;
+    }
+    </style>    
+        
+    <!-- Apex function called to move the selected values from available list to chosen list and vice versa --> 
+    <apex:actionFunction name="selection" action="{!selecting}" rerender="panel" />    
+    <apex:actionFunction name="deselection" action="{!deselecting}" rerender="panel"/>    
+
+    <div class="pickList" style="width:0px;border:0px;color:#000000;"> 
+    <!--<apex:actionStatus id="waitingStatus" startText="Updating lists ..." stopText=""/> -->        
+    <apex:pageBlock id="panel" >
+        <apex:pageBlockSection columns="5"  >
+        <apex:pageBlockSectionItem >
+            <!--<apex:outputLabel value="{!Label}" style="font-weight:bold;align:right;"></apex:outputLabel>-->
+            <apex:selectList multiselect="true" size="5" value="{!selected}" style="width:150px;align:right;" onclick="javascript: changeTitle(this);">            
+                <apex:SelectOption value="{!Available}"  />            
+                <apex:SelectOptions value="{!AllOptions}"/>            
+                <apex:actionSupport event="ondblclick" action="{!Selecting}" rerender="panel" status="waitingStatus" />        
+            </apex:selectList>
+        </apex:pageBlockSectionItem>
+        <apex:pageBlockSectionItem labelStyleClass="btnBlock">
+            <apex:pageBlockSection columns="1"  >
+                <apex:commandButton reRender="panel" id="select" action="{!Selecting}" value=">" status="waitingStatus"/>            
+                <apex:commandButton reRender="panel" id="deselect" action="{!Deselecting}" value="<" status="waitingStatus"/>            
+            </apex:pageBlockSection>
+            <apex:selectList multiselect="true" size="5" value="{!deselected}" style="width:150px;align:right;" onclick="javascript: changeTitle(this);">            
+                <apex:SelectOption value="{!Chosen}"/>            
+                <apex:SelectOptions value="{!selectedOptions}" />            
+                <apex:actionSupport event="ondblclick" action="{!Deselecting}" rerender="panel" status="waitingStatus" />        
+            </apex:selectList>    
+        </apex:pageBlockSectionItem>
+        </apex:pageBlockSection>    
+    </apex:pageBlock>
+    </div>
+</apex:component>

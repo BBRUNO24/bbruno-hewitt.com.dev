@@ -1,0 +1,57 @@
+<apex:page standardController="Opportunity" extensions="ctlr_TabbedProductList" action="{!init}">
+    <apex:form >
+    <apex:stylesheet value="{!URLFOR($Resource.jquery, 'css/ui-lightness/jquery-ui-1.7.3.custom.css')}" />
+    <apex:includeScript value="{!URLFOR($Resource.jquery, 'js/debug.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.jquery, 'js/jquery-1.3.2.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.jquery, 'js/jquery-ui-1.7.3.custom.min.js')}" />
+    <script type="text/javascript">
+
+        $(function() {
+                    $( "#productsTab" ).tabs();
+        });
+        
+        // Revenue Schedule : Begin ----- 
+        // Added by : Amrita on “02/17/12”
+        // This method will be called on window load, to check whether to redirect to the revenue schedule page
+        // Revenue Schedule : End -----
+        /* window.onload = function() {
+            var retURL = "{!RevenueSchedulePage}";
+            if(retURL != '') {
+                window.open(retURL, '_parent');
+            }
+        }*/
+    </script>
+
+    <apex:pageBlock >
+        <div id="productsTab">
+            <ul>
+                <apex:repeat value="{!lineItemProducts}" var="product" id="theTabs">
+                    <li><a href="#tab-{!product.LineItem.Id}"><span>{!product.Product.Name}</span></a></li>
+                </apex:repeat>
+            </ul>
+            <apex:repeat value="{!lineItemProducts}" var="product" id="theTabData">
+                <div id="tab-{!product.LineItem.Id}">
+                    <apex:pageBlockSection columns="2">
+                        <apex:repeat value="{!product.FieldList}" var="f">
+                            <apex:outputField value="{!product.Opp[f.Field_Name__c]}" rendered="{!f.Source_Object__c = 'Opportunity'}" />
+                            <apex:outputField value="{!product.LineItem[f.Field_Name__c]}" rendered="{!f.Source_Object__c = 'OpportunityLineItem'}" />
+                            <apex:outputField value="{!product.Pricebook[f.Field_Name__c]}" rendered="{!f.Source_Object__c = 'PricebookEntry'}" />
+                            <apex:outputField value="{!product.Product[f.Field_Name__c]}" rendered="{!f.Source_Object__c = 'Product'}" />
+                        </apex:repeat>
+                    </apex:pageBlockSection>
+                    <!--Revenue Schedule : Begin ----- Modified / Created by : Amrita on “02/16/12” -->
+                    <!--Ritu Sharma - Case No. 00091993 - Using isRevSchUser variable instead of ISAusUser to see if the section should be rendered-->
+                    <!--Ritu Sharma - Case No. 00091993 - Revenue schedule section will be visible only if Revenue Schedule is enabled for the product-->
+                    <apex:outputPanel rendered="{!isRevSchUser && product.product.CanUseRevenueSchedule}">  
+                        &nbsp;&nbsp;<apex:outputLabel value="Revenue Schedule Status" for="lblRevSchd"></apex:outputLabel>
+                        &nbsp;&nbsp;&nbsp;<apex:outputText id="lblRevSchd" style="{!IF(product.LineItem['HasRevenueSchedule'] == true, 'color: green;', 'color: red;')}" styleClass="lblRevSchd" value="{!IF(product.LineItem['HasRevenueSchedule'] == true, 'Complete', 'Not Complete')}"></apex:outputtext>
+                        &nbsp;<apex:outputLink value="{!URLFOR('/oppitm/establishschedule.jsp')}?id={!product.LineItem.ID}&retURL=%2F{!product.Opp.ID}" target="_parent" rendered="{!product.LineItem['HasRevenueSchedule'] = false}">Establish</apex:outputLink>
+                        &nbsp;<apex:outputLink value="{!URLFOR('/oppitm/establishschedule.jsp')}?id={!product.LineItem.ID}&retURL=%2F{!product.Opp.ID}" target="_parent" rendered="{!product.LineItem['HasRevenueSchedule'] = true}">Re-Establish</apex:outputLink>
+                        &nbsp;<apex:outputLink value="{!URLFOR('/oppitm/scheduleedit.jsp')}?id={!product.LineItem.ID}&sUrl=%2F{!product.LineItem.ID}&retURL=%2F{!product.Opp.ID}" target="_parent" rendered="{!product.LineItem['HasRevenueSchedule'] = true}">Edit</apex:outputLink>
+                    </apex:outputPanel>
+                    <!--Revenue Schedule : End ------->
+                </div>
+            </apex:repeat>
+        </div>
+     </apex:pageBlock>
+     </apex:form> </apex:page>

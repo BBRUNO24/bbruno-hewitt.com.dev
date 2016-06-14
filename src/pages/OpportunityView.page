@@ -1,0 +1,45 @@
+<apex:page standardController="Opportunity" extensions="ctlr_OpportunityView"  action="{!init}">
+  <style>
+    .notify_container {
+      position: fixed;
+      width: 100%;
+      left: 0;
+      top: 0;
+      z-index: 10000;
+      text-align: center;
+    }
+    .slds-notify {
+      color: #fff;
+      position: relative;
+      background: #54698d;
+      font-weight: 300;
+    }
+    .slds-notify--alert {
+      padding: .5rem;
+      text-align: center;
+    }
+    .slds-theme--error {
+      color: #fff;
+      background-color: #c23934;
+    }
+    .slds-theme--alert-texture {
+      background-image: linear-gradient(45deg,rgba(0,0,0,.025) 25%,transparent 25%,transparent 50%,rgba(0,0,0,.025) 50%,rgba(0,0,0,.025) 75%,transparent 75%,transparent);
+      background-size: 64px 64px;
+    }
+    .slds-theme--error a:not(.slds-button--neutral):link, .slds-theme--error a:not(.slds-button--neutral):visited {
+      color: #fff;
+    }
+    .slds-theme--error a:not(.slds-button--neutral) {
+      color: #fff;
+      text-decoration: underline;
+    }
+  </style>
+  <apex:outputPanel rendered="{!contactCount = 0}">
+    <div class="slds-notify_container">
+      <div class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert">
+        <h2>There are currently 0 contacts associated with this Opportunity. You will need to add a contact prior to editing. <a href="/p/opp/ContactRoleEditUi/e?oppid={!recordId}&retURL=/apex/OpportunityView?id={!recordId}">Click Here to add a Contact</a></h2>
+      </div>
+    </div>
+  </apex:outputPanel>
+  <apex:detail relatedList="true" showChatter="true"/>
+</apex:page>

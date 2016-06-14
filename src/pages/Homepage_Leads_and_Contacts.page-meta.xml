@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ApexPage xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>25.0</apiVersion>
+    <availableInTouch>false</availableInTouch>
+    <confirmationTokenRequired>false</confirmationTokenRequired>
+    <description>Custom page to display links to Leads and Contact reports from the homepage per cases #14300 &amp; 10036</description>
+    <label>Homepage Leads and Contacts</label>
+</ApexPage>

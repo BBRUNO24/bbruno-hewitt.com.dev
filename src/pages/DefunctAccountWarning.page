@@ -1,0 +1,18 @@
+<apex:page standardController="Account">
+	<head>
+		<style type="text/css">
+		.tableHead {
+			font: Garamond, Georgia, serif;
+			font-size:10.0pt;
+			font-weight: bold;
+			border-style: none;
+			color: #FFFFFF;
+			background-color: #FF0000;
+			height: 20px
+		}
+		</style>
+	</head>
+	<div align="center" class="tableHead" style="{!If(Account.Account_Status__c == 'Defunct', 'display:visible;' , 'display:none')}">
+		This Account has been marked Defunct. Please do not enter data on this record. Contact your Sales Operations Team for more information.
+	</div>
+</apex:page>

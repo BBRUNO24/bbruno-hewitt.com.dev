@@ -1,0 +1,1 @@
+public enum SLDS_ToastEnum { BASE, ERROR, SUCCESS }

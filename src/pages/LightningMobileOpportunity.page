@@ -1,0 +1,352 @@
+<apex:page id="page" Controller="LightningMobileOppExtension" showHeader="false" standardStylesheets="false" sidebar="false" applyHtmlTag="false" applyBodyTag="false" docType="html-5.0" cache="false">    
+
+<html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">    
+
+<head>
+    <c:MobileOpportunityHeader />
+</head>   
+
+    <body>
+
+    <apex:form id="oppForm">
+        <script>
+            var j$ = jQuery.noConflict();
+
+            function rerenderStageFieldsJS(domRef) {
+                var selectedValue = domRef.options[domRef.selectedIndex].value;
+                rerenderStageFieldsAF(selectedValue);
+            }
+
+            function removeProductJS(domRef) {
+                var prodName = domRef.value;
+                removeProductAF(prodName);
+            }
+
+            function createOpportunityJS(domRef){
+                checkProductsAF();
+                var submitForm = j$('#disableSubmitButton').val();
+                domRef.disabled = submitForm;
+                createOpportunityAF();
+            }
+        </script>
+        <apex:actionFunction name="rerenderStageFieldsAF" action="{!rerenderStageFields}" rerender="proposeSolutionPanel,closeWonPanel,probabilityPanel" status="rerenderingStageFields" >
+            <apex:param name="oppStageTemp" assignTo="{!selectedOpportunityStage}" value="" />
+        </apex:actionFunction>
+        <apex:actionFunction name="checkProductsAF" action="{!checkProducts}" rerender="submitFormPanel" ></apex:actionFunction>
+        <apex:actionFunction name="createOpportunityAF" action="{!saveWithProducts}"></apex:actionFunction>
+        <apex:actionFunction name="removeProductAF" action="{!removeProduct}" reRender="productsList, toastContainer">
+            <apex:param name="productNameTemp" assignTo="{!productId}" value="" />
+        </apex:actionFunction>
+    </apex:form>
+    <apex:form id="opportunityForm"> 
+        <apex:outputPanel id="submitFormPanel">
+            <input type="hidden" value="{!disableSubmitButton}" id="disableSubmitButton"/>
+        </apex:outputPanel>
+        <!-- REQUIRED SLDS WRAPPER -->
+        <div class="slds">  
+            <!-- NOTIFICATION TOAST -->
+             <c:SLDS_Toast toast="{!toast}"> </c:SLDS_Toast>
+             <!-- / NOTIFICATION TOAST -->
+            <!-- TABS -->  
+            <div class="slds-tabs--default">
+                <c:MobileOpportunityTabs id="tabsComponent" tabToShow="{!tabToShow}" activeTab="{!activeTab}" inactiveTab="{!inactiveTab}" showSalesCredit="{!showSalesCredit}" />
+                <!-- TAB 1 OPPORTUNITY -->
+                <apex:outputPanel id="opportunityPanel" layout="block">
+                    <apex:outputPanel id="opportunityContainter" layout="block" rendered="{!tabToShow = 'Opportunity'}">
+                       <div id="tab-default-1" class="{!activePanel}" role="tabpanel" aria-labelledby="tab-default-1__item">
+                             <!-- PRIMARY CONTENT WRAPPER -->
+                            <div class="myapp">
+
+                                <!-- CREATE NEW OPPORTUNITY -->
+                                <div aria-labelledby="newaopportunityform">
+                                
+                                    <!-- BOXED AREA -->
+                                    <fieldset class="slds-box slds-theme--default slds-container--small">
+                                        <legend id="newaccountform" class="slds-text-heading--medium slds-p-vertical--medium">Add a New Opportunity</legend>
+                                            
+                                            <!-- OPPORTUNITY NAME -->
+                                            <c:LexInputField sObject="{!opp}" Field="Name" label="Opportunity Name" required="true"></c:LexInputField>
+                                            <!-- / OPPORTUNITY NAME -->
+
+                                            <!-- ACCOUNT LOOKUP -->
+                                            <c:LexInputField sObject="{!opp}" Field="AccountId" label="Account Name"></c:LexInputField>
+                                            <!-- / ACCOUNT LOOKUP -->
+
+                                            <!-- STAGE NAME -->
+                                            <!--  reRender="changeThisValue" -->
+                                            <apex:outputPanel layout="block" styleClass="slds-form-element" id="divPicklist" >
+                                                <label class="slds-form-element__label" for="stageName">Stage</label>
+                                                <div class="slds-form-element__control">
+                                                    <apex:inputField id="stageName" value="{!opp.StageName}" styleclass="slds-select" required="true" onChange="rerenderStageFieldsJS(this); return false;"></apex:inputField>
+                                                </div>
+                                                <apex:actionStatus id="rerenderingStageFields">
+                                                    <apex:facet name="start">
+                                                        <apex:image value="/img/loading.gif"/>                                                    
+                                                    </apex:facet>
+                                                    <apex:facet name="stop"/>
+                                                </apex:actionStatus>
+                                            </apex:outputPanel>                     
+                                            <!-- / STAGE NAME -->
+
+                                            <!-- PROBABILITY -->
+                                            <apex:outputPanel layout="block" id="probabilityPanel">
+                                                <c:LexInputField sObject="{!opp}" Field="Probability" required="true"></c:LexInputField>
+                                            </apex:outputPanel>
+                                            <!-- / PROBABILITY -->
+
+                                            <!-- CLOSE DATE -->
+                                            <label class="slds-form-element__label" for="stageName">Close Date</label>
+                                            <apex:inputField value="{!opp.CloseDate}" styleClass="slds-input" type="auto" required="true"></apex:inputField>
+                                            <!-- / CLOSE DATE -->
+
+                                            <!-- PROPOSE SOLUTION/NEGOTIATE STAGE FIELDS -->
+                                            <apex:outputPanel id="proposeSolutionPanel" layout="block">
+                                                <apex:outputPanel id="proposeSoluitonFields" layout="block" rendered="{!opp.StageName = 'Propose Solution'}">
+                                                    <c:LexInputField sobject="{!opp}" Field="Current_Provider_Reference__c"></c:LexInputField>
+                                                    <div styleClass="slds-form-element" >
+                                                        <apex:outputPanel styleClass="requiredInput" layout="block" id="proposeCompetitor" >
+                                                            <div class="requiredInput"> 
+                                                                <div class="requiredBlock"></div>
+                                                                 <apex:actionRegion >
+                                                                    <label class="slds-form-element__label" for="selPicklist">Competitor</label>
+                                                                    <div class="slds-form-element__control">
+                                                                        <apex:selectList size="4" id="proposeCompetitorOptions" value="{!opp.Competitor__c}" styleClass="slds-select" multiselect="true">
+                                                                            <apex:selectOptions value="{!competitorOptions}" />
+                                                                            
+                                                                        </apex:selectList>
+                                                                    </div>
+                                                                </apex:actionRegion>
+                                                            </div>
+                                                        </apex:outputPanel>
+                                                    </div>
+                                                </apex:outputPanel>
+                                            </apex:outputPanel>
+                                            <!-- / PROPOSE SOLUTION/NEGOTIATE STAGE FIELDS -->
+
+                                            <!-- CLOSE WON STAGE FIELDS -->
+                                            <apex:outputPanel id="closeWonPanel" layout="block">
+                                                <apex:outputPanel id="closedWonFields" layout="block" rendered="{!opp.StageName = 'Closed Won'}">
+                                                    <c:LexInputField sobject="{!opp}" Field="Current_Provider_Reference__c"></c:LexInputField>
+                                                     <div styleClass="slds-form-element" >
+                                                        <apex:outputPanel styleClass="requiredInput" layout="block" id="closedWonCompetitor" >
+                                                            <div class="requiredInput"> 
+                                                                <div class="requiredBlock"></div>
+                                                                 <apex:actionRegion >
+                                                                    <label class="slds-form-element__label" for="selPicklist">Competitor</label>
+                                                                    <div class="slds-form-element__control">
+                                                                        <apex:selectList size="4" id="closeWonCompetitorOptions" value="{!opp.Competitor__c}" styleClass="slds-select" multiselect="true">
+                                                                            <apex:selectOptions value="{!competitorOptions}" />
+                                                                            
+                                                                        </apex:selectList>
+                                                                    </div>
+                                                                </apex:actionRegion>
+                                                            </div>
+                                                        </apex:outputPanel>
+                                                    </div>
+                                                    <c:LexInputField sobject="{!opp}" Field="Reason_Won_or_Lost__c" required="true"></c:LexInputField>
+                                                    <c:LexInputField sobject="{!opp}" Field="Chosen_Provider_Reference__c"></c:LexInputField>
+                                                    <c:LexInputField sobject="{!opp}" Field="Executed_Contract_Date__c" required="true"></c:LexInputField>
+                                                    <c:LexInputField sobject="{!opp}" Field="CAS_ID__c" required="true"></c:LexInputField>
+                                                    <c:LexInputField sobject="{!opp}" Field="Probability" required="true"></c:LexInputField>
+                                                </apex:outputPanel>
+                                            </apex:outputPanel>
+                                            <!-- / CLOSED WON STAGE FIELDS -->
+
+                                            <apex:pageBlock id="saveOpportunity">
+                                                <apex:outputPanel >
+                                                    <apex:commandButton id="bthSaveProducts" action="{!goToProducts}" value="Save & Next" styleClass="slds-button slds-button--brand slds-m-top--medium" reRender="closeWonPanel, tabsPanel,productsPanel,opportunityPanel,practice, toastContainer" />
+                                                </apex:outputPanel>
+                                            </apex:pageBlock>
+                                             
+                                        <!-- / CREATE NEW OPPORTUNITY FORM -->
+
+                                    </fieldset>
+                                    <!-- / BOXED AREA -->
+                                </div>
+                            </div>
+                        </div>
+                        <!-- <c:MobileOpportunityOppTab id="opportunityComponent" activePanel="{!activePanel}" opp="{!opp}" tabToShow="{!tabToShow}" toast="{!toast}" /> -->
+                    </apex:outputPanel>
+                </apex:outputPanel>                
+                <!-- / TAB 1 OPPORTUNITY -->
+
+                <!-- TAB 2 PRODUCTS --> 
+                <apex:outputPanel id="productsPanel" layout="block" >
+                    <apex:outputPanel id="pruductsContainter" layout="block" rendered="{!tabToShow = 'Products'}">
+                            <div id="tab-default-2" class="{!activePanel}" role="tabpanel" aria-labelledby="tab-default-2__item">
+                            <!-- PRIMARY CONTENT WRAPPER -->
+                            <div class="myapp">     
+                                 <!-- BOXED AREA -->
+                                <fieldset class="slds-box slds-theme--default slds-container--small">
+                                    <legend id="newaccountform" class="slds-text-heading--medium slds-p-vertical--medium">Add a Product</legend>
+
+                                        <!-- PRICEBOOK OPTIONS -->
+                                        <!-- <div styleClass="slds-form-element" >
+                                            <div class="requiredInput"> 
+                                                <div class="requiredBlock"></div>
+                                                 <apex:actionRegion >
+                                                    <label class="slds-form-element__label" for="selPicklist">Pricebook</label>
+                                                    <div class="slds-form-element__control">
+                                                        <apex:selectList size="1" required="true" id="pricebookSelectList" value="{!pricebookSelection}" styleClass="slds-select">
+                                                            <apex:selectOptions value="{!pricebookOptions}" />
+                                                            <apex:actionSupport event="onchange" reRender="practice, error" action="{!refreshPracticeOptions}"/>
+                                                            </apex:selectList>
+                                                    </div>
+                                                </apex:actionRegion>
+                                            </div>
+                                        </div> -->
+                                       <!-- / PRICEBOOK OPTIONS -->                            
+
+                                        <!-- PRACTICE OPTIONS -->
+                                        <div styleClass="slds-form-element" >
+                                            <apex:outputPanel styleClass="requiredInput" layout="block" id="practice" >
+                                                <div class="requiredInput"> 
+                                                    <div class="requiredBlock"></div>
+                                                     <apex:actionRegion >
+                                                        <label class="slds-form-element__label" for="selPicklist">Practice</label>
+                                                        <div class="slds-form-element__control">
+                                                            <apex:selectList size="1" id="practiceSelectList" value="{!practiceSelection}" styleClass="slds-select">
+                                                                <apex:selectOptions value="{!practiceOptions}" />
+                                                                <apex:actionSupport event="onchange" reRender="products, error" action="{!refreshProductOptions}"/>
+                                                                </apex:selectList>
+                                                        </div>
+                                                    </apex:actionRegion>
+                                                </div>
+                                            </apex:outputPanel>
+                                        </div>
+                                       <!-- / PRACTICE OPTIONS -->
+
+                                        <!-- PR0ODUCTS OPTIONS -->
+                                        <div styleClass="slds-form-element" >
+                                            <apex:outputPanel styleClass="requiredInput" layout="block" id="products" >
+                                                <apex:outputPanel styleClass="requiredBlock"/>
+                                                    <label class="slds-form-element__label" for="selPicklist">Products</label>
+                                                    <div class="slds-form-element__control">
+                                                        <apex:selectList size="1" id="productSelectList" value="{!productSelection}" styleClass="slds-select">
+                                                            <apex:selectOptions value="{!productOptions}" />
+                                                        </apex:selectList>
+                                                    </div>
+                                            </apex:outputPanel>
+                                        </div>
+                                       <!-- / PRODUCTE OPTIONS -->                            
+
+                                        <!-- RECURRING -->
+                                        <c:LexInputField sObject="{!currOLI}" Field="Recurring_Non_Recurring__c" required="true"></c:LexInputField>
+                                        <!-- / RECURRING --> 
+
+                                        <!-- COMMISSION -->
+                                        <c:LexInputField sObject="{!currOLI}" Field="Fee_Commission__c" required="true"></c:LexInputField>
+                                        <!-- / COMMISSION -->                              
+
+                                        <!-- TYPE -->
+                                        <c:LexInputField sObject="{!currOLI}" Field="Type__c" required="true"></c:LexInputField>
+                                        <!-- / TYPE -->                                 
+
+                                        <!-- FIRST YEAR VALUE -->
+                                        <c:LexInputField sObject="{!currOLI}" Field="First_Year_Value__c" required="true"></c:LexInputField>
+                                        <!-- / FIRST YEAR VALUE -->
+
+                                        <!-- UNIT PRICE -->
+                                        <c:LexInputField sObject="{!currOLI}" Field="UnitPrice" required="true"></c:LexInputField>
+                                        <!-- / UNIT PRICE -->   
+
+                                        <!-- SERVICE START DATE -->
+                                        <label class="slds-form-element__label" for="stageName">Service Start Date</label>
+                                        <apex:inputField value="{!currOLI.Service_Start_Date__c}" styleClass="slds-input" type="auto" required="true"></apex:inputField>
+                                        <!-- / SERVICE START DATE -->   
+
+                                        <!-- SERVICE END DATE -->
+                                        <div><label class="slds-form-element__label" for="stageName">Service End Date</label></div>
+                                        <apex:inputField value="{!currOLI.Service_End_Date__c}" styleClass="slds-input" type="auto" required="true"></apex:inputField>
+                                        <!-- / SERVICE END DATE -->   
+
+
+                                        <!-- <apex:commandButton value="Back" action="{!goToProducts}" styleClass="slds-button slds-button--brand slds-m-top--medium" reRender="productsList, toastContainer"   /> --> 
+                                        <apex:pageBlock id="productsBottons">
+                                            <apex:outputPanel >
+                                              <!--   <apex:commandLink value="Back" action="{!goToProducts}" styleClass="slds-button slds-button--brand slds-m-top--medium" id="oppLink" reRender="tabsPanel,productsPanel,opportunityPanel" /> -->
+                                                <apex:commandButton value="Add Product" action="{!addProduct}" styleClass="slds-button slds-button--brand slds-m-top--medium" reRender="productsList, toastContainer" />       
+                                            </apex:outputPanel>
+                                        </apex:pageBlock>                      
+                                        <br />
+                                        <div class="slds-card">
+                                            <header class="slds-card__header slds-grid">
+                                              <div class="slds-col slds-media slds-media--center">
+                                                <div class="slds-media__figure">
+                                                <!-- FOR SOME REASON THIS BREAKS THE RERENDER ON ADDING OPPORTUNITY -->
+                                                  <!-- <svg aria-hidden="true" class="slds-icon slds-icon-standard-contact slds-icon--small">
+                                                    <use xlink:href="{!URLFOR($Resource.SLDS0122, 'assets/icons/standard-sprite/svg/symbols.svg#product')}"></use>
+                                                  </svg> -->
+                                                </div>
+                                                <div class="slds-media__body">
+                                                  <h3 class="slds-text-heading--small">Added Products</h3>
+                                                </div>
+                                              </div>
+                                            </header>
+
+                                            <!-- CARD BODY = TABLE -->
+                                            <section class="slds-card__body">
+                                              <div class="slds-scrollable--x">
+                                                <apex:outputPanel id="productsList" layout="block">
+                                                    <table class="slds-table slds-table--bordered slds-max-medium-table--stacked-horizontal">
+                                                      <thead>
+                                                        <tr class="slds-no-hover">
+                                                          <th class="slds-text-heading--label slds-size--1-of-2" scope="col">Name</th>
+                                                          <th class="slds-text-heading--label slds-size--2-of 2" scope="col">Remove</th>
+                                                        </tr>
+                                                      </thead>
+                                                      <tbody>
+                                                        <apex:repeat var="p"  value="{!pbEntryList}">
+                                                            <tr class="slds-hint-parent">
+                                                                <td class="slds-size--1-of-2" data-label="Name">{!p.Name}</td>
+                                                                <td class="slds-size--2-of-2" data-label="Remove">    
+                                                                    <button class="slds-button slds-button--icon-border-filled slds-button--icon-x-small" onclick="removeProductJS(this); return false;" value="{!p.Id}">
+                                                                        <c:SLDS_SVG styleClass="slds-button__icon slds-button__icon--hint slds-button__icon--small" path="assets/icons/utility-sprite/svg/symbols.svg#down" ></c:SLDS_SVG>
+                                                                        <span class="slds-assistive-text">Remove Product</span>
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+                                                        </apex:repeat>                                                            
+                                                      </tbody>
+
+                                                    </table>
+                                                </apex:outputPanel>
+                                              </div>
+                                            </section>
+                                            <!-- / CARD BODY = SECTION + TABLE -->
+                                           <input type="submit" value="Save and Create Opportunity" onclick="createOpportunityJS(this); return false;" class="slds-button slds-button--brand slds-m-top--medium" />
+                                           <!--  <apex:commandButton value="Save and Create Opportunity" action="{!saveWithProducts}" status="creatingOpportunity" styleClass="slds-button slds-button--brand slds-m-top--medium" />     -->
+                                            <apex:actionStatus id="creatingOpportunity">
+                                                    <apex:facet name="start">
+                                                        <apex:image value="/img/loading.gif"/>                                                    
+                                                    </apex:facet>
+                                                    <apex:facet name="stop"/>
+                                            </apex:actionStatus>
+
+                                        </div>
+
+                                    </fieldset>
+                                    <!-- / BOXED AREA -->
+                                    </div>
+                            </div>      
+                        <!-- <c:MobileOpportunityProductTab id="productsComponent" activePanel="{!activePanel}" opp="{!opp}" tabToShow="{!tabToShow}" toast="{!toast}" /> -->
+                    </apex:outputPanel>
+                </apex:outputPanel>
+                <!-- / TAB 2 PRODUCTS -->
+
+                <!-- TAB 3 SALES CREDIT -->
+                <apex:outputPanel id="salesCreditPanel" layout="block">
+                    <apex:outputPanel id="salesCreditContainer" layout="block" rendered="{!tabToShow = 'SalesCredit'}">
+                        <c:MobileOpportunitySalesCredit id="salesCreditComponent" tabToShow="{!tabToShow}" toast="{!toast}" parentOpportunity="{!opp}"/>
+                    </apex:outputPanel>
+                </apex:outputPanel>
+                <!-- / TAB 3 SALES CREDIT -->
+
+            </div> 
+            <!-- / TABS -->
+        </div>
+        <!-- / REQUIRED SLDS WRAPPER -->
+        </apex:form>
+    </body>
+</html>
+</apex:page>

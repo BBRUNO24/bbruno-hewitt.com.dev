@@ -1,0 +1,5 @@
+<apex:page standardController="account" tabStyle="Account" > 
+    <div>
+        <c:AccountHierarchyTree curID="{!Account.id}" />
+    </div>
+</apex:page>

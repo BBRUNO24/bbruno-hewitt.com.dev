@@ -1,0 +1,4 @@
+<apex:page standardController="Sales_Debrief_Survey__c" extensions="ctlr_SalesDebriefEditButtonOverride" action="{!init}">
+	<apex:variable var="errorMessage" value="Oops! Something went wrong. Please contact your local Sales Operations Team." />
+	<apex:pageMessage summary="{!errorMessage}" severity="error" strength="3" />
+</apex:page>

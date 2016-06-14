@@ -1,0 +1,154 @@
+<apex:page showHeader="true" sidebar="true" controller="BatchUpdateController" standardStylesheets="false">
+<html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">    
+
+    <head>
+      <title>Salesforce Lightning Design System Trailhead Module</title>
+      <apex:stylesheet value="{!URLFOR($Resource.LightningDesignSystem, 'assets/styles/salesforce-lightning-design-system-vf.css')}"/>
+      <style>
+        .bPageBlock{
+          margin-bottom: 0px !important;
+        }
+        .oRight{
+          padding-top: 0px !important;
+        }
+      </style>
+    </head>
+
+    <body> 
+      <div class="slds">
+        <apex:form id="theform">
+          <apex:pageBlock mode="maindetail" id="header">
+            <div class="slds-page-header" role="banner">
+              <nav class="slds-m-bottom--xx-small" role="navigation">
+                <p id="bread-crumb-label" class="slds-assistive-text">You are here:</p>
+                <ol class="slds-breadcrumb slds-list--horizontal" aria-labelledby="bread-crumb-label">
+                  <li class="slds-list__item slds-text-heading--label"><a>Admin Tools</a></li>
+                </ol>
+              </nav>
+              <div class="slds-grid">
+                <div class="slds-col slds-has-flexi-truncate">
+                  <h1 class="slds-text-heading--medium slds-truncate" title="Salesforce.com Bulk Updater">Salesforce.com Bulk Updater</h1>
+                </div>
+                <div class="slds-col slds-no-flex slds-align-bottom">
+                  <div class="slds-grid">
+                    <div class="slds-button-group">
+                      <apex:commandButton action="{!showEstimates}" value="Show Estimates" reRender="theform, header"  styleClass="slds-button slds-button--neutral"/>
+                      <apex:commandButton action="{!doUpdate}" value="Do Updates" reRender="theform, header" rendered="{!batchConfig.hasCounted && batchConfig.recordCount > 0}" styleClass="slds-button slds-button--brand"/>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <p class="slds-text-body--small slds-m-top--x-small">
+                <apex:outputText value="Fill out all fields then press Show Estimates" rendered="{!!batchConfig.hasCounted}"/> 
+                <apex:outputText value="{!batchConfig.recordCount} records will be updated" rendered="{!batchConfig.hasCounted}"/> 
+              </p>
+            </div>
+          </apex:pageBlock>
+          <apex:pageBlock mode="maindetail" id="updates" >
+            <div class="slds-container--center slds-container--medium slds-m-top--medium">
+              <div class="slds-form">
+                <div class="slds-form-element">
+                  <label class="slds-form-element__label" for="select-01">Select Object</label>
+                  <div class="slds-form-element__control">
+                    <div class="slds-select_container">
+                      <apex:selectList value="{!batchConfig.objectApiName}" multiselect="false" size="1" styleClass="slds-select">
+                        <apex:actionSupport event="onchange" action="{!doNothing}" rerender="updates"/>
+                        <apex:selectOptions value="{!ObjectOptions}"/>
+                      </apex:selectList>
+                    </div>
+                  </div>
+                </div>
+                <div class="slds-form-element">
+                  <label class="slds-form-element__label" for="select-01">Select Field</label>
+                  <div class="slds-form-element__control">
+                    <div class="slds-select_container">
+                      <apex:selectList value="{!batchConfig.fieldApiName}" multiselect="false" size="1" styleClass="slds-select">
+                        <apex:actionSupport event="onchange" action="{!doNothing}" rerender="updates"/>
+                        <apex:selectOptions value="{!FieldOptions}"/>
+                      </apex:selectList>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="slds-form-element">
+                <label class="slds-form-element__label" for="text-input-01">Old Value</label>
+                <div class="slds-form-element__control">
+                  <apex:inputText value="{!batchConfig.oldValue}" id="oldValue" styleClass="slds-input" ></apex:inputText>
+                </div>
+              </div>
+              <div class="slds-form-element">
+                <label class="slds-form-element__label" for="text-input-01">New Value</label>
+                <div class="slds-form-element__control">
+                  <apex:inputText value="{!batchConfig.changeToValue}" id="changeToValue" styleClass="slds-input" ></apex:inputText>
+                </div>
+              </div>
+            </div>
+          </apex:pageBlock> 
+          <apex:pageBlock mode="maindetail" id="results" rendered="{!updates.size > 0}">
+            <div class="slds-grid slds-m-top--large">
+              <div class="slds-col">
+                <div class="slds-card">
+                  <div class="slds-card__header slds-grid">
+                    <div class="slds-media slds-media--center slds-has-flexi-truncate">
+                      <div class="slds-media__figure">
+                        <svg aria-hidden="true" class="slds-icon slds-icon-standard-contact slds-icon--small">
+                          <use xlink:href="{!URLFOR($Resource.LightningDesignSystem, '/assets/icons/standard-sprite/svg/symbols.svg#contact')}"></use>
+                        </svg>
+                      </div>
+                      <div class="slds-media__body">
+                        <h2 class="slds-text-heading--small slds-truncate">Results</h2>
+                      </div>
+                    </div>
+                    <div class="slds-no-flex">
+                      <div class="slds-button-group">
+                         <apex:commandButton action="{!fetchJobStatus}" value="Refresh Job Status" reRender="results"  styleClass="slds-button slds-button--neutral"/>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="slds-card__body">
+                    <table class="slds-table slds-table--bordered slds-max-medium-table--stacked-horizontal slds-no-row-hover">
+                      <thead>
+                        <tr class="slds-text-heading--label">
+                          <th>Object</th>
+                          <th>Field to Update</th>
+                          <th>Old Value</th>
+                          <th>New Value</th>
+                          <th>Records</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <apex:repeat value="{!updates}" var="b">
+                          <tr>
+                            <td>
+                              {!b.objectApiName}
+                            </td>
+                            <td>
+                              {!b.fieldApiName}
+                            </td>
+                            <td>
+                              {!b.oldValue}
+                            </td>
+                            <td>
+                              {!b.changeToValue}
+                            </td>
+                            <td>
+                              {!b.recordCount}
+                            </td>
+                            <td>
+                              {!b.result.status}
+                            </td>
+                          </tr>
+                        </apex:repeat>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </apex:pageBlock>
+        </apex:form>
+      </div>
+    </body>
+</html>
+</apex:page>

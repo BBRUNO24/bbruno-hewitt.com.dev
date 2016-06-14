@@ -1,0 +1,37 @@
+<apex:page standardController="Account" extensions="ctlr_Client_Scorecard_Selection" showHeader="true" sidebar="false">
+<apex:pageMessages />
+<b>Hello {!$User.FirstName} 
+<p>Please select the Financial Year and the Quarter for which you wish to print the Client Scorecard Report. 
+Both are required before you can proceed.</p></b>
+<apex:form >
+    <table border="0" cellpadding="3" style="font:normal 12px Arial;">
+        <tr>
+            <th>
+                <apex:outputLabel id="lblFinancialYear" for="financialYear" value="Select Financial Year"/>
+            </th>
+            <td>
+                <apex:selectList id="financialYear" value="{!financialYear}" required="true" size="1" style="width: 85px">
+                    <apex:selectOptions value="{!validFinancialYears}"/>
+                </apex:selectList>
+             </td>
+         </tr>
+         <tr>
+            <th>
+                <apex:outputLabel id="lblQuarter" for="Quarter" value="Select Quarter"/>
+            </th>
+            <td>
+                <apex:selectList id="quarter" value="{!quarter}" required="true" size="1" style="width: 85px">
+                    <apex:selectOptions value="{!validQuarters}"/>
+                </apex:selectList>
+             </td>
+            <td>&nbsp;</td>
+            <td>
+                <apex:commandButton id="btnPrintScore" value="Create Scorecard" action="{!printScorecard}"/>
+            </td>
+        </tr>
+    </table>
+</apex:form>
+<font style="color: red;">
+    <b>&#42; The Client Scorecard Report is currently only available for US and APAC accounts</b>
+</font>
+</apex:page>

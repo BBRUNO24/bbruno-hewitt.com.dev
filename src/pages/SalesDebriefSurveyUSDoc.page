@@ -1,0 +1,548 @@
+<!--
+ * History
+ * ---------------------------------------------
+ * 2014-04-04   Chintan Adhyapak        Created
+ * --------------------------------------------->
+<apex:page cache="false" renderAs="PDF" title="Sales Debrief Survey Document" standardController="Sales_Debrief_Survey__c" extensions="ctlr_SalesDebriefSurveyUSDoc">
+	<apex:stylesheet value="{!URLFOR($Resource.OpportunityPlan, 'Opportunity_Plan.css')}" />
+
+ 	<!--  Do not print header on Page 1 -->
+    <apex:outputPanel rendered="true">
+        <c:comp_ClientPromisePlanDocHeaderFooter type="header" position="right"></c:comp_ClientPromisePlanDocHeaderFooter>
+        <c:comp_ClientPromisePlanDocHeaderFooter type="header" position="left"></c:comp_ClientPromisePlanDocHeaderFooter>
+        <c:comp_ClientPromisePlanDocHeaderFooter type="header" position="center"></c:comp_ClientPromisePlanDocHeaderFooter>
+    </apex:outputPanel>
+    
+    <!--  Header for all other pages -->
+    <c:comp_ClientPromisePlanDocHeaderFooter type="header" position="left">Sales Debrief Survey</c:comp_ClientPromisePlanDocHeaderFooter>
+    <c:comp_ClientPromisePlanDocHeaderFooter type="header" position="center">Confidential &amp; Proprietary. Internal Aon Hewitt Use Only</c:comp_ClientPromisePlanDocHeaderFooter>
+    <c:comp_ClientPromisePlanDocHeaderFooter type="header" position="right"><apex:image url="{!URLFOR($Resource.ClientPromisePlan, 'AonHewittLogo.PNG')}" width="100" height="27"/></c:comp_ClientPromisePlanDocHeaderFooter>
+    
+    <!-- Do not Print footer on Page 1 -->
+    <apex:outputPanel >
+        <c:comp_ClientPromisePlanDocHeaderFooter type="footer" position="left" showPageNumbers="false"></c:comp_ClientPromisePlanDocHeaderFooter>
+        <c:comp_ClientPromisePlanDocHeaderFooter type="footer" position="center" showPageNumbers="false"></c:comp_ClientPromisePlanDocHeaderFooter>
+        <c:comp_ClientPromisePlanDocHeaderFooter type="footer" position="right" showPageNumbers="false"></c:comp_ClientPromisePlanDocHeaderFooter>
+    </apex:outputPanel>
+
+    <!--  Footer for all other pages -->
+    <c:comp_ClientPromisePlanDocHeaderFooter type="footer" position="left">{!myOpp.Account.Legal_Name__c}</c:comp_ClientPromisePlanDocHeaderFooter>
+    <c:comp_ClientPromisePlanDocHeaderFooter type="footer" position="center" showPageNumbers="true"></c:comp_ClientPromisePlanDocHeaderFooter>
+    <c:comp_ClientPromisePlanDocHeaderFooter type="footer" position="right">Printed on &nbsp;<apex:outputText value="{0,date,MMMM dd, yyyy}"><apex:param value="{!today()}"/></apex:outputText>
+    </c:comp_ClientPromisePlanDocHeaderFooter>
+    
+    <apex:outputPanel >
+    	<div class="coverPage">
+    		<br/><br/><br/><br/><br/><br/><br/><br/>
+        	<table cellpadding="1" cellspacing="1" width="90%" border="0" align="center" >
+            	<tr class="documentTitle1" ><td align="left">Aon Hewitt Sales Debrief Survey</td></tr>
+                <tr><td>&nbsp;</td></tr>
+                <tr><td>&nbsp;</td></tr>
+                <tr><td>&nbsp;</td></tr>
+                <tr class="documentTitle2"><td>{!myOpp.Account.Legal_Name__c}</td></tr>
+                <tr class="documentTitle3"><td><apex:outputText value="{0,date,MMMM dd, yyyy} <br/><br/> Confidential &amp; Proprietary. Internal Aon Hewitt Use Only" escape="false"><apex:param value="{!today()}"/></apex:outputText></td></tr>
+        	</table>
+        </div>
+    </apex:outputPanel>
+    
+    <div class="div1">
+        <table class="table1">
+            <tr>
+                <th class="tableTitle" colspan="4">Opportunity Overview<br/></th>
+            </tr>
+            <tr>
+                <td width="20%" class="tableRowBlueTop">Opportunity Name</td>
+                <td width="30%" class="tableRowTop"><apex:outputText value="{!myOpp.Name}"/></td>
+                <td class="tableRowBlueTop">Expected Close Date</td>
+                <td class="tableRowTop"><apex:outputText value="{0,date,MM/dd/YYYY}"><apex:param value="{!myOpp.CloseDate}"/></apex:outputText></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueTop">Account Name</td>
+                <td class="tableRowTop">{!myOpp.Account.Legal_Name__c}</td>
+                <td class="tableRowBlueTop">Opportunity Owner</td>
+                <td class="tableRowTop">{!mySurvey.Opportunity_Owner_Full_Name__c}</td>
+            </tr>
+            <tr>
+                <td width="20%" class="tableRowBlueTop">Opportunity Services</td>
+                <td width="30%" class="tableRowTop">{!myOpp.All_Services__c}</td>
+                <td class="tableRowBlueTop">Opportunity Stage</td>
+                <td class="tableRowTop">{!myOpp.StageName}</td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueTop">Chosen Provider</td>
+                <td class="tableRowTop">{!Sales_Debrief_Survey__c.Opportunity_Chosen_Provider__c}</td>
+                <td class="tableRowBlueTop">Primary Reason for Win/Loss</td>
+                <td class="tableRowTop">{!Sales_Debrief_Survey__c.Opportunity_Primary_Reason_for_Win_Loss__c}</td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueTopBottom">Sourcing Provider</td>
+                <td class="tableRowTopBottom">{!Sales_Debrief_Survey__c.Sourcing_Provider__c}</td>
+                <td class="tableRowBlueTopBottom">&nbsp;</td>
+                <td class="tableRowTopBottom">&nbsp;</td>
+            </tr>
+        </table>
+        <br/><br/>
+        
+        <table class="table1">
+            <tr>
+                <th class="tableTitle" colspan="4">Survey Overview<br/></th>
+            </tr>
+            <tr>
+                <td width="20%" class="tableRowBlueTop">Survey Number</td>
+                <td width="30%" class="tableRowTop">{!mySurvey.Name}</td>
+                <td class="tableRowBlueTop">Survey Type</td>
+                <td class="tableRowTop">{!mySurvey.Sales_Survey_Type__c}</td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueTop">External Contact</td>
+                <td class="tableRowTop">{!mySurvey.Contact__r.Name}</td>
+                <td class="tableRowBlueTop">Interviewer Name</td>
+                <td class="tableRowTop">{!mySurvey.Interviewer_Name__r.Name}</td>
+            </tr>
+            <tr>
+                <td width="20%" class="tableRowBlueTopBottom">Survey Completion Date</td>
+                <td width="30%" class="tableRowTopBottom"><apex:outputText value="{0,date,MM/dd/YYYY}"><apex:param value="{!mySurvey.Survey_Completion_Date__c}"/></apex:outputText></td>
+                <td class="tableRowBlueTopBottom">Due Date</td>
+                <td class="tableRowTopBottom"><apex:outputText value="{0,date,MM/dd/YYYY}"><apex:param value="{!mySurvey.Due_Date__c}"/></apex:outputText></td>
+            </tr>
+        </table>
+        <br/><br/>
+        
+        <table class="table1">
+            <tr>
+                <th class="tableTitle" colspan="3">Opportunity Strategy</th>
+            </tr>
+            <tr>
+                <th width="30%" class="tableHeadGray">Evaluation Criterion<br/></th>
+                <th width="35%" class="tableHeadGray">Comments from Opportunity Plan<br/></th>
+                <th width="35%" class="tableHeadGray">Post Close Comments<br/></th>
+            </tr>
+            <tr>
+                <td class="tableRowBlue">Situation</td>
+                <td class="tableRow"><apex:outputText value="{!myStrategy.Situation__c}" escape="false"/></td>
+                <td class="tableRow"><apex:outputText value="{!mySurvey.Situation_Post_Close__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueTop">Opportunity</td>
+                <td class="tableRowTop"><apex:outputText value="{!myStrategy.Opportunity__c}" escape="false"/></td>
+                <td class="tableRowTop"><apex:outputText value="{!mySurvey.Opportunity_Post_Close__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueTop">Walls (or Barriers)</td>
+                <td class="tableRowTop"><apex:outputText value="{!myStrategy.Walls__c}" escape="false"/></td>
+                <td class="tableRowTop"><apex:outputText value="{!mySurvey.Walls_Post_Close__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueTop">Solutions</td>
+                <td class="tableRowTop"><apex:outputText value="{!myStrategy.Solutions__c}" escape="false"/></td>
+                <td class="tableRowTop"><apex:outputText value="{!mySurvey.Solutions_Post_Close__c}" escape="false"/></td>
+            </tr>
+             <tr>
+                <td class="tableRowBlueTop">Our Value Proposition</td>
+                <td class="tableRowTop"><apex:outputText value="{!myStrategy.Value_Proposition__c}" escape="false"/></td>
+                <td class="tableRowTop"><apex:outputText value="{!mySurvey.Value_Proposition_Post_Close__c}" escape="false"/></td>
+            </tr>
+             <tr>
+                <td class="tableRowBlueTop">Our Elevator Message</td>
+                <td class="tableRowTop"><apex:outputText value="{!myStrategy.Elevator_Message__c}" escape="false"/></td>
+                <td class="tableRowTop"><apex:outputText value="{!mySurvey.Elevator_Message_Post_Close__c}" escape="false"/></td>
+            </tr>
+             <tr>
+                <td class="tableRowBlueTop">Plan to Win the Deal</td>
+                <td class="tableRowTop"><apex:outputText value="{!myStrategy.Steps_to_Win_This_Deal__c}" escape="false"/></td>
+                <td class="tableRowTop"><apex:outputText value="{!mySurvey.Steps_to_Win_This_Deal_Post_Close__c}" escape="false"/></td>
+            </tr>
+            <tr>
+            	<td class="tableRowBlueTop">What Transpired to Close This Deal</td>
+            	<td class="tableRowTop"><apex:outputText value="{!myStrategy.Close_This_Deal__c}" escape="false"/></td>
+                <td class="tableRowTop"><apex:outputText value="{!mySurvey.Close_This_Deal_Post_Close__c}" escape="false"/></td>
+            </tr>
+            <tr>
+            	<td class="tableRowBlueTopBottom">Overall Strategy Rating</td>
+            	<td class="tableRowBlueTopBottom">{!mySurvey.Opportunity_Strategy_Rating__c}</td>
+            	<td class="tableRowBlueTopBottom">&nbsp;</td>
+            </tr>
+        </table>
+	</div>   
+        
+    <div class="div1">    
+        <table class="table1">
+            <tr>
+                <th class="tableTitle" colspan="5">Opportunity Assessment<br/></th>
+            </tr>
+            <tr>
+                <th width="18%" class="tableHeadGray">Evaluation Criterion<br/></th>
+                <th width="9%" class="tableHeadGray" style="text-align:center">Opp Plan Rating<br/></th>
+                <th width="9%" class="tableHeadGray" style="text-align:center">Post Close Rating<br/></th>
+                <th width="32%" class="tableHeadGray">Opp Plan Comments<br/></th>
+                <th width="32%" class="tableHeadGray">Post Close Comments<br/></th>
+            </tr>
+            <tr>
+                <td class="tableRowBlue">Burning Platform</td>
+                <td class="tableRow" style="text-align:center"><apex:outputText value="{!myStrategy.Burning_Platform_Rating__c}" escape="false"/></td>
+                <td class="tableRow" style="text-align:center"><apex:outputText value="{!mySurvey.Burning_Platform_Post_Close_Rating__c}" escape="false"/></td>
+                <td class="tableRow"><apex:outputText value="{!myStrategy.Burning_Platform_Comments__c}" escape="false"/></td>
+                <td class="tableRow"><apex:outputText value="{!mySurvey.Burning_Platform_Post_Close_Comments__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueTop">Relationship</td>
+                <td class="tableRowTop" style="text-align:center"><apex:outputText value="{!myStrategy.Relationship_Rating__c}" escape="false"/></td>
+                <td class="tableRowTop" style="text-align:center"><apex:outputText value="{!mySurvey.Relationship_Post_Close_Rating__c}" escape="false"/></td>
+                <td class="tableRowTop"><apex:outputText value="{!myStrategy.Relationship_Comments__c}" escape="false"/></td>
+                <td class="tableRowTop"><apex:outputText value="{!mySurvey.Relationship_Post_Close_Comments__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueTop">Active Opportunities</td>
+                <td class="tableRowTop" style="text-align:center"><apex:outputText value="{!myStrategy.Active_Opportunities_Rating__c}" escape="false"/></td>
+                <td class="tableRowTop" style="text-align:center"><apex:outputText value="{!mySurvey.Active_Opportunities_Post_Close_Rating__c}" escape="false"/></td>
+                <td class="tableRowTop"><apex:outputText value="{!myStrategy.Active_Opportunities_Comments__c}" escape="false"/></td>
+                <td class="tableRowTop"><apex:outputText value="{!mySurvey.Active_Opportunities_Post_Close_Comments__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueTop">Decision Making Process</td>
+                <td class="tableRowTop" style="text-align:center"><apex:outputText value="{!myStrategy.Decision_Making_Process_Rating__c}" escape="false"/></td>
+                <td class="tableRowTop" style="text-align:center"><apex:outputText value="{!mySurvey.Decision_Making_Post_Close_Rating__c}" escape="false"/></td>
+                <td class="tableRowTop"><apex:outputText value="{!myStrategy.Decision_Making_Process_Comments__c}" escape="false"/></td>
+                <td class="tableRowTop"><apex:outputText value="{!mySurvey.Decision_Making_Post_Close_Comments__c}" escape="false"/></td>
+            </tr>
+             <tr>
+                <td class="tableRowBlueTop">Solution Fit</td>
+                <td class="tableRowTop" style="text-align:center"><apex:outputText value="{!myStrategy.Solution_Fit_Rating__c}" escape="false"/></td>
+                <td class="tableRowTop" style="text-align:center"><apex:outputText value="{!mySurvey.Solution_Fit_Post_Close_Rating__c}" escape="false"/></td>
+                <td class="tableRowTop"><apex:outputText value="{!myStrategy.Solution_Fit_Comments__c}" escape="false"/></td>
+                <td class="tableRowTop"><apex:outputText value="{!mySurvey.Solution_Fit_Post_Close_Comments__c}" escape="false"/></td>
+            </tr>
+             <tr>
+                <td class="tableRowBlueTop">Qualifications &amp; References</td>
+                <td class="tableRowTop" style="text-align:center"><apex:outputText value="{!myStrategy.Qualifications_References_Rating__c}" escape="false"/></td>
+                <td class="tableRowTop" style="text-align:center"><apex:outputText value="{!mySurvey.Q_and_R_Post_Close_Rating__c}" escape="false"/></td>
+                <td class="tableRowTop"><apex:outputText value="{!myStrategy.Qualifications_References_Comments__c}" escape="false"/></td>
+                <td class="tableRowTop"><apex:outputText value="{!mySurvey.Q_and_R_Post_Close_Comments__c}" escape="false"/></td>
+            </tr>
+             <tr>
+                <td class="tableRowBlueTop">Revenue Growth</td>
+                <td class="tableRowTop" style="text-align:center"><apex:outputText value="{!myStrategy.Revenue_Growth_Rating__c}" escape="false"/></td>
+                <td class="tableRowTop" style="text-align:center"><apex:outputText value="{!mySurvey.Revenue_Growth_Post_Close_Rating__c}" escape="false"/></td>
+                <td class="tableRowTop"><apex:outputText value="{!myStrategy.Revenue_Growth_Comments__c}" escape="false"/></td>
+                <td class="tableRowTop"><apex:outputText value="{!mySurvey.Revenue_Growth_Post_Close_Comments__c}" escape="false"/></td>
+            </tr>
+            <tr>
+            	<td class="tableRowBlueTop">Firm Leverage</td>
+                <td class="tableRowTop" style="text-align:center"><apex:outputText value="{!myStrategy.Firm_Leverage_Rating__c}" escape="false"/></td>
+                <td class="tableRowTop" style="text-align:center"><apex:outputText value="{!mySurvey.Firm_Leverage_Post_Close_Rating__c}" escape="false"/></td>
+                <td class="tableRowTop"><apex:outputText value="{!myStrategy.Firm_Leverage_Comments__c}" escape="false"/></td>
+                <td class="tableRowTop"><apex:outputText value="{!mySurvey.Firm_Leverage_Post_Close_Comments__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueTop">Financial Factors</td>
+                <td class="tableRowTop" style="text-align:center"><apex:outputText value="{!myStrategy.Financial_Factors_Rating__c}" escape="false"/></td>
+                <td class="tableRowTop" style="text-align:center"><apex:outputText value="{!mySurvey.Financial_Factors_Post_Close_Rating__c}" escape="false"/></td>
+                <td class="tableRowTop"><apex:outputText value="{!myStrategy.Financial_Factors_Comments__c}" escape="false"/></td>
+                <td class="tableRowTop"><apex:outputText value="{!mySurvey.Financial_Factors_Post_Close_Comments__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueTop">Risk Factors</td>
+                <td class="tableRowTop" style="text-align:center"><apex:outputText value="{!myStrategy.Risk_Factors_Rating__c}" escape="false"/></td>
+                <td class="tableRowTop" style="text-align:center"><apex:outputText value="{!mySurvey.Risk_Factors_Post_Close_Rating__c}" escape="false"/></td>
+                <td class="tableRowTop"><apex:outputText value="{!myStrategy.Risk_Factors_Comments__c}" escape="false"/></td>
+                <td class="tableRowTop"><apex:outputText value="{!mySurvey.Risk_Factors_Post_Close_Comments__c}" escape="false"/></td>
+            </tr>
+            <tr>
+                <td class="tableRowBlueTop">Competition</td>
+                <td class="tableRowTop" style="text-align:center"><apex:outputText value="{!myStrategy.Competition_Rating__c}" escape="false"/></td>
+                <td class="tableRowTop" style="text-align:center"><apex:outputText value="{!mySurvey.Competition_Post_Close_Rating__c}" escape="false"/></td>
+                <td class="tableRowTop"><apex:outputText value="{!myStrategy.Competition_Comments__c}" escape="false"/></td>
+                <td class="tableRowTop"><apex:outputText value="{!mySurvey.Competition_Post_Close_Comments__c}" escape="false"/></td>
+            </tr>
+            <tr>
+            	<td class="tableRowBlueTopBottom">Total</td>
+            	<td class="tableRowBlueTopBottom" style="text-align:center"><apex:outputText value="{0,number,#}"><apex:param value="{!myStrategy.Total__c}"/></apex:outputText>
+                </td>
+            	<td class="tableRowBlueTopBottom" style="text-align:center"><apex:outputText value="{0,number,#}"><apex:param value="{!mySurvey.Total_Post_Close__c}"/></apex:outputText>
+                </td>
+            	<td class="tableRowBlueTopBottom">&nbsp;</td>
+            	<td class="tableRowBlueTopBottom">&nbsp;</td>
+            </tr>
+        </table>
+        <br/><br/>
+        
+         <table class="table1">
+            <tr>
+                <th class="tableTitle" colspan="5">Issues<br/></th>
+            </tr>
+            <tr class="tableRowHeading">
+                <th class="tableHeadGray" width="20%">Evaluation Criterion</th>
+                <th class="tableHeadGray" width="20%">Client Position</th>
+                <th class="tableHeadGray" width="5%">Deal Breaker?</th>
+				<th class="tableHeadGray" width="20%">Aon Hewitt Position</th>
+	        	<th class="tableHeadGray">Post Close Comments</th>
+            </tr>
+            <tr>
+	        	<td class="tableRowBlue">Form of Contract</td>
+                <td class="tableRow"><apex:outputText value="{!myStrategy.Form_of_Contract_Client__c}" escape="false"/></td>
+                <td class="tableRow" style="text-align:center"><apex:outputText value="{!myStrategy.Form_of_Contract_Deal_Breaker__c}"/></td>
+                <td class="tableRow"><apex:outputText value="{!myStrategy.Form_of_Contract_Aon_Hewitt__c}" escape="false"/></td>
+                <td class="tableRow"><apex:outputText value="{!mySurvey.Form_of_Contract_Post_Close_Comments__c}" escape="false"/></td>
+            </tr>
+            <tr>
+	        	<td class="tableRowBlueTop">Term of Convenience</td>
+                <td class="tableRowTop"><apex:outputText label="" value="{!myStrategy.Term_for_Convenience_Client__c}" escape="false"/></td>
+                <td class="tableRowTop" style="text-align:center"><apex:outputText label="" value="{!myStrategy.Term_for_Convenience_Deal_Breaker__c}"/></td>
+                <td class="tableRowTop"><apex:outputText label="" value="{!myStrategy.Term_for_Convenience_Aon_Hewitt__c}" escape="false"/></td>
+                <td class="tableRowTop"><apex:outputText value="{!mySurvey.Term_of_Convenience_Post_Close_Comments__c}" escape="false"/></td>
+            </tr>
+            <tr>
+	        	<td class="tableRowBlueTop">Liability Cap</td>
+               	<td class="tableRowTop"><apex:outputText label="" value="{!myStrategy.Liability_Cap_Client__c}" escape="false"/></td>
+                <td class="tableRowTop" style="text-align:center"><apex:outputText label="" value="{!myStrategy.Liability_Cap_Deal_Breaker__c}"/></td>
+                <td class="tableRowTop"><apex:outputText label="" value="{!myStrategy.Liability_Cap_Aon_Hewitt__c}" escape="false"/></td>
+                <td class="tableRowTop"><apex:outputText value="{!mySurvey.Liability_Cap_Post_Close_Comments__c}" escape="false"/></td>
+            </tr>
+            <tr>
+	            <td class="tableRowBlueTop">Fee Escalator</td>
+                <td class="tableRowTop"><apex:outputText label="" value="{!myStrategy.Fee_Escalator_Client__c}" escape="false"/></td>
+                <td class="tableRowTop" style="text-align:center"><apex:outputText label="" value="{!myStrategy.Fee_Escalator_Deal_Breaker__c}"/></td>
+                <td class="tableRowTop"><apex:outputText label="" value="{!myStrategy.Fee_Escalator_Aon_Hewitt__c}" escape="false"/></td>
+                <td class="tableRowTop"><apex:outputText value="{!mySurvey.Fee_Escalator_Post_Close_Comments__c}" escape="false"/></td>
+            </tr>
+            <tr>
+               	<td class="tableRowBlueTop">Service Levels</td>
+	            <td class="tableRowTop"><apex:outputText label="" value="{!myStrategy.Service_Levels_Client__c}" escape="false"/></td>
+               	<td class="tableRowTop" style="text-align:center"><apex:outputText label="" value="{!myStrategy.Service_Levels_Deal_Breaker__c}"/></td>
+               	<td class="tableRowTop"><apex:outputText label="" value="{!myStrategy.Service_Levels_Aon_Hewitt__c}" escape="false"/></td>
+               	<td class="tableRowTop"><apex:outputText value="{!mySurvey.Service_Levels_Post_Close_Comments__c}" escape="false"/></td>
+            </tr>
+            <tr>
+	            <td class="tableRowBlueTop">Payment Terms</td>
+               	<td class="tableRowTop"><apex:outputText label="" value="{!myStrategy.Payment_Terms_Client__c}" escape="false"/></td>
+               	<td class="tableRowTop" style="text-align:center"><apex:outputText label="" value="{!myStrategy.Payment_Terms_Deal_Breaker__c}"/></td>
+               	<td class="tableRowTop"><apex:outputText label="" value="{!myStrategy.Payment_Terms_Aon_Hewitt__c}" escape="false"/></td>
+               	<td class="tableRowTop"><apex:outputText value="{!mySurvey.Payment_Terms_Post_Close_Comments__c}" escape="false"/></td>
+            </tr>
+            <tr>
+	            <td class="tableRowBlueTop">Required Decision Date</td>
+               	<td class="tableRowTop"><apex:outputText label="" value="{!myStrategy.Required_Decision_Date_Client__c}" escape="false"/></td>
+               	<td class="tableRowTop" style="text-align:center"><apex:outputText label="" value="{!myStrategy.Required_Decision_Date_Deal_Breaker__c}"/></td>
+               	<td class="tableRowTop"><apex:outputText label="" value="{!myStrategy.Required_Decision_Date_Aon_Hewitt__c}" escape="false"/></td>
+               	<td class="tableRowTop"><apex:outputText value="{!mySurvey.Required_Decision_Post_Close_Comments__c}" escape="false"/></td>
+            </tr>
+            <tr>
+	            <td class="tableRowBlueTop">Other Key Terms</td>
+               	<td class="tableRowTop"><apex:outputText label="" value="{!myStrategy.Other_Key_Terms_Client__c}" escape="false"/></td>
+               	<td class="tableRowTop" style="text-align:center"><apex:outputText label="" value="{!myStrategy.Other_Key_Terms_Deal_Breaker__c}"/></td>
+               	<td class="tableRowTop"><apex:outputText label="" value="{!myStrategy.Other_Key_Terms_Aon_Hewitt__c}" escape="false"/></td>
+               	<td class="tableRowTop"><apex:outputText value="{!mySurvey.Key_Terms_Post_Close_Comments__c}" escape="false"/></td>
+            </tr>
+            <tr>
+            	<td class="tableRowBlueTopBottom">Overall Rating</td>
+            	<td class="tableRowBlueTopBottom"><apex:outputText value="{!mySurvey.Opportunity_Issue_Rating__c}"/></td>
+            	<td class="tableRowBlueTopBottom" colspan="3">&nbsp;</td>
+            </tr>
+        </table>
+    </div>
+    
+    <div class="div1">
+        <table class="table1">
+            <tr>
+                <th class="tableTitle">Competitive Analysis<br/></th>
+            </tr>
+        </table>
+        <apex:dataTable value="{!compList}" var="comp" cellpadding="0" cellspacing="2" rowClasses="strategy,strategyBlue" styleClass="table1" headerClass="tableHeadGray" width="100%">
+        	<apex:column headerValue="Competitor" width="10%">
+            	<apex:outputText value="{!comp.Competitor__c}"/>
+            </apex:column>
+            <apex:column headerValue="Strengths" width="15%">
+                <apex:outputText value="{!comp.Strength__c}" escape="false"/>
+            </apex:column>
+            <apex:column headerValue="Weaknesses" width="15%">
+                <apex:outputText value="{!comp.Weakness__c}" escape="false"/>
+            </apex:column>
+            <apex:column headerValue="How is Aon Hewitt Superior in the Client's View" width="20%">
+                <apex:outputText value="{!comp.Client_View__c}" escape="false"/>
+            </apex:column>
+            <apex:column headerValue="Estimated Fees" width="10%">
+                <apex:outputText value="{!comp.Estimated_Fees__c}" escape="false"/>
+            </apex:column>
+            <apex:column headerValue="Post Close Comments" width="30%">
+                <apex:outputText value="{!comp.Post_Close_Comments__c}" escape="false"/>
+            </apex:column>
+        </apex:dataTable>
+		<table width="100%">
+        	<tr>
+           		<td style="white-space:nowrap" class="tableRowBlueTopBottom">How would the Client Rate Aon Hewitt Versus the Competition?</td>
+           		<td class="tableRowBlueTopBottom" width="15%" style="text-align:center"><apex:outputText value="{!mySurvey.Competitor_Rating__c}"/></td>
+           		<td class="tableRowBlueTopBottom" width="35%">&nbsp;</td>
+           	</tr>
+        </table>
+        <br/><br/>
+        
+        <table class="table1">
+            <tr>
+                <th class="tableTitle" colspan="4">Pricing<br/></th>
+            </tr>
+            <tr class="tableRowHeading">
+                <th class="tableHeadGray" width="35%">Final Competitor Pricing</th>
+                	<th class="tableHeadGray" width="25%" style="text-align:center">Rating</th>
+                	<th class="tableHeadGray" width="20">Actual Fees</th>
+	                <th class="tableHeadGray">Comments</th>
+            </tr>
+            <tr>
+	        	<td class="tableRowBottom">Describe our pricing strategy and how our pricing compared to the primary competitor</td>
+                <td class="tableRowBottom" style="text-align:center"><apex:outputText value="{!mySurvey.Pricing_Rating__c}"/></td>
+                <td class="tableRowBottom"><apex:outputText value="{!mySurvey.Actual_Price__c}"/></td>
+                <td class="tableRowBottom"><apex:outputText value="{!mySurvey.Pricing_Comments__c}" escape="false"/></td>
+            </tr>
+        </table>
+        <br/><br/>
+        
+        <table class="table1">
+            <tr>
+                <th class="tableTitle">Contact Roles<br/></th>
+            </tr>
+        </table>
+        <apex:dataTable value="{!ocrList}" var="ocr" id="ocrTable" cellpadding="0" cellspacing="2" rowClasses="tableRow,tableRowBlue" styleClass="table1" headerClass="tableHeadGray" width="100%">
+            <apex:column headerValue="Contact">
+                <apex:outputText value="{!ocr.Contact__r.Name}"/>
+            </apex:column>
+            <apex:column headerValue="Role">
+                <apex:outputText value="{!ocr.Role__c}"/>
+            </apex:column>
+            <apex:column headerValue="Comments">
+                <apex:outputText value="{!ocr.Comments__c}" escape="false"/>
+            </apex:column>
+            <apex:column headerValue="Account">
+                <apex:outputText value="{!ocr.Account__r.Name}"/>
+            </apex:column>
+            <apex:column headerValue="Post Close Comments" width="30%">
+                <apex:outputText value="{!ocr.Post_Close_Comments__c}" escape="false"/>
+            </apex:column>
+        </apex:dataTable>
+        <br/><br/>
+        
+        <table class="table1">
+            <tr>
+                <th class="tableTitle" colspan="4">Additional Questions</th>
+            </tr>
+            <tr class="tableRowHeading">
+               	<th class="tableHeadGray" width="15%">Category</th>
+               	<th class="tableHeadGray" width="40%">Description</th>
+             	<th class="tableHeadGray" width="10%" style="text-align:center">Rating</th>
+	            <th class="tableHeadGray">Post Close Comments</th>
+            </tr>
+            <tr>
+	        	<td class="tableRowBlue">Third Party Evaluators</td>
+                <td class="tableRow">How would the Third Party Evaluator rate Aon Hewitt? What role did the sourcing advisor play during the sales process?</td>
+                <td class="tableRow" style="text-align:center"><apex:outputText value="{!mySurvey.Third_Party_Evaluators_Rating__c}"/></td>
+                <td class="tableRow"><apex:outputText value="{!mySurvey.Third_Party_Evaluators_Comments__c}" escape="false"/></td>
+            </tr>
+            <tr>
+	        	<td class="tableRowBlueTop">Finalist/Site Visit Meetings</td>
+                <td class="tableRowTop">How would the client rate our finalist meeting/site visit? Did we effectively convey our capabilities set via our interactions with the client? Did you have the needed support? (i.e. Leadership presence when needed)</td>
+                <td class="tableRowTop" style="text-align:center"><apex:outputText value="{!mySurvey.Finalist_Site_Visit_Meetings_Rating__c}"/></td>
+                <td class="tableRowTop"><apex:outputText value="{!mySurvey.Finalist_Site_Visit_Meetings_Comments__c}" escape="false"/></td>
+            </tr>
+            <tr>
+	        	<td class="tableRowBlueTopBottom">Demo Feedback</td>
+                <td class="tableRowTopBottom">How would the client rate our demo presentation? What system demos were used? What comments did the client provide about the system demo?</td>
+                <td class="tableRowTopBottom" style="text-align:center"><apex:outputText value="{!mySurvey.Finalist_Site_Visit_Meetings_Rating__c}"/></td>
+                <td class="tableRowTopBottom"><apex:outputText value="{!mySurvey.Demo_Feedback_Comments__c}" escape="false"/></td>
+            </tr>
+        </table>
+    </div>
+    
+    <div class="div2" style="{!If(!myOpp.IsWon, 'display:visible;', 'display:none;')}">
+		<table class="table1">
+            <tr>
+                <th class="tableTitle" colspan="2">Loss Reasons</th>
+            </tr>
+            <tr class="tableRowHeading">
+               	<th class="tableHeadGray" width="40%">Question</th>
+               	<th class="tableHeadGray">Response</th>
+            </tr>
+            <tr>
+	        	<td class="tableRowBlue" width="40%">Why was Aon Hewitt Not Selected</td>
+                <td class="tableRow"><apex:outputText value="{!mySurvey.Why_was_Aon_Hewitt_Not_Selected__c}"/></td>
+            </tr>
+            <tr>
+	        	<td class="tableRowBlueTop">Most Important Reason in Decision</td>
+                <td class="tableRowTop"><apex:outputText value="{!mySurvey.Lost_Most_Important_Reason_in_Decision__c}"/></td>
+            </tr>
+            <tr>
+	        	<td class="tableRowBlueTop">Why Did You Select Our Competitor</td>
+                <td class="tableRowTop"><apex:outputText value="{!mySurvey.Why_did_you_select_our_Competitors__c}"/></td>
+            </tr>
+            <tr>
+	        	<td class="tableRowBlueTop">Most Important Reason in Competitor Selection</td>
+                <td class="tableRowTop"><apex:outputText value="{!mySurvey.Lost_Which_of_these_is_most_important__c}"/></td>
+            </tr>
+            <tr>
+	        	<td class="tableRowBlueTop">What Should We Do Differently in Future</td>
+                <td class="tableRowTop"><apex:outputText value="{!mySurvey.What_should_we_do_differently_in_future__c}"/></td>
+            </tr>
+            <tr>
+	        	<td class="tableRowBlueTop">What Factors are important to You</td>
+                <td class="tableRowTop"><apex:outputText value="{!mySurvey.Lost_Point_most_important_to_you__c}"/></td>
+            </tr>
+            <tr>
+	        	<td class="tableRowBlueTopBottom">Additional Comments on Aon Hewitt</td>
+                <td class="tableRowTopBottom"><apex:outputText value="{!mySurvey.Lost_Any_other_comments_on_Aon_Hewitt__c}" escape="false"/></td>
+            </tr>
+        </table>    
+		<br/><br/>
+    </div>
+    
+    <div class="div2" style="{!If(myOpp.IsWon, 'display:visible;', 'display:none;')}">
+		<table class="table1">
+            <tr>
+                <th class="tableTitle" colspan="2">Won Reasons</th>
+            </tr>
+            <tr class="tableRowHeading">
+               	<th class="tableHeadGray" width="40%">Question</th>
+               	<th class="tableHeadGray">Response</th>
+            </tr>
+            <tr>
+	        	<td class="tableRowBlue" width="40%">Why was Aon Hewitt Selected</td>
+                <td class="tableRow"><apex:outputText value="{!mySurvey.Why_was_Aon_Hewitt_Selected__c}"/></td>
+            </tr>
+            <tr>
+	        	<td class="tableRowBlueTop">Most Important Reason in Decision</td>
+                <td class="tableRowTop"><apex:outputText value="{!mySurvey.What_was_Most_Important_Reason__c}"/></td>
+            </tr>
+            <tr>
+	        	<td class="tableRowBlueTop">What will Ensure You Remain a Client</td>
+                <td class="tableRowTop"><apex:outputText value="{!mySurvey.What_will_make_sure_you_remain_a_Client__c}"/></td>
+            </tr>
+            <tr>
+	        	<td class="tableRowBlueTop">What Factors are important to You</td>
+                <td class="tableRowTop"><apex:outputText value="{!mySurvey.Which_of_these_is_important_to_you__c}"/></td>
+            </tr>
+            <tr>
+	        	<td class="tableRowBlueTopBottom">Additional Comments on Aon Hewitt</td>
+                <td class="tableRowTopBottom"><apex:outputText value="{!mySurvey.Won_Any_other_comments_on_Aon_Hewitt__c}" escape="false"/></td>
+            </tr>
+        </table>    
+		<br/><br/>
+    </div>
+    
+    <table class="table1">
+    	<tr>
+            <th class="tableTitle" colspan="2">Conclusion</th>
+        </tr>
+        <tr class="tableRowHeading">
+           	<th class="tableHeadGray" width="40%">Question</th>
+           	<th class="tableHeadGray">Response</th>
+        </tr>
+        <tr>
+	    	<td class="tableRowBlue" width="40%">What We Did Right</td>
+            <td class="tableRow"><apex:outputText value="{!mySurvey.What_We_Did_Right__c}"/></td>
+        </tr>
+        <tr>
+	    	<td class="tableRowBlueTop">What We Could Have Done Better</td>
+            <td class="tableRowTop"><apex:outputText value="{!mySurvey.What_We_Could_Have_Done_Better__c}"/></td>
+        </tr>
+        <tr>
+	       	<td class="tableRowBlueTopBottom">Conclusions</td>
+            <td class="tableRowTopBottom"><apex:outputText value="{!mySurvey.Conclusions__c}" escape="false"/></td>
+        </tr>
+    </table>
+</apex:page>

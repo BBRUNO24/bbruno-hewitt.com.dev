@@ -1,0 +1,17 @@
+<apex:page standardController="Sales_Debrief_Survey__c" extensions="ctlr_SalesDebriefSurveyNewButtonOverride">
+    <apex:form >
+    	<apex:pageMessages />
+		<apex:pageBlock title="Survey Selection">
+			Hello {!$User.FirstName} {!$User.LastName}. What type of Survey would you like to create today?<p/>
+			<apex:selectRadio value="{!selectedSurvey}" layout="pageDirection">
+				<apex:selectOption itemValue="End Of Project" itemLabel="End Of Project Survey"/>
+				<apex:selectOption itemValue="Sales Debrief" itemLabel="Sales Debrief Survey"/>
+			</apex:selectRadio>
+			<br/>
+			<apex:commandButton action="{!createSurveyRecord}" value="Create Survey Record"></apex:commandButton>&nbsp;&nbsp;
+			<apex:commandButton action="{!returnBack}" value="Return"></apex:commandButton>
+		</apex:pageBlock>
+	</apex:form>
+    <apex:pageMessage summary="{!errorMessage}" severity="error" strength="3" rendered="{!error}"/>
+    <br/>
+</apex:page>

@@ -1,0 +1,118 @@
+<apex:page cache="false" renderAs="PDF" title="Opportunity Summary Plan Document" standardController="Opportunity" extensions="ctlr_OpportunityPlanDoc">
+    <apex:stylesheet value="{!URLFOR($Resource.OpportunityPlan,'Opportunity_Plan.css')}" />
+    <!--  Header & Footer for all pages -->
+    <c:comp_ClientPromisePlanDocHeaderFooter type="header" position="left">Opportunity Plan - Executive Deal Review</c:comp_ClientPromisePlanDocHeaderFooter>
+    <c:comp_ClientPromisePlanDocHeaderFooter type="header" position="right"><apex:image url="{!URLFOR($Resource.ClientPromisePlan, 'AonHewittLogo.PNG')}" width="100" height="27"/></c:comp_ClientPromisePlanDocHeaderFooter>
+        
+    <c:comp_ClientPromisePlanDocHeaderFooter type="footer" position="left">{!opp.Account.Legal_Name__c}</c:comp_ClientPromisePlanDocHeaderFooter>
+    <c:comp_ClientPromisePlanDocHeaderFooter type="footer" position="center" showPageNumbers="true"></c:comp_ClientPromisePlanDocHeaderFooter>
+    <c:comp_ClientPromisePlanDocHeaderFooter type="footer" position="right">Printed on &nbsp;<apex:outputText value="{0,date,MMMM dd, yyyy}"><apex:param value="{!today()}"/></apex:outputText></c:comp_ClientPromisePlanDocHeaderFooter>     
+       
+	<table class="table1">
+    	<tr>
+        	<th class="tableTitle">Opportunity &amp; Strategy</th>
+        </tr>
+    </table>
+    <apex:dataTable value="{!oliList}" var="oli" cellpadding="0" cellspacing="2" rowClasses="tableRow,tableRowBlue" styleClass="table1" headerClass="tableHeadGrayCenter">
+		<apex:column styleClass="tableRow" headerValue="Service">
+			<apex:outputText value="{!oli.PriceBookEntry.Product2.Name}"/>
+		</apex:column>
+        <apex:column styleClass="tableRow" headerValue="Incumbent">
+        	<apex:outputText value="{!opp.Current_Provider_Reference__r.Name}"/>
+        </apex:column>
+		<apex:column styleClass="tableRow" headerValue="Platform">
+			<apex:outputText value="{!oli.Platform__c}"/>
+		</apex:column>
+        <apex:column styleClass="tableRowCenter" headerValue="PPT Count" width="10%">
+           	<apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!oli.Eligible_Participants_Units__c}"/></apex:outputText>
+        </apex:column>
+        <apex:column styleClass="tableRowRight" headerValue="Estimated Revenue" width="15%">
+           	<apex:outputText value="$ {0,number,###,###,###,###}"><apex:param value="{!oli.First_Year_Value__c}"/></apex:outputText>
+        </apex:column>
+        <apex:column styleClass="tableRowRight" headerValue="Live/Renewal Date" width="10%">
+           	<apex:outputText value="{0,date,MM/dd/yy}"><apex:param value="{!oli.Service_Start_Date__c}"/></apex:outputText>
+        </apex:column>
+        <apex:column styleClass="tableRowRight" headerValue="Expected Close Date" width="10%">
+           	<apex:outputText value="{0,date,MM/dd/yy}"><apex:param value="{!opp.CloseDate}"/></apex:outputText>
+        </apex:column>
+        <apex:column styleClass="tableRowCenter" headerValue="Probability" width="10%">
+        	<apex:outputText value="{0,number,###}"><apex:param value="{!opp.Probability}"/></apex:outputText>%
+        </apex:column>
+    </apex:dataTable>
+	<table class="table1"><tr><td class="tableRowTop">&nbsp;</td></tr></table>
+	<br/>
+        
+	<table class="table1">
+		<tr>
+			<th class="tableHeadGray" width="30%">Role</th>
+			<th class="tableHeadGray">Name</th>
+		</tr>
+        <tr>
+        	<td class="tableRowBlue">Search Consultant</td>
+            <td class="tableRow"><apex:outputText value="{!opp.Sourcing_Provider__r.Name}"/></td>
+        </tr>
+        <tr>
+            <td class="tableRowBlueTop">Sales Executive</td>
+        	<td class="tableRowTop">{!opp.Owner.Name}</td>
+		</tr>
+        <tr>
+        	<td class="tableRowBlueTop">Account Executive</td>
+            <td class="tableRowTop">{!opp.Account.Owner.Name}</td>
+		</tr>
+        <tr>
+        	<td class="tableRowBlueTopBottom">Owning GM</td>
+            <td class="tableRowTopBottom">{!opp.Delivery_Location__c}</td>
+		</tr>
+	</table>
+    <br/><br/>
+        
+    <table class="table1">
+    	<tr>
+        	<th class="tableTitle">Background</th>
+        </tr>
+        <tr>
+        	<td class="tableRowTopBottom"><apex:outputText value="{!strategy.Situation__c}" escape="false"/></td>
+        </tr>
+    </table>
+    <br/><br/>
+        
+    <table class="table1">
+    	<tr>
+        	<th class="tableTitle">Walls (or Barriers)</th>
+		</tr>
+        <tr>
+        	<td class="tableRowTopBottom"><apex:outputText value="{!strategy.Walls__c}" escape="false"/></td>
+        </tr>
+    </table>
+    <br/><br/>
+        
+    <table class="table1">
+    	<tr>
+        	<th class="tableTitle">Aon Hewitt Value Proposition</th>
+        </tr>
+        <tr>
+        	<td class="tableRowTopBottom"><apex:outputText value="{!strategy.Value_Proposition__c}" escape="false"/></td>
+        </tr>
+	</table>
+    <br/><br/>
+        
+    <table class="table1">
+    	<tr>
+        	<th class="tableTitle" colspan="3">Competitive Summary<br/></th>
+		</tr>
+    </table>
+    <apex:dataTable value="{!compList}" var="comp" cellpadding="0" cellspacing="2" rowClasses="tableRow,tableRowBlue" styleClass="table1" headerClass="tableHeadGrayCenter">
+		<apex:column styleClass="tableRow" headerValue="Provider">
+			<apex:outputText value="{!comp.Competitor__c}"/>
+		</apex:column>
+		<apex:column styleClass="tableRow" headerValue="Strengths">
+			<apex:outputText value="{!comp.Strength__c}" escape="false"/>
+		</apex:column>
+		<apex:column styleClass="tableRow" headerValue="Weaknesses">
+			<apex:outputText value="{!comp.Weakness__c}" escape="false"/>
+		</apex:column>
+		<apex:column styleClass="tableRow" headerValue="Estimated Fees">
+			<apex:outputText value="{!comp.Estimated_Fees__c}" escape="false"/>
+		</apex:column>
+	</apex:dataTable>
+</apex:page>

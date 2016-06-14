@@ -1,0 +1,352 @@
+<!--
+ * History
+ * ----------------------------------------------------------------------------
+ * 2013-04-24   Chintan Adhyapak        Created
+ ************ -->
+<apex:page standardController="Opportunity" extensions="ctlr_ViewOpportunityStrategy" action="{!init}" showheader="true">
+<apex:stylesheet value="{!URLFOR($Resource.OpportunityPlan, 'Opportunity_Plan.css')}" />
+<apex:pageMessages />
+    <head>
+        <style type="text/css"></style>    
+    </head>
+    <apex:form id="theForm">
+        <apex:actionFunction name="autosave" action="{!autosave}" rerender="theForm" status="savestatus"/>
+            <apex:actionStatus id="savestatus">
+                <apex:facet name="start"> Auto Saving....<img src="/img/loading32.gif"/> </apex:facet> 
+            </apex:actionStatus>
+        
+        <!-- A javascript recursive function which calls itself every 300 seconds, the setTimeout method calls the apex function 'autosave' defined in the <apex:actionfunction> tag above -->
+        <script>
+            window.setTimeout(recursivecall,300000);
+            function recursivecall() {
+                window.setTimeout(recursivecall,300000);
+                autosave();
+            }    
+        </script>
+
+        <table style="width:100%">
+            <tr>
+                <td align="center"><apex:commandButton value="Save Plan Data" action="{!saveData}"/>
+                    &nbsp;&nbsp;<apex:commandButton value="Close (without Saving)" onclick="window.parent.close()"/>
+                    &nbsp;&nbsp;<apex:commandButton value="Create Opportunity Plan Document" action="{!createPlan}"/>
+                    &nbsp;&nbsp;<apex:commandButton value="Create Opportunity Exec Summary" action="{!createSummaryPlan}"/>
+                </td>
+            </tr>
+        </table>
+            
+        <apex:pageBlock title="Opportunity Detail">
+            <apex:pageBlockSection >
+                <apex:outputField value="{!myOpp.Name}"/>
+                <apex:outputField value="{!myOpp.AccountId}"/>
+                <apex:outputField value="{!myOpp.StageName}"/>
+                <apex:outputField value="{!myOpp.Probability}"/>
+                <apex:outputField value="{!myopp.CloseDate}"/>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+        Fields with an asterisk (*) will appear in both, the Opportunity Plan and the Opportunity Exec Summary
+        <apex:pageBlock title="Opportunity Strategy">
+            <apex:pageBlockSection collapsible="false" columns="1">
+                <apex:inputTextArea cols="200" rows="10" title="Describe the client’s current situation. What does the client want? Why is the work out to bid? What do they value?" value="{!strategy.Situation__c}" label="Situation *" required="false"/>
+                <apex:inputTextArea cols="200" rows="10" title="Articulate how we can meet the client’s needs and help the client achieve success. Why are we the best fit?" value="{!strategy.Opportunity__c}" required="false"/>
+                <apex:inputTextArea cols="200" rows="10" title="Describe any concerns or obstacles for success." value="{!strategy.Walls__c}" label="Walls (or Barriers) *" required="false"/>
+                <apex:inputTextArea cols="200" rows="10" title="What is our proposed solution? What measurable results will be impacted?" value="{!strategy.Solutions__c}" required="false"/>
+                <apex:inputTextArea cols="200" rows="10" label="Articulate our Value Proposition for this Client *" value="{!strategy.Value_Proposition__c}" required="false"/>
+                <apex:inputTextArea cols="200" rows="10" label="What is our Elevator Message to this Client" value="{!strategy.Elevator_Message__c}" required="false"/>
+                <apex:inputTextArea cols="200" rows="10" label="What are my Steps to Win this Deal" value="{!strategy.Steps_to_Win_This_Deal__c}" required="false"/>
+                <apex:inputTextArea cols="200" rows="10" label="What do I need to Close this Deal" value="{!strategy.Close_This_Deal__c}" required="false"/>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+        
+        <apex:pageBlock title="Opportunity Assessment">
+        <table style="width:100%">
+            <tr class="tableRowHeading">
+                <th class="tableHeadGray" width="13%">Evaluation Criterion</th>
+                <th class="tableHeadGray" align="center" width="30%">Description</th>
+                <th class="tableHeadGray" align="center" width="8%">Rating</th>
+                <th class="tableHeadGray" width="49%">Comments/Action Plan</th>
+            </tr>
+            <tr>
+                <th class="strategy">Burning Platform</th>
+                <td class="strategy">Is there a compelling business reason for the client to take action? What is broken? Are they motivated to change?</td>
+                <td class="strategy"><apex:inputField label="" value="{!strategy.Burning_Platform_Rating__c}"/></td>
+                <td class="strategy"><apex:inputTextArea cols="160" rows="3" label="" value="{!strategy.Burning_Platform_Comments__c}"/></td>
+            </tr>
+            <tr>
+                <th class="strategy">Relationship</th>
+                <td class="strategy">Do we have relationships with people of influence and will they support our solution over our competitors? Is our relationship a help or a hindrance, and why? 
+                    Is our delivery a help or a hindrance, and why? What other points of contact do we have at senior levels?
+                </td>
+                <td class="strategy"><apex:inputField label="" value="{!strategy.Relationship_Rating__c}"/></td>
+                <td class="strategy"><apex:inputTextArea cols="160" rows="3" label="" value="{!strategy.Relationship_Comments__c}"/></td>
+            </tr>
+            <tr>
+                <th class="strategy">Active Opportunities</th>
+                <td class="strategy">What additional opportunities are active currently?</td>
+                <td class="strategy"><apex:inputField label="" value="{!strategy.Active_Opportunities_Rating__c}"/></td>
+                <td class="strategy"><apex:inputTextArea cols="160" rows="3" label="" value="{!strategy.Active_Opportunities_Comments__c}"/></td>
+            </tr>
+            <tr>
+                <th class="strategy">Decision Making Process</th>
+                <td class="strategy">Do we know the decision-making process and have an opportunity to influence it? 
+                    Have we influenced in the past? Did we have a role in this opportunity coming to market? 
+                    Have we met with the client prior to proposal coming to the market? Is this blind?
+                </td>
+                <td class="strategy"><apex:inputField label="" value="{!strategy.Decision_Making_Process_Rating__c}"/></td>
+                <td class="strategy"><apex:inputTextArea cols="160" rows="3" label="" value="{!strategy.Decision_Making_Process_Comments__c}"/></td>
+            </tr>
+            <tr>
+                <th class="strategy">Solution Fit</th>
+                <td class="strategy">Does Aon Hewitt’s solution meet the client’s requirements better than the competitors? What are our gaps based on their requirements?</td>
+                <td class="strategy"><apex:inputField label="" value="{!strategy.Solution_Fit_Rating__c}"/></td>
+                <td class="strategy"><apex:inputTextArea cols="160" rows="3" label="" value="{!strategy.Solution_Fit_Comments__c}"/></td>
+            </tr>
+            <tr>
+                <th class="strategy">Qualifications &amp; References</th>
+                <td class="strategy">Do we have the necessary qualifications/references/case studies to demonstrate our strength? If so, who?</td>
+                <td class="strategy"><apex:inputField label="" value="{!strategy.Qualifications_References_Rating__c}"/></td>
+                <td class="strategy"><apex:inputTextArea cols="160" rows="3" label="" value="{!strategy.Qualifications_References_Comments__c}"/></td>
+            </tr>
+            <tr>
+                <th class="strategy">Revenue Growth</th>
+                <td class="strategy">Is this a recurring sale or is there high potential for future revenue growth on this account? If we win this opportunity, 
+                    what is our upside and estimated ARR of other opportunities?
+                </td>
+                <td class="strategy"><apex:inputField label="" value="{!strategy.Revenue_Growth_Rating__c}"/></td>
+                <td class="strategy"><apex:inputTextArea cols="160" rows="3" label="" value="{!strategy.Revenue_Growth_Comments__c}"/></td>
+            </tr>
+            <tr>
+                <th class="strategy">Firm Leverage</th>
+                <td class="strategy">What business do we do with this client outside of AH and can it be leveraged? 
+                    What business does this client do with us? Are we a client of theirs?
+                </td>
+                <td class="strategy"><apex:inputField label="" value="{!strategy.Firm_Leverage_Rating__c}"/></td>
+                <td class="strategy"><apex:inputTextArea cols="160" rows="3" label="" value="{!strategy.Firm_Leverage_Comments__c}"/></td>
+            </tr>
+            <tr>
+                <th class="strategy">Financial Factors</th>
+                <td class="strategy">Is there sufficient funding/budget to make the opportunity profitable? Is the client buying primarily on price?</td>
+                <td class="strategy"><apex:inputField label="" value="{!strategy.Financial_Factors_Rating__c}"/></td>
+                <td class="strategy"><apex:inputTextArea cols="160" rows="3" label="" value="{!strategy.Financial_Factors_Comments__c}"/></td>
+            </tr>
+            <tr>
+                <th class="strategy">Risk Factors</th>
+                <td class="strategy">Is there significant delivery, financial, implementation, technological, or legal risk?</td>
+                <td class="strategy"><apex:inputField label="" value="{!strategy.Risk_Factors_Rating__c}"/></td>
+                <td class="strategy"><apex:inputTextArea cols="160" rows="3" label="" value="{!strategy.Risk_Factors_Comments__c}"/></td>
+            </tr>
+            <tr>
+                <th class="strategy">Competition</th>
+                <td class="strategy">Are there special considerations that favor us or the competition? Do they already have preferred solution provider in mind? 
+                    If so, who?
+                </td>
+                <td class="strategy"><apex:inputField label="" value="{!strategy.Competition_Rating__c}"/></td>
+                <td class="strategy"><apex:inputTextArea cols="160" rows="3" label="" value="{!strategy.Competition_Comments__c}"/></td>
+            </tr>
+            <tr style="height: 20px;">
+                <th class="tableRowBottomLightGray">Total Score</th>
+                <th class="tableRowBottomLightGray">Weak: -22 to +5 | Average: +6 to +8 | Strong: +9 to +22</th>
+                <th class="tableRowRed" style="{!If(score == 'Red', 'display:visible;' , 'display:none;')}">
+                    <apex:outputText value="{0,number,#}"><apex:param value="{!strategy.Total__c}"/></apex:outputText>
+                </th>
+                <th class="tableRowYellow" style="{!If(score == 'Yellow', 'display:visible;' , 'display:none;')}">
+                    <apex:outputText value="{0,number,#}"><apex:param value="{!strategy.Total__c}"/></apex:outputText>
+                </th>
+                <th class="tableRowGreen" style="{!If(score == 'Green', 'display:visible;' , 'display:none;')}">
+                    <apex:outputText value="{0,number,#}"><apex:param value="{!strategy.Total__c}"/></apex:outputText>
+                </th>
+                <td class="tableRowBottomLightGray">&nbsp;</td>
+            </tr>
+            <tr class="tableRowHeading">
+                <th class="tableHeadGray">Evaluation Criterion - Exchanges Only</th>
+                <th class="tableHeadGray" align="center">Description</th>
+                <th class="tableHeadGray" align="center">Rating</th>
+                <th class="tableHeadGray">Comments/Action Plan</th>
+            </tr>
+            <tr>
+                <th class="strategy">Burning Platform</th>
+                <td class="strategy">Is there a compelling business reason for the client to take action? What is broken? Are they motivated to change?</td>
+                <td class="strategyCenter"><apex:outputText label="" value="{!strategy.Burning_Platform_Rating__c}"/></td>
+                <td class="strategy"><apex:outputText label="" value="{!strategy.Burning_Platform_Comments__c}"/></td>
+            </tr>
+            <tr>
+                <th class="strategy">Philosophical Fit</th>
+                <td class="strategy">Are they on board with the Fully-Insured idea? Or do they only believe that a Self-Insured Model is the way to go?</td>
+                <td class="strategy"><apex:inputField label="" value="{!strategy.Philosophical_Fit_Rating__c}"/></td>
+                <td class="strategy"><apex:inputTextArea cols="160" rows="3" label="" value="{!strategy.Philosophical_Fit_Comments__c}"/></td>
+            </tr>
+            <tr>
+                <th class="strategy">Champion</th>
+                <td class="strategy">Do we have a champion at the right level within the client organization that believes in Aon Hewitt and our Exchange Model and will go to bat for us, push the business case up to the C-suite for approval?</td>
+                <td class="strategy"><apex:inputField label="" value="{!strategy.Champion_Rating__c}"/></td>
+                <td class="strategy"><apex:inputTextArea cols="160" rows="3" label="" value="{!strategy.Champion_Comments__c}"/></td>
+            </tr>
+            <tr>
+                <th class="strategy">Executive Alignment</th>
+                <td class="strategy">Do we have alignment at the Executive Level- both internally and externally to support and influence this opportunity through to close?</td>
+                <td class="strategy"><apex:inputField label="" value="{!strategy.Executive_Alignment_Rating__c}"/></td>
+                <td class="strategy"><apex:inputTextArea cols="160" rows="3" label="" value="{!strategy.Executive_Alignment_Comments__c}"/></td>
+            </tr>
+            <tr>
+                <th class="strategy">Business Case (Financial Only)</th>
+                <td class="strategy">Do we have a compelling business case: Do they need admin, neutral or better financials, better healthcare strategy for their employees?</td>
+                <td class="strategy"><apex:inputField label="" value="{!strategy.Business_Case_Rating__c}"/></td>
+                <td class="strategy"><apex:inputTextArea cols="160" rows="3" label="" value="{!strategy.Business_Case_Comments__c}"/></td>
+            </tr>
+            <tr style="height: 20px;">
+                <th class="tableRowBottomLightGray">Total Score - Exchanges Only</th>
+                <th class="tableRowBottomLightGray">Weak: -10 to +3 | Average: +4 to +6 | Strong: +7 to +10</th>
+                <th class="tableRowRed" style="{!If(exchangeScore == 'Red', 'display:visible;' , 'display:none;')}">
+                    <apex:outputText value="{0,number,#}"><apex:param value="{!strategy.Total_2__c}"/></apex:outputText>
+                </th>
+                <th class="tableRowYellow" style="{!If(exchangeScore == 'Yellow', 'display:visible;' , 'display:none;')}">
+                    <apex:outputText value="{0,number,#}"><apex:param value="{!strategy.Total_2__c}"/></apex:outputText>
+                </th>
+                <th class="tableRowGreen" style="{!If(exchangeScore == 'Green', 'display:visible;' , 'display:none;')}">
+                    <apex:outputText value="{0,number,#}"><apex:param value="{!strategy.Total_2__c}"/></apex:outputText>
+                </th>
+                <td class="tableRowBottomLightGray">&nbsp;</td>
+            </tr>
+        </table>
+        </apex:pageBlock>
+        <br/>
+        
+        <apex:pageBlock title="Carrier Rates - Active Exchange Only">
+        <table width="100%">
+            <tr class="tableRowHeading">
+                <th class="tableHeadGray" width="25%">Rate Target</th>
+                <th class="tableHeadGray" width="25%">Rate Actual</th>
+                <th class="tableHeadGray" width="25">Carrier Action</th>
+                <th class="tableHeadGray" width="25%">Next Steps</th>
+            </tr>
+            <tr>
+                <td class="strategy"><apex:inputTextArea cols="70" rows="3" label="" value="{!strategy.Rate_Target__c}"/></td>
+                <td class="strategy"><apex:inputTextArea cols="70" rows="3" label="" value="{!strategy.Rate_Actual__c}"/></td>
+                <td class="strategy"><apex:inputTextArea cols="70" rows="3" label="" value="{!strategy.Carrier_Action__c}"/></td>
+                <td class="strategy"><apex:inputTextArea cols="70" rows="3" label="" value="{!strategy.Next_Steps__c}"/></td>
+            </tr>
+        </table>
+        </apex:pageBlock>
+        
+        <apex:pageBlock title="Key Contract Terms">
+        <table width="100%">
+            <tr class="tableRowHeading">
+                <th class="tableHeadGray" width="30%">Issues</th>
+                <th class="tableHeadGray" width="30%">Position Taken by Client/Prospect</th>
+                <th class="tableHeadGray" align="center" width="8%">Deal Breaker?</th>
+                <th class="tableHeadGray" width="32%">Position to be Proposed by Aon Hewitt</th>
+            </tr>
+            <tr>
+                <th class="strategy">Form of Contract - Client's or Aon Hewitt's</th>
+                <td class="strategy"><apex:inputTextArea cols="90" rows="3" label="" value="{!strategy.Form_of_Contract_Client__c}"/></td>
+                <td class="strategy"><apex:inputField label="" value="{!strategy.Form_of_Contract_Deal_Breaker__c}"/></td>
+                <td class="strategy"><apex:inputTextArea cols="90" rows="3" label="" value="{!strategy.Form_of_Contract_Aon_Hewitt__c}"/></td>
+            </tr>
+            <tr>
+                <th class="strategy">Term of Convenience - Notice Period and Termination Fees</th>
+                <td class="strategy"><apex:inputTextArea cols="90" rows="3" label="" value="{!strategy.Term_for_Convenience_Client__c}"/></td>
+                <td class="strategy"><apex:inputField label="" value="{!strategy.Term_for_Convenience_Deal_Breaker__c}"/></td>
+                <td class="strategy"><apex:inputTextArea cols="90" rows="3" label="" value="{!strategy.Term_for_Convenience_Aon_Hewitt__c}"/></td>
+            </tr>
+            <tr>
+                <th class="strategy">Liability Cap</th>
+                <td class="strategy"><apex:inputTextArea cols="90" rows="3" label="" value="{!strategy.Liability_Cap_Client__c}"/></td>
+                <td class="strategy"><apex:inputField label="" value="{!strategy.Liability_Cap_Deal_Breaker__c}"/></td>
+                <td class="strategy"><apex:inputTextArea cols="90" rows="3" label="" value="{!strategy.Liability_Cap_Aon_Hewitt__c}"/></td>
+            </tr>
+            <tr>
+                <th class="strategy">Fee Escalator</th>
+                <td class="strategy"><apex:inputTextArea cols="90" rows="3" label="" value="{!strategy.Fee_Escalator_Client__c}"/></td>
+                <td class="strategy"><apex:inputField label="" value="{!strategy.Fee_Escalator_Deal_Breaker__c}"/></td>
+                <td class="strategy"><apex:inputTextArea cols="90" rows="3" label="" value="{!strategy.Fee_Escalator_Aon_Hewitt__c}"/></td>
+            </tr>
+            <tr>
+                <th class="strategy">Service Levels</th>
+                <td class="strategy"><apex:inputTextArea cols="90" rows="3" label="" value="{!strategy.Service_Levels_Client__c}"/></td>
+                <td class="strategy"><apex:inputField label="" value="{!strategy.Service_Levels_Deal_Breaker__c}"/></td>
+                <td class="strategy"><apex:inputTextArea cols="90" rows="3" label="" value="{!strategy.Service_Levels_Aon_Hewitt__c}"/></td>
+            </tr>
+            <tr>
+                <th class="strategy">Payment Terms</th>
+                <td class="strategy"><apex:inputTextArea cols="90" rows="3" label="" value="{!strategy.Payment_Terms_Client__c}"/></td>
+                <td class="strategy"><apex:inputField label="" value="{!strategy.Payment_Terms_Deal_Breaker__c}"/></td>
+                <td class="strategy"><apex:inputTextArea cols="90" rows="3" label="" value="{!strategy.Payment_Terms_Aon_Hewitt__c}"/></td>
+            </tr>
+            <tr>
+                <th class="strategy">Required Decision Date for Proposed Live Date</th>
+                <td class="strategy"><apex:inputTextArea cols="90" rows="3" label="" value="{!strategy.Required_Decision_Date_Client__c}"/></td>
+                <td class="strategy"><apex:inputField label="" value="{!strategy.Required_Decision_Date_Deal_Breaker__c}"/></td>
+                <td class="strategy"><apex:inputTextArea cols="90" rows="3" label="" value="{!strategy.Required_Decision_Date_Aon_Hewitt__c}"/></td>
+            </tr>
+            <tr>
+                <th>Other Key Terms Presented as Possible Deal Breakers</th>
+                <td><apex:inputTextArea cols="90" rows="3" label="" value="{!strategy.Other_Key_Terms_Client__c}"/></td>
+                <td><apex:inputField label="" value="{!strategy.Other_Key_Terms_Deal_Breaker__c}"/></td>
+                <td><apex:inputTextArea cols="90" rows="3" label="" value="{!strategy.Other_Key_Terms_Aon_Hewitt__c}"/></td>
+            </tr>
+        </table>
+        </apex:pageBlock>
+        
+        <apex:pageBlock title="Competitive Analysis *">
+            <apex:dataTable value="{!compList}" var="comp" cellpadding="0" cellspacing="2" rowClasses="tableRow,tableRowBlue" styleClass="table1" headerClass="tableHeadGray" width="100%">
+                <apex:column headerValue="Competitor" width="10%">
+                    <apex:outputText value="{!comp.Competitor__c}"/>
+                </apex:column>
+                <apex:column headerValue="Strength(s)" width="25%">
+                    <apex:inputTextArea cols="70" rows="3" value="{!comp.Strength__c}"/>
+                </apex:column>
+                <apex:column headerValue="Weaknesses" width="25%">
+                    <apex:inputTextArea cols="70" rows="3" value="{!comp.Weakness__c}"/>
+                </apex:column>
+                <apex:column headerValue="How is Aon Hewitt Superior in the Client's View" width="30%">
+                    <apex:inputTextArea cols="90" rows="3" value="{!comp.Client_View__c}"/>
+                </apex:column>
+                <apex:column headerValue="Estimated Fees" width="10%">
+                    <apex:inputTextArea rows="3" value="{!comp.Estimated_Fees__c}"/>
+                </apex:column>
+            </apex:dataTable>
+            * This data will appear in both, the Opportunity Plan and the Opportunity Exec Summary
+        </apex:pageBlock>
+        
+        <apex:pageBlock title="Contact Roles" id="contactRoles">
+            <apex:dataTable value="{!ocrList}" var="ocr" id="ocrTable" cellpadding="0" cellspacing="2" rowClasses="tableRow,tableRowBlue" styleClass="table1" headerClass="tableHeadGray" width="100%">
+                <apex:facet name="footer">
+                    <apex:commandLink value="Add Contact" action="{!addOcr}" reRender="contactRoles"/>
+                </apex:facet>
+                <apex:column headerValue="Action" >
+                    <a href="javascript:if (window.confirm('Are you sure?')) deleteOcrRow('{!ocr.Id}');" style="font-weight:bold">Delete</a>
+                </apex:column>
+                <apex:column headerValue="Contact">
+                    <apex:inputField value="{!ocr.Contact__c}"/>
+                </apex:column>
+                <apex:column headerValue="Role">
+                    <apex:inputField value="{!ocr.Role__c}" required="true"/>
+                </apex:column>
+                <apex:column headerValue="Comments - What do they personally care about? How do we infulence this buyer?">
+                    <apex:inputTextArea cols="140" rows="3" value="{!ocr.Comments__c}"/>
+                </apex:column>
+                <apex:column headerValue="Account" width="20%">
+                    <apex:outputText >
+                        <apex:outputPanel style="display:none">
+                            <apex:inputField value="{!ocr.Account__c}" />
+                        </apex:outputPanel>
+                    </apex:outputText>          
+                    <apex:outputField value="{!ocr.Account__c}"/>
+                </apex:column>
+            </apex:dataTable>
+        </apex:pageBlock>
+        
+        <apex:actionFunction action="{!deleteOCR}" name="deleteOcrRow" reRender="contactRoles" >
+            <apex:param name="ocrId" value="" assignTo="{!selectedOcrId}"/>
+        </apex:actionFunction>
+        
+        <table width="100%">
+            <tr>
+                <td align="center"><apex:commandButton value="Save Plan Data" action="{!saveData}"/>
+                    &nbsp;&nbsp;<apex:commandButton value="Close (without Saving)" onclick="window.parent.close()"/>
+                    &nbsp;&nbsp;<apex:commandButton value="Create Opportunity Plan Document" action="{!createPlan}"/>
+                    &nbsp;&nbsp;<apex:commandButton value="Create Opportunity Summary Plan Document" action="{!createSummaryPlan}"/>                    
+                </td>
+            </tr>
+        </table>
+    </apex:form>
+</apex:page>

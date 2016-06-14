@@ -1,0 +1,674 @@
+<!-- 
+/******************************************************************************
+ * Filename: Client_Scorecard.page
+ * Author:   Chintan Adhyapak
+ * Purpose:  Renders a Client Scorecard as a PDF. 
+ ****************************************************************************** 
+ * History
+ * ----------------------------------------------------------------------------
+ * 2012-06-30   Chintan Adhyapak	Created
+ ******************************************************************************/
+-->
+<apex:page cache="false" title="Client Scorecard" standardController="Account" extensions="ctlr_Client_Scorecard" renderAs="PDF">
+<apex:stylesheet value="{!URLFOR($Resource.Client_Scorecard, 'Client_Scorecard_StyleSheet.css')}" />
+<head>
+	<style type="text/css">
+	@page {
+    	counter-increment: page;
+    	@bottom-right {
+			font-family: Arial Sans-Serif;
+			font-size: 9.0pt;
+			font-style: italic;
+        	content: "Page " counter(page) " of " counter(pages) "&nbsp;&nbsp;&nbsp;" 
+    	}
+    	@bottom-center {
+			font-family: Arial Sans-Serif;
+			font-size: 9.0pt;
+			font-style: italic;
+        	content: "Printed on &nbsp;<apex:outputText value="{0,date,MMMM dd, yyyy}"><apex:param value="{!today()}"/></apex:outputText>" 
+    	}
+    	@bottom-left {
+			font-family: Arial Sans-Serif;
+    		font-size: 9.0pt;
+    		font-style: italic;
+    		content: "&nbsp;&nbsp;&nbsp;{!myScorecard.accountName}";
+    	}
+	}
+	td.twenty{background-color:#FF0000; border:none}
+  	td.forty{background-color:#F76541; border:none}
+  	td.sixty{background-color:#FFFF00; border:none}
+  	td.eighty{background-color:#B1FB17; border:none}
+  	td.hundred{background-color:#00FF00; border:none}
+  	td.grey{background-color:#DDDDDD; border:none} 
+	</style>
+</head>
+<div class="container">
+	<table class="table0">
+		<tr>
+			<td align="left"><apex:image url="{!URLFOR($Resource.Client_Scorecard, 'AonHewittLogo.PNG')}" width="100" height="27"/></td>
+		</tr>
+	</table>
+
+	<div class="top">
+    	<table class="table0">
+        	<tr>
+	            <th align="left" class="title">{!financialYear} {!quarter} US Client Scorecard</th>
+            	<th align="right" class="title">&nbsp;</th>
+	    	</tr>
+    	</table>
+    	<hr class="hr"/>
+	</div>
+    
+    <div class="div1">
+        <table class="table1">
+        <tr>
+            <th class="tableHeadGray" colspan="2">Account Summary</th>
+        </tr>
+        <tr>
+            <td width="45%" class="tableRow">Account</td>
+            <td width="55%" class="tableRow"><apex:outputText value="{!myScorecard.accountName}"/></td>
+        </tr>
+        <tr>
+            <td class="tableRowBlue">Market</td>
+            <td class="tableRowBlue"><apex:outputText value="{!myScorecard.market}"/></td>
+        </tr>
+        <tr>
+            <td class="tableRow">Account Executive</td>
+            <td class="tableRow"><apex:outputText value="{!myScorecard.ownerName}"/></td>
+        </tr>
+        <tr>
+            <td class="tableRowBlue">Executive Sponsor</td>
+            <td class="tableRowBlue"><apex:outputText value="{!myScorecard.executiveSponsor}"/></td>
+        </tr>
+        <apex:repeat var="iat" value="{!myScorecard.iatList}">
+        <tr style="{!IF(iat.Contact_Role__c == 'General Manager (HRO GM)', 'display:visible;' , 'display:none')}">
+            <td class="tableRow">GM</td>
+            <td class="tableRow">{!iat.Contact__r.Name}</td>
+        </tr>
+        </apex:repeat>
+        <apex:repeat var="iat" value="{!myScorecard.iatList}">
+        <tr style="{!IF(iat.Contact_Role__c == 'BGM (Business Group Manager)', 'display:visible;' , 'display:none')}">  
+            <td class="tableRowBlue">BGM</td>
+            <td class="tableRowBlue">{!iat.Contact__r.Name}</td>
+        </tr>
+        </apex:repeat>
+        <tr>
+            <td class="tableRow">Client Promise Required</td>
+            <td class="tableRow"><apex:outputText value="{!If(account.Client_Promise_Required__c, 'Yes', 'No')}"/></td>
+        </tr>
+        <tr>
+            <td class="tableRowBlue">Client Promise Score</td>
+            <td class="tableRowBlue"><apex:outputText value="{!score} % for {!currYear}"/></td>
+        </tr>
+        </table>
+        <br/>
+        
+        <table class="table1a">
+        <tr>
+            <th class="tableHeadGray" colspan="2">Overall Relationship</th>
+        </tr>
+        <apex:repeat var="cas" value="{!myScorecard.casList}">
+        <tr>
+            <td class="tableRow" width="45%">Overall Status</td>
+            <td class="tableRowRed" width="55%" style="{!If(cas.Overall_Relationship_Status__c == 'Red', 'display:visible;' , 'display:none')}">{!cas.Overall_Relationship_Status__c}</td>
+            <td class="tableRowYellow" width="55%" style="{!If(cas.Overall_Relationship_Status__c == 'Yellow', 'display:visible;' , 'display:none')}">{!cas.Overall_Relationship_Status__c}</td>
+            <td class="tableRowGreen" width="55%" style="{!If(cas.Overall_Relationship_Status__c == 'Green', 'display:visible;' , 'display:none')}">{!cas.Overall_Relationship_Status__c}</td>
+        </tr>
+        <tr>
+            <td class="tableRowBlue">Consulting Status</td>
+            <td class="tableRowRed" width="50%" style="{!If(cas.Consulting_Relationship_Status__c == 'Red', 'display:visible;' , 'display:none')}">{!cas.Consulting_Relationship_Status__c}</td>
+            <td class="tableRowYellow" width="50%" style="{!If(cas.Consulting_Relationship_Status__c == 'Yellow', 'display:visible;' , 'display:none')}">{!cas.Consulting_Relationship_Status__c}</td>
+            <td class="tableRowGreen" width="50%" style="{!If(cas.Consulting_Relationship_Status__c == 'Green', 'display:visible;' , 'display:none')}">{!cas.Consulting_Relationship_Status__c}</td>
+        </tr>
+        <tr>
+            <td class="tableRow">Outsourcing Status</td>
+            <td class="tableRowRed" width="50%" style="{!If(cas.Outsourcing_Relationship_Status__c == 'Red', 'display:visible;' , 'display:none')}">{!cas.Outsourcing_Relationship_Status__c}</td>
+            <td class="tableRowYellow" width="50%" style="{!If(cas.Outsourcing_Relationship_Status__c == 'Yellow', 'display:visible;' , 'display:none')}">{!cas.Outsourcing_Relationship_Status__c}</td>
+            <td class="tableRowGreen" width="50%" style="{!If(cas.Outsourcing_Relationship_Status__c == 'Green', 'display:visible;' , 'display:none')}">{!cas.Outsourcing_Relationship_Status__c}</td>
+        </tr>
+        <tr>
+            <td class="tableRowBlue">Leverage ARS Relationship</td>
+            <td class="tableRowBlue">{!cas.ARS_Relationship__c}</td>
+        </tr>
+        <tr>
+            <td class="tableRow">Risks</td>
+            <td class="tableRow">{!cas.Risks__c}</td>
+        </tr>
+        <tr>
+            <td class="tableRowBlue">Opportunities</td>
+            <td class="tableRowBlue">{!cas.Opportunities__c}</td>
+        </tr>
+        </apex:repeat>
+        </table>
+        <br/>
+        
+        <table class="table3">
+			<tr>
+	    		<th class="tableHeadGray" colspan="6">Revenue, Sales &amp; Pipeline</th>
+	    		<th class="tableHeadGray" colspan="2" align="right" style="{!If(rspListSize > 0, 'display:visible;' , 'display:none')}">as of &nbsp;{!asOfDate}&nbsp;&nbsp;</th>
+				<th class="tableHeadGray" colspan="2" style="{!If(rspListSize == 0, 'display:visible;' , 'display:none')}">&nbsp;</th>
+			</tr>
+			<tr>
+				<td class="tableRowBottomRight">&nbsp;</td>
+				<td class="revRowBottom" align="center" colspan="2">Full Year Revenue</td>
+	   			<td class="revRowBottom" colspan="3" align="center">YTD Revenue</td>
+	    		<td class="tableRowBottomRight" align="center">YTD Sales</td>
+	    		<td class="tableRowBottomLightGray" align="center">Pipeline</td>
+			</tr>
+			<tr>
+	    		<td class="tableRow">&nbsp;</td>
+	    		<td class="tableRow" width="12%" align="right">{!prevPrevYear}</td>
+	    		<td class="tableRowRightHeavy" width="12%" align="right">{!prevYear}</td>
+	    		<td class="tableRow" width="12%" align="right">{!prevYear}</td>
+	    		<td class="tableRow" width="12%" align="right">{!financialYear}</td>
+	    		<td class="tableRowRightHeavy" width="12%" align="right">Growth</td>
+	    		<td class="tableRow" width="12%" align="right">FY Value</td>
+	    		<td class="tableRow" width="12%" align="right">FY Value</td>
+			</tr>
+			<apex:repeat var="rsp" value="{!myScorecard.rspList}">
+				<tr>
+	    			<td class="tableRowBlue">COMM</td>
+	    			<td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PPY_Full_Year_Revenue_COMM__c}"/></apex:outputText></td>
+	    			<td class="revRowBlueRight"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Prior_Year_Revenue_COMM__c}"/></apex:outputText></td>
+	    			<td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PY_YTD_Revenue_COMM__c}"/></apex:outputText></td>
+	    			<td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Revenue_COMM__c}"/></apex:outputText></td>
+	   				<td class="revRowBlueRight">{!rsp.COMM_Growth__c}%</td>
+	    			<td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Sales_COMM__c}"/></apex:outputText></td>
+	    			<td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Pipeline_COMM__c}"/></apex:outputText></td>
+				</tr>
+				<tr>
+	    			<td class="tableRow">H&amp;B&#42;</td>
+	    			<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PPY_Full_Year_Revenue_H_B__c}"/></apex:outputText></td>
+	    			<td class="revRowRight"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Prior_Year_Revenue_H_B__c}"/></apex:outputText></td>
+	    			<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PY_YTD_Revenue_H_B__c}"/></apex:outputText></td>
+	    			<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Revenue_H_B__c}"/></apex:outputText></td>
+	    			<td class="revRowRight">{!rsp.H_B_Growth__c}%</td>
+	    			<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Sales_H_B__c}"/></apex:outputText></td>
+	    			<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Pipeline_H_B__c}"/></apex:outputText></td>
+				</tr>
+				<tr>
+	    			<td class="tableRowBlue">RET</td>
+	    			<td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PPY_Full_Year_Revenue_RET__c}"/></apex:outputText></td>
+	    			<td class="revRowBlueRight"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Prior_Year_Revenue_RET__c}"/></apex:outputText></td>
+	    			<td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PY_YTD_Revenue_RET__c}"/></apex:outputText></td>
+	    			<td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Revenue_RET__c}"/></apex:outputText></td>
+				   	<td class="revRowBlueRight">{!rsp.RET_Growth__c}%</td>
+	    			<td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Sales_RET__c}"/></apex:outputText></td>
+	    			<td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Pipeline_RET__c}"/></apex:outputText></td>
+				</tr>
+				<tr>
+	    			<td class="tableRow">PRT</td>
+	    			<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PPY_Full_Year_Revenue_C_T__c}"/></apex:outputText></td>
+	    			<td class="revRowRight"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Prior_Year_Revenue_C_T__c}"/></apex:outputText></td>
+	    			<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PY_YTD_Revenue_C_T__c}"/></apex:outputText></td>
+	    			<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Revenue_C_T__c}"/></apex:outputText></td>
+	    			<td class="revRowRight">{!rsp.C_T_Growth__c}%</td>
+	    			<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Sales_C_T__c}"/></apex:outputText></td>
+	    			<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Pipeline_C_T__c}"/></apex:outputText></td>
+				</tr>
+				<tr>
+	    			<td class="tableRowBlue">AMAS</td>
+	    			<td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PPY_Full_Year_Revenue_AMAS__c}"/></apex:outputText></td>
+	    			<td class="revRowBlueRight"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Prior_Year_Revenue_AMAS__c}"/></apex:outputText></td>
+	    			<td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PY_YTD_Revenue_AMAS__c}"/></apex:outputText></td>
+	    			<td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Revenue_AMAS__c}"/></apex:outputText></td>
+	    			<td class="revRowBlueRight">{!rsp.AMAS_Growth__c}%</td>
+	    			<td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Sales_AMAS__c}"/></apex:outputText></td>
+	    			<td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Pipeline_AMAS__c}"/></apex:outputText></td>
+				</tr>	
+				<tr>
+    				<td class="tableRow">Global Benefits&#42;</td>
+    				<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PPY_Full_Year_Revenue_GBS__c}"/></apex:outputText></td>
+	    			<td class="revRowRight"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Prior_Year_Revenue_Global_Benefits__c}"/></apex:outputText></td>
+    				<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PY_YTD_Revenue_Global_Benefits__c}"/></apex:outputText></td>
+    				<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Revenue_Global_Benefits__c}"/></apex:outputText></td>
+    				<td class="revRowRight">{!rsp.Global_Benefits_Growth__c}%</td>
+    				<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Sales_Global_Benefits__c}"/></apex:outputText></td>
+    				<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Pipeline_Global_Benefits__c}"/></apex:outputText></td>
+				</tr>
+				<tr>
+	    			<td class="tableRow">Executive Benefits&#42;</td>
+	    			<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PPY_Full_Year_Revenue_EXB__c}"/></apex:outputText></td>
+	    			<td class="revRowRight"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Prior_Year_Revenue_Executive_Benefits__c}"/></apex:outputText></td>
+	    			<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PY_YTD_Revenue_Executive_Benefits__c}"/></apex:outputText></td>
+	    			<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Revenue_Executive_Benefits__c}"/></apex:outputText></td>
+	    			<td class="revRowRight">{!rsp.Executive_Benefits_Growth__c}%</td>
+	    			<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Sales_Executive_Benefits__c}"/></apex:outputText></td>
+	    			<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Pipeline_Executive_Benefits__c}"/></apex:outputText></td>
+				</tr>	
+				<tr>
+	    			<td class="tableHeadGray">CNS Total</td>
+	    			<td class="revRowGray"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PPY_Full_Year_Revenue_CNS_Total__c}"/></apex:outputText></td>
+	    			<td class="revRowGrayRight"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Prior_Year_Revenue_CNS_Total__c}"/></apex:outputText></td>
+	    			<td class="revRowGray"><apex:outputText value="$ {0,number,###,###,###,###}"><apex:param value="{!rsp.PY_YTD_Revenue_CNS_Total__c}"/></apex:outputText></td>
+	    			<td class="revRowGray"><apex:outputText value="$ {0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Revenue_CNS_Total__c}"/></apex:outputText></td>
+	    			<td class="revRowGrayRight">{!rsp.CNS_Total_Growth__c}%</td>
+    				<td class="revRowGray"><apex:outputText value="$ {0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Sales_CNS_Total__c}"/></apex:outputText></td>
+    				<td class="revRowGray"><apex:outputText value="$ {0,number,###,###,###,###}"><apex:param value="{!rsp.Pipeline_CNS_Total__c}"/></apex:outputText></td>
+				</tr>	
+				<tr>
+	    			<td class="tableRow">LM Benefits Admin</td>
+	    			<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PPY_Full_Year_Revenue_Ben_Admin__c}"/></apex:outputText></td>
+	    			<td class="revRowRight"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Prior_Year_Revenue_Ben_Admin__c}"/></apex:outputText></td>
+	    			<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PY_YTD_Revenue_Ben_Admin__c}"/></apex:outputText></td>
+	    			<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Revenue_Ben_Admin__c}"/></apex:outputText></td>
+	    			<td class="revRowRight">{!rsp.Ben_Admin_Growth__c}%</td>
+	    			<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Sales_Ben_Admin__c}"/></apex:outputText></td>
+	    			<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Pipeline_Ben_Admin__c}"/></apex:outputText></td>
+				</tr>
+				<tr>
+	    			<td class="tableRowBlue">Health Exchanges</td>
+	    			<td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PPY_Full_Year_Revenue_Exchanges__c}"/></apex:outputText></td>
+	    			<td class="revRowBlueRight"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Prior_Year_Revenue_Healthcare_Exchanges__c}"/></apex:outputText></td>
+	    			<td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PY_YTD_Revenue_Healthcare_Exchanges__c}"/></apex:outputText></td>
+	    			<td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Revenue_Healthcare_Exchanges__c}"/></apex:outputText></td>
+	    			<td class="revRowBlueRight">{!rsp.Healthcare_Exchanges_Growth__c}%</td>
+	    			<td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Sales_Healthcare_Exchanges__c}"/></apex:outputText></td>
+	    			<td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Pipeline_Healthcare_Exchanges__c}"/></apex:outputText></td>
+				</tr>
+				<tr>
+	    			<td class="tableRow">HRBPO</td>
+	    			<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PPY_Full_Year_Revenue_HRBPO__c}"/></apex:outputText></td>
+	    			<td class="revRowRight"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Prior_Year_Revenue_HRBPO__c}"/></apex:outputText></td>
+	    			<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PY_YTD_Revenue_HRBPO__c}"/></apex:outputText></td>
+	    			<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Revenue_HRBPO__c}"/></apex:outputText></td>
+	    			<td class="revRowRight">{!rsp.HRBPO_Growth__c}%</td>
+	    			<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Sales_HRBPO__c}"/></apex:outputText></td>
+	    			<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Pipeline_HRBPO__c}"/></apex:outputText></td>
+				</tr>
+				<tr>
+	    			<td class="tableRowBlue">Enterprise Benefits</td>
+	    			<td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PPY_Full_Year_Revenue_Enterprise_Benefit__c}"/></apex:outputText></td>
+	    			<td class="revRowBlueRight"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PY_Full_Year_Revenue_Enterprise_Benefits__c}"/></apex:outputText></td>
+	    			<td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PY_YTD_Revenue_Enterprise_Benefits__c}"/></apex:outputText></td>
+	    			<td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Revenue_Enterprise_Benefits__c}"/></apex:outputText></td>
+	    			<td class="revRowBlueRight">{!rsp.Enterprise_Benefits_Growth__c}%</td>
+	    			<td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Sales_Enterprise_Benefits__c}"/></apex:outputText></td>
+	    			<td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Pipeline_Enterprise_Benefits__c}"/></apex:outputText></td>
+				</tr>
+				<tr>
+	    			<td class="tableRow">Absence Mgmt</td>
+	    			<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PPY_Full_Year_Revenue_Absence_Mgmt__c}"/></apex:outputText></td>
+	    			<td class="revRowRight"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PY_Full_Year_Revenue_Absence_Mgmt__c}"/></apex:outputText></td>
+	    			<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PY_YTD_Revenue_Absence_Mgmt__c}"/></apex:outputText></td>
+	    			<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Revenue_Absence_Mgmt__c}"/></apex:outputText></td>
+	    			<td class="revRowRight">{!rsp.Absence_Mgmt_Growth__c}%</td>
+	    			<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Sales_Absence_Mgmt__c}"/></apex:outputText></td>
+	    			<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Pipeline_Absence_Mgmt__c}"/></apex:outputText></td>
+				</tr>
+				<tr>
+	    			<td class="tableRowBlue">Point Solutions</td>
+	    			<td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PPY_Full_Year_Revenue_Point_Solutions__c}"/></apex:outputText></td>
+	    			<td class="revRowBlueRight"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PY_Full_Year_Revenue_Point_Solutions__c}"/></apex:outputText></td>
+	    			<td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PY_YTD_Revenue_Point_Solutions__c}"/></apex:outputText></td>
+	    			<td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Revenue_Point_Solutions__c}"/></apex:outputText></td>
+	    			<td class="revRowBlueRight">{!rsp.Point_Solutions_Growth__c}%</td>
+	    			<td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Sales_Point_Solutions__c}"/></apex:outputText></td>
+	    			<td class="revRowBlue"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Pipeline_Point_Solutions__c}"/></apex:outputText></td>
+				</tr>
+				<tr>
+	    			<td class="tableRow">RPO</td>
+	    			<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PPY_Full_Year_Revenue_RPO__c}"/></apex:outputText></td>
+	    			<td class="revRowRight"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PY_Full_Year_Revenue_RPO__c}"/></apex:outputText></td>
+	    			<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PY_YTD_Revenue_RPO__c}"/></apex:outputText></td>
+	    			<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Revenue_RPO__c}"/></apex:outputText></td>
+	    			<td class="revRowRight">{!rsp.RPO_Growth__c}%</td>
+	    			<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Sales_RPO__c}"/></apex:outputText></td>
+	    			<td class="revRow"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Pipeline_RPO__c}"/></apex:outputText></td>
+				</tr>
+				<tr>
+	    			<td class="tableHeadGray">HRO Total</td>
+	    			<td class="revRowGray"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PPY_Full_Year_Revenue_HRO_Total__c}"/></apex:outputText></td>
+	    			<td class="revRowGrayRight"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Prior_Year_Revenue_HRO_Total__c}"/></apex:outputText></td>
+	    			<td class="revRowGray"><apex:outputText value="$ {0,number,###,###,###,###}"><apex:param value="{!rsp.PY_YTD_Revenue_HRO_Total__c}"/></apex:outputText></td>
+	    			<td class="revRowGray"><apex:outputText value="$ {0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Revenue_HRO_Total__c}"/></apex:outputText></td>
+	    			<td class="revRowGrayRight">{!rsp.HRO_Total_Growth__c}%</td>
+	    			<td class="revRowGray"><apex:outputText value="$ {0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Sales_HRO_Total__c}"/></apex:outputText></td>
+	    			<td class="revRowGray"><apex:outputText value="$ {0,number,###,###,###,###}"><apex:param value="{!rsp.Pipeline_HRO_Total__c}"/></apex:outputText></td>
+				</tr>
+				<tr>
+	    			<th class="tableRowBottomLightGray">Grand Total</th>
+	    			<th class="revRowBottomMargin"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PPY_Full_Year_Revenue_Grand_Total__c}"/></apex:outputText></th>
+	    			<th class="revRowRightBottom"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Prior_Year_Revenue_Grand_Total__c}"/></apex:outputText></th>
+	    			<th class="revRowBottomMargin"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.PY_YTD_Revenue_Grand_Total__c}"/></apex:outputText></th>
+	    			<th class="revRowBottomMargin"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Revenue_Grand_Total__c}"/></apex:outputText></th>
+	    			<th class="revRowRightBottom">{!rsp.Grand_Total_Growth__c}%</th>
+	    			<th class="revRowBottomMargin"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.YTD_Sales_Grand_Total__c}"/></apex:outputText></th>
+	    			<th class="revRowBottomMargin"><apex:outputText value="{0,number,###,###,###,###}"><apex:param value="{!rsp.Pipeline_Grand_Total__c}"/></apex:outputText></th>
+				</tr>
+			</apex:repeat>
+		</table>
+		<table>
+			<tr>
+				<td class="tableNote" colspan="8">&#42; The sales and pipeline results for <b>H&amp;B</b>, <b>Global Benefits</b> and <b>Executive Benefits</b> reflect only those opportunities managed by an 
+						Aon Hewitt Account Executive and do not represent all ARS activity. 
+						Revenue is included in the Consulting Total above if billing is processed by Aon Hewitt.<br/>
+						&#42;PPY values reflect US revenue only while PY and YTD reflect North America
+				</td>
+			</tr>
+		</table>
+    </div>
+	<br/>
+
+    <div class="div2">
+    	<table class="table2">
+        <tr>
+            <th class="tableHeadGray">Client Promise Survey</th>
+            <th class="tableHeadGray" align="center">{!prevYear}</th>
+            <th class="tableHeadGray" align="center">{!financialYear}</th>
+        </tr>
+        <tr>
+            <td class="tableRow">Likelihood to Recommend</td>
+            <td class="tableRow" align="center">{!myScorecard.csdMap['PYlikelihood']}</td>
+            <td class="tableRow" align="center">{!myScorecard.csdMap['CYlikelihood']}</td>
+        </tr>
+        <tr>
+            <td class="tableRowBlue">Overall Satisfaction</td>
+            <td class="tableRowBlue" align="center">{!myScorecard.csdMap['PYsatisfaction']}</td>
+            <td class="tableRowBlue" align="center">{!myScorecard.csdMap['CYsatisfaction']}</td>
+        </tr>
+        </table>
+    </div>
+    <br/>
+	
+	 <div class="div3">
+	 	<table class="table2">
+		<tr>
+			<th class="tableHeadGray" colspan="2">HRO Renewal Info</th>
+		</tr>
+		<apex:repeat var="hr" value="{!myScorecard.hroList}">
+		<tr>
+		    <td class="tableRow" width="45%">Services</td>
+	    	<td class="tableRow" width="55%">&nbsp;{!hr.Services__c}&nbsp;&nbsp;</td>
+		</tr>
+			<tr>
+	    	<td class="tableRowBlue">Renewal Stage</td>
+	    	<td class="tableRowBlue">&nbsp;{!hr.Renewal_Stage__c}</td>
+		</tr>
+		<tr>
+		    <td class="tableRow">Overall Renewal Rating</td>
+	    	<td class="tableRowRed" style="{!If(hr.Overall_Renewal_Rating__c == 'Red', 'display:visible;' , 'display:none')}">&nbsp;{!hr.Overall_Renewal_Rating__c}</td>
+        	<td class="tableRowYellow" style="{!If(hr.Overall_Renewal_Rating__c == 'Yellow', 'display:visible;' , 'display:none')}">&nbsp;{!hr.Overall_Renewal_Rating__c}</td>
+        	<td class="tableRowGreen" style="{!If(hr.Overall_Renewal_Rating__c == 'Green', 'display:visible;' , 'display:none')}">&nbsp;{!hr.Overall_Renewal_Rating__c}</td>
+		</tr>
+		<tr>
+		    <td class="tableRowBlue">Min Contract End Date</td>
+	    	<td class="tableRowBlue">&nbsp;<apex:outputText value="{0,date,MMMMM dd, yyyy}"><apex:param value="{!hr.Min_Contract_End_Date__c}" /></apex:outputText></td>
+		</tr>
+		<tr>
+		    <td class="tableRow">Renewal Lead</td>
+	    	<td class="tableRow">&nbsp;<apex:outputText value="{!hr.Renewal_Lead__r.Name}"/></td>
+		</tr>
+		</apex:repeat>
+		</table>
+	</div>
+</div>
+
+<div class="containerWithBreakBefore">
+	<table class="table0">
+		<tr>
+			<td align="left"><apex:image url="{!URLFOR($Resource.Client_Scorecard, 'AonHewittLogo.PNG')}" width="100" height="27"/></td>
+		</tr>
+	</table>
+
+	<div class="top">
+	    <table class="table0">
+        	<tr>
+	            <th align="left" class="title">{!financialYear} {!quarter} US Client Scorecard</th>
+	    	</tr>
+   		</table>
+    	<hr class="hr"/>
+	</div>
+    
+    <div class="div6">
+		<table class="table3">
+			<tr>
+    			<th colspan="5" class="tableHeadGray">Penetration</th>
+    			<th class="tableHeadGray" style="{!If(casListSize > 0, 'display:visible;' , 'display:none')}">Score<font style="font-size: 9.0pt;">&#42;</font> &nbsp;<apex:outputText value="{0,number,###}"><apex:param value="{!penetrationScore}"/></apex:outputText>%</th>
+				<th class="tableHeadGray" style="{!If(casListSize == 0, 'display:visible;' , 'display:none')}">Score<font style="font-size: 9.0pt;">&#42;</font> &nbsp;0%</th>
+			</tr>
+			<tr>
+    			<td width="25%" class="tableRowRight">Service</td>
+			    <td align="center" width="15%" class="tableRowRight">Recent Loss</td>
+			    <td align="center" width="15%" class="tableRowRight">No Activity or N/A</td>
+    			<td align="center" width="15%" class="tableRowRight">Opportunity in SFDC</td>
+	    		<td align="center" width="15%" class="tableRowRight">Partially Penetrated</td>
+    			<td align="center" width="15%" class="tableRow">Lead Provider</td>
+			</tr>
+			<apex:repeat var="cas" value="{!myScorecard.casList}">
+			<tr>
+    			<td colspan="6" class="tableRowGray">Healthcare</td>
+			</tr>
+			<tr>
+			    <td class="tableRowBottom">H&amp;B Consulting</td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.H_B_Consulting__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.H_B_Consulting__c == 'Recent Loss', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.H_B_Consulting__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.H_B_Consulting__c == 'No Activity or N/A', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.H_B_Consulting__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.H_B_Consulting__c == 'Opportunity in SFDC', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.H_B_Consulting__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.H_B_Consulting__c == 'Partially Penetrated', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.H_B_Consulting__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.H_B_Consulting__c == 'Lead Provider', true, false)}" /></td>
+			</tr>
+			<tr>
+    			<td class="tableRowBottom">H&amp;W Admin</td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.H_W_Admin__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.H_W_Admin__c == 'Recent Loss', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.H_W_Admin__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.H_W_Admin__c == 'No Activity or N/A', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.H_W_Admin__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.H_W_Admin__c == 'Opportunity in SFDC', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.H_W_Admin__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.H_W_Admin__c == 'Partially Penetrated', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.H_W_Admin__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.H_W_Admin__c == 'Lead Provider', true, false)}" /></td>
+			</tr>
+			<tr>
+    			<td class="tableRowBottom">Absence Mgmt</td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Absence_Mgmt__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Absence_Mgmt__c == 'Recent Loss', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Absence_Mgmt__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Absence_Mgmt__c == 'No Activity or N/A', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Absence_Mgmt__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Absence_Mgmt__c == 'Opportunity in SFDC', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Absence_Mgmt__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Absence_Mgmt__c == 'Partially Penetrated', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Absence_Mgmt__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Absence_Mgmt__c == 'Lead Provider', true, false)}" /></td>
+			</tr>
+			<tr>
+    			<td class="tableRowBottom">Advocacy</td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Advocacy__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Advocacy__c == 'Recent Loss', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Advocacy__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Advocacy__c == 'No Activity or N/A', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Advocacy__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Advocacy__c == 'Opportunity in SFDC', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Advocacy__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Advocacy__c == 'Partially Penetrated', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Advocacy__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Advocacy__c == 'Lead Provider', true, false)}" /></td>
+			</tr>
+			<tr>
+    			<td class="tableRowBottom">Dependent Verification</td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Dependent_Verification__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Dependent_Verification__c == 'Recent Loss', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Dependent_Verification__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Dependent_Verification__c == 'No Activity or N/A', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Dependent_Verification__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Dependent_Verification__c == 'Opportunity in SFDC', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Dependent_Verification__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Dependent_Verification__c == 'Partially Penetrated', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Dependent_Verification__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Dependent_Verification__c == 'Lead Provider', true, false)}" /></td>
+			</tr>
+			<tr>
+    			<td class="tableRowBottom">Spending Acct Admin</td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Spending_Acct_Admin__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Spending_Acct_Admin__c == 'Recent Loss', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Spending_Acct_Admin__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Spending_Acct_Admin__c == 'No Activity or N/A', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Spending_Acct_Admin__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Spending_Acct_Admin__c == 'Opportunity in SFDC', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Spending_Acct_Admin__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Spending_Acct_Admin__c == 'Partially Penetrated', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Spending_Acct_Admin__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Spending_Acct_Admin__c == 'Lead Provider', true, false)}" /></td>
+			</tr>
+			<tr>
+    			<td class="tableRow">Exchanges</td>
+			   <td class="tableRow" bgcolor="{!If(cas.Exchanges__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Exchanges__c == 'Recent Loss', true, false)}" /></td>
+			    <td class="tableRow" bgcolor="{!If(cas.Exchanges__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Exchanges__c == 'No Activity or N/A', true, false)}" /></td>
+			    <td class="tableRow" bgcolor="{!If(cas.Exchanges__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Exchanges__c == 'Opportunity in SFDC', true, false)}" /></td>
+			    <td class="tableRow" bgcolor="{!If(cas.Exchanges__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Exchanges__c == 'Partially Penetrated', true, false)}" /></td>
+			    <td class="tableRow" bgcolor="{!If(cas.Exchanges__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Exchanges__c == 'Lead Provider', true, false)}" /></td>
+			</tr>
+			<tr>
+    			<td colspan="6" class="tableRowGray">Retirement</td>
+			</tr>
+			<tr>
+    			<td class="tableRowBottom">Actuarial</td>
+    			<td class="tableRowBottom" bgcolor="{!If(cas.Actuarial__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Actuarial__c == 'Recent Loss', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Actuarial__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Actuarial__c == 'No Activity or N/A', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Actuarial__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Actuarial__c == 'Opportunity in SFDC', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Actuarial__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Actuarial__c == 'Partially Penetrated', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Actuarial__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Actuarial__c == 'Lead Provider', true, false)}" /></td>
+			</tr>
+			<tr>
+    			<td class="tableRowBottom">Investment</td>
+    			<td class="tableRowBottom" bgcolor="{!If(cas.Investment__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Investment__c == 'Recent Loss', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Investment__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Investment__c == 'No Activity or N/A', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Investment__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Investment__c == 'Opportunity in SFDC', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Investment__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Investment__c == 'Partially Penetrated', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Investment__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Investment__c == 'Lead Provider', true, false)}" /></td>
+			</tr>
+			<tr>
+    			<td class="tableRowBottom">DB Admin</td>
+    			<td class="tableRowBottom" bgcolor="{!If(cas.DB_Admin__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.DB_Admin__c == 'Recent Loss', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.DB_Admin__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.DB_Admin__c == 'No Activity or N/A', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.DB_Admin__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.DB_Admin__c == 'Opportunity in SFDC', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.DB_Admin__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.DB_Admin__c == 'Partially Penetrated', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.DB_Admin__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.DB_Admin__c == 'Lead Provider', true, false)}" /></td>
+			</tr>
+			<tr>
+    			<td class="tableRowBottom">DC Admin</td>
+    			<td class="tableRowBottom" bgcolor="{!If(cas.DC_Admin__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.DC_Admin__c == 'Recent Loss', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.DC_Admin__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.DC_Admin__c == 'No Activity or N/A', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.DC_Admin__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.DC_Admin__c == 'Opportunity in SFDC', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.DC_Admin__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.DC_Admin__c == 'Partially Penetrated', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.DC_Admin__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.DC_Admin__c == 'Lead Provider', true, false)}" /></td>
+			</tr>
+			<tr>
+    			<td class="tableRow">Advisory</td>
+    			<td class="tableRow" bgcolor="{!If(cas.Advisory__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Advisory__c == 'Recent Loss', true, false)}" /></td>
+			    <td class="tableRow" bgcolor="{!If(cas.Advisory__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Advisory__c == 'No Activity or N/A', true, false)}" /></td>
+			    <td class="tableRow" bgcolor="{!If(cas.Advisory__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Advisory__c == 'Opportunity in SFDC', true, false)}" /></td>
+			    <td class="tableRow" bgcolor="{!If(cas.Advisory__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Advisory__c == 'Partially Penetrated', true, false)}" /></td>
+			    <td class="tableRow" bgcolor="{!If(cas.Advisory__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Advisory__c == 'Lead Provider', true, false)}" /></td>
+			</tr>
+			<tr>
+    			<td colspan="6" class="tableRowGray">Talent &amp; Rewards</td>
+			</tr>
+			<tr>
+    			<td class="tableRowBottom">Compensation</td>
+    			<td class="tableRowBottom" bgcolor="{!If(cas.Compensation__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Compensation__c == 'Recent Loss', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Compensation__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Compensation__c == 'No Activity or N/A', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Compensation__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Compensation__c == 'Opportunity in SFDC', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Compensation__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Compensation__c == 'Partially Penetrated', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Compensation__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Compensation__c == 'Lead Provider', true, false)}" /></td>
+			</tr>
+			<tr>
+    			<td class="tableRowBottom">Engagement</td>
+    			<td class="tableRowBottom" bgcolor="{!If(cas.Engagement__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Engagement__c == 'Recent Loss', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Engagement__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Engagement__c == 'No Activity or N/A', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Engagement__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Engagement__c == 'Opportunity in SFDC', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Engagement__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Engagement__c == 'Partially Penetrated', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Engagement__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Engagement__c == 'Lead Provider', true, false)}" /></td>
+			</tr>
+			<tr>
+    			<td class="tableRowBottom">Selection Assessment</td>
+    			<td class="tableRowBottom" bgcolor="{!If(cas.Selection_Assessment__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Selection_Assessment__c == 'Recent Loss', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Selection_Assessment__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Selection_Assessment__c == 'No Activity or N/A', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Selection_Assessment__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Selection_Assessment__c == 'Opportunity in SFDC', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Selection_Assessment__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Selection_Assessment__c == 'Partially Penetrated', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Selection_Assessment__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Selection_Assessment__c == 'Lead Provider', true, false)}" /></td>
+			</tr>
+			<tr>
+    			<td class="tableRowBottom">Talent Acquisition Solutions</td>
+    			<td class="tableRowBottom" bgcolor="{!If(cas.Talent_Acquisition_Solutions__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Talent_Acquisition_Solutions__c == 'Recent Loss', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Talent_Acquisition_Solutions__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Talent_Acquisition_Solutions__c == 'No Activity or N/A', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Talent_Acquisition_Solutions__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Talent_Acquisition_Solutions__c == 'Opportunity in SFDC', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Talent_Acquisition_Solutions__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Talent_Acquisition_Solutions__c == 'Partially Penetrated', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Talent_Acquisition_Solutions__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Talent_Acquisition_Solutions__c == 'Lead Provider', true, false)}" /></td>
+			</tr>
+			<tr>
+    			<td class="tableRowBottom">HRE</td>
+    			<td class="tableRowBottom" bgcolor="{!If(cas.HRE__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.HRE__c == 'Recent Loss', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.HRE__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.HRE__c == 'No Activity or N/A', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.HRE__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.HRE__c == 'Opportunity in SFDC', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.HRE__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.HRE__c == 'Partially Penetrated', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.HRE__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.HRE__c == 'Lead Provider', true, false)}" /></td>
+			</tr>
+			<tr>
+    			<td class="tableRow">Leadership</td>
+    			<td class="tableRow" bgcolor="{!If(cas.Leadership__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Leadership__c == 'Recent Loss', true, false)}" /></td>
+			    <td class="tableRow" bgcolor="{!If(cas.Leadership__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Leadership__c == 'No Activity or N/A', true, false)}" /></td>
+			    <td class="tableRow" bgcolor="{!If(cas.Leadership__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Leadership__c == 'Opportunity in SFDC', true, false)}" /></td>
+			    <td class="tableRow" bgcolor="{!If(cas.Leadership__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Leadership__c == 'Partially Penetrated', true, false)}" /></td>
+			    <td class="tableRow" bgcolor="{!If(cas.Leadership__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Leadership__c == 'Lead Provider', true, false)}" /></td>
+			</tr>
+			<tr>
+    			<td colspan="6" class="tableRowGray">Other</td>
+			</tr>
+			<tr>
+    			<td class="tableRowBottom">Communications</td>
+    			<td class="tableRowBottom" bgcolor="{!If(cas.Communications__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Communications__c == 'Recent Loss', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Communications__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Communications__c == 'No Activity or N/A', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Communications__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Communications__c == 'Opportunity in SFDC', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Communications__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Communications__c == 'Partially Penetrated', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Communications__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Communications__c == 'Lead Provider', true, false)}" /></td>
+			</tr>
+			<tr>
+    			<td class="tableRowBottom">AMAS</td>
+    			<td class="tableRowBottom" bgcolor="{!If(cas.AMAS_M_A__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.AMAS_M_A__c == 'Recent Loss', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.AMAS_M_A__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.AMAS_M_A__c == 'No Activity or N/A', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.AMAS_M_A__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.AMAS_M_A__c == 'Opportunity in SFDC', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.AMAS_M_A__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.AMAS_M_A__c == 'Partially Penetrated', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.AMAS_M_A__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.AMAS_M_A__c == 'Lead Provider', true, false)}" /></td>
+			</tr>
+			<tr>
+    			<td class="tableRowBottom">Global Benefits/Brokerage</td>
+    			<td class="tableRowBottom" bgcolor="{!If(cas.Global_Benefits_Brokerage__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.Global_Benefits_Brokerage__c == 'Recent Loss', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Global_Benefits_Brokerage__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.Global_Benefits_Brokerage__c == 'No Activity or N/A', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Global_Benefits_Brokerage__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.Global_Benefits_Brokerage__c == 'Opportunity in SFDC', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Global_Benefits_Brokerage__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Global_Benefits_Brokerage__c == 'Partially Penetrated', true, false)}" /></td>
+			    <td class="tableRowBottom" bgcolor="{!If(cas.Global_Benefits_Brokerage__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.Global_Benefits_Brokerage__c == 'Lead Provider', true, false)}" /></td>
+			</tr>
+			<tr>
+    			<td class="tableRow">BPO</td>
+    			<td class="tableRow" bgcolor="{!If(cas.BPO__c == 'Recent Loss', '#696969', 'white')}"><apex:outputText value="" rendered="{!If(cas.BPO__c == 'Recent Loss', true, false)}" /></td>
+			    <td class="tableRow" bgcolor="{!If(cas.BPO__c == 'No Activity or N/A', '#FF0000', 'white')}"><apex:outputText value="" rendered="{!If(cas.BPO__c == 'No Activity or N/A', true, false)}" /></td>
+			    <td class="tableRow" bgcolor="{!If(cas.BPO__c == 'Opportunity in SFDC', '#00FF00', 'white')}"><apex:outputText value="" rendered="{!If(cas.BPO__c == 'Opportunity in SFDC', true, false)}" /></td>
+			    <td class="tableRow" bgcolor="{!If(cas.BPO__c == 'Partially Penetrated', '#00BFFF', 'white')}"><apex:outputText value="" rendered="{!If(cas.BPO__c == 'Partially Penetrated', true, false)}" /></td>
+			    <td class="tableRow" bgcolor="{!If(cas.BPO__c == 'Lead Provider', '#4876FF', 'white')}"><apex:outputText value="" rendered="{!If(cas.BPO__c == 'Lead Provider', true, false)}" /></td>
+			</tr>
+			</apex:repeat>
+		</table>
+		<font style="font-size: 9.0pt; color: red;">
+			&#42; Penetration Score = [(Number <b>Partially Penetrated</b> x 1) + (Number <b>Lead Provider</b> x 2)] ÷ 44 || 22 Total Service Areas x 2 = 44
+		</font>
+		<br/><br/>
+	
+		<apex:dataTable value="{!myScorecard.winList}" var="opp" cellpadding="2" cellspacing="2" rowClasses="tableRow,tableRowBlue" styleClass="table3" headerClass="tableHeadGray">
+			<apex:facet name="header"><apex:outputText value="Top 5 Recently Won Opportunities by First Year Value as of {0,date,MMMMM dd, yyyy}"><apex:param value="{!today()}"/></apex:outputText></apex:facet>
+			<apex:column styleClass="tableRow" headerValue="Opportunity Name" headerClass="tableRow">
+				<apex:outputText value="{!opp.Name}"/>
+			</apex:column>
+			<apex:column styleClass="tableRow" headerValue="Stage" headerClass="tableRow">
+				<apex:outputText value="{!opp.StageName}"/>
+			</apex:column>
+			<apex:column styleClass="tableRowData" headerValue="FY Value" headerClass="tableRowData">
+				<apex:outputText value="$ {0,number,###,###,###,###}"><apex:param value="{!opp.Total_First_Year_Value__c}"/></apex:outputText>
+			</apex:column>
+			<apex:column styleClass="tableRow" headerValue="Current Provider" headerClass="tableRow">
+				<apex:outputText value="{!opp.Current_Provider_Reference__r.Name}"/>
+			</apex:column>
+			<apex:column styleClass="tableRowData" headerValue="LOI Contract Date" headerClass="tableRowData">
+				<apex:outputText value="{0,date,MM/dd/yy}"><apex:param value="{!opp.LOI_Contract_Date__c}"/></apex:outputText>
+			</apex:column>
+		</apex:dataTable>
+		<br/>
+		
+		<apex:dataTable value="{!myScorecard.openList}" var="opp" cellpadding="2" cellspacing="2" rowClasses="tableRow,tableRowBlue" styleClass="table3" headerClass="tableHeadGray">
+			<apex:facet name="header"><apex:outputText value="Top 5 Opportunities in the Pipeline by First Year Value as of {0,date,MMMMM dd, yyyy}"><apex:param value="{!today()}"/></apex:outputText></apex:facet>
+			<apex:column styleClass="tableRow" headerValue="Opportunity Name" headerClass="tableRow">
+				<apex:outputText value="{!opp.Name}"/>
+			</apex:column>
+			<apex:column styleClass="tableRow" headerValue="Stage" headerClass="tableRow">
+				<apex:outputText value="{!opp.StageName}"/>
+			</apex:column>
+			<apex:column styleClass="tableRowData" headerValue="FY Value" headerClass="tableRowData">
+				<apex:outputText value="$ {0,number,###,###,###,###}"><apex:param value="{!opp.Total_First_Year_Value__c}"/></apex:outputText>
+			</apex:column>
+			<apex:column styleClass="tableRowData" headerValue="Probability" headerClass="tableRowData">
+				<apex:outputText value="{0,number,###}"><apex:param value="{!opp.Probability}"/></apex:outputText>%
+			</apex:column>
+			<apex:column styleClass="tableRowData" headerValue="Expected Close Date" headerClass="tableRowData">
+				<apex:outputText value="{0,date,MM/dd/yy}"><apex:param value="{!opp.CloseDate}"/></apex:outputText>
+			</apex:column>
+		</apex:dataTable>
+	</div>
+</div>
+</apex:page>

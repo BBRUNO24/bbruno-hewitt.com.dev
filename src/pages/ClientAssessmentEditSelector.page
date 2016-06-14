@@ -1,0 +1,8 @@
+<apex:page standardController="Client_Assessment_Survey__c" extensions="ctlr_ClientAssessmentEditSelector" showHeader="true" action="{!init}">
+     <apex:variable var="errorMessage" value="I cannot determine the Page Layout tied to the Record Type for this record. Contact your local Sales Operations team for further assistance." />
+    <apex:pageMessage summary="{!errorMessage}" severity="error" strength="3" />
+    <br/>
+    <apex:form >
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<apex:commandButton action="{!returnBack}" value="Return"></apex:commandButton>
+    </apex:form>
+</apex:page>

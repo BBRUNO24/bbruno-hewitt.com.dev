@@ -1,0 +1,6 @@
+<apex:page standardcontroller="Opportunity">
+    <flow:interview name="ClientReferenceRequest" finishLocation="{!URLFOR($Action.Opportunity.View, Id)}">
+        <apex:param name="OpptyID" value="{!Opportunity.Id}"/>
+        <apex:param name="UserID" value="{!$User.Id}"/>
+   </flow:interview>
+</apex:page>

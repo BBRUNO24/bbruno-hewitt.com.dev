@@ -1,0 +1,58 @@
+<apex:component Controller="AccountStructure">
+    <style>
+        .parent{color:blue;}
+        .child{color:green;}
+    </style>
+    <apex:attribute name="curId" description="This is the Account Id for displaying Acccount Hierarchy" type="String" required="true" assignTo="{!currentId}"/>
+    <table width="100%">        
+        <tr>        
+            <td with="50%"><b>Account Name</b></td>
+            <td with="25%"><b><apex:outputText value="Legal Name"/></b></td>
+            <td with="10%"><b><apex:outputText value="Country"/></b></td>
+            <td with="15%"><b><apex:outputText value="Owner"/></b></td>
+        </tr>
+        <apex:repeat value="{!ObjectStructure}" var="pos" >
+            <tr>
+                <apex:repeat value="{!pos.levelFlag}" var="flag" first="0">
+                    <apex:image url="/img/tree/empty.gif" height="16" width="20" rendered="{!IF(flag,false,true)}"/>
+                    <apex:image url="/s.gif" alt="" width="3" height="16" rendered="{!IF(flag,true,false)}"/>
+                    <apex:image url="/img/tree/chain.gif" height="16" width="20" rendered="{!IF(flag,true,false)}"/>
+                </apex:repeat>
+                <apex:outputText rendered="{!IF(pos.nodeType=='start',true,false)}">
+                    <td>
+                        <apex:image id="Icon_start" url="/img/icon/custom51_100/globe16.png" width="16" height="16" rendered="{!IF(pos.currentNode,false,true)}"/>
+                        <apex:image id="Icon_start_current" url="/img/icon/star16.png" width="16" height="16" rendered="{!IF(pos.currentNode,true,false)}"/>
+                        <apex:outputLink value="/{!pos.Account.Id}" target="_top">{!pos.account.name}</apex:outputLink>
+                    </td>
+                </apex:outputText>
+                <apex:outputText rendered="{!IF(OR(pos.nodeType=='parent',pos.nodeType=='parent_end'),true,false)}">
+                    <td>
+                        <apex:image id="Icon_parent" url="/img/icon/factory16.png" width="16" height="16" rendered="{!IF(pos.currentNode,false,true)}"/>
+                        <apex:image id="Icon_parent_current" url="/img/icon/star16.png" width="16" height="16" rendered="{!IF(pos.currentNode,true,false)}"/>
+                        <apex:outputLink value="/{!pos.Account.Id}" target="_top">{!pos.account.name}</apex:outputLink>
+                    </td>
+                </apex:outputText>
+                <apex:outputText rendered="{!IF(OR(pos.nodeType=='child',pos.nodeType=='child_end'),true,false)}">
+                    <td>
+                        <apex:image id="Tree_child" url="/img/tree/node.gif" rendered="{!IF(pos.nodeType=='child',true,false)}" height="16" width="20"/>
+                        <apex:image id="Tree_child_current" url="/img/tree/nodeEnd.gif" rendered="{!IF(pos.nodeType=='child_end',true,false)}" height="16" width="20"/>
+                        <apex:image id="Icon_child" url="/img/icon/desk16.png" width="16" height="16" rendered="{!IF(pos.currentNode,false,true)}"/>    
+                        <apex:image id="Icon_child_current" url="/img/icon/star16.png" width="16" height="16" rendered="{!IF(pos.currentNode,true,false)}"/>
+                        <apex:outputLink value="/{!pos.Account.Id}" target="_top">{!pos.account.name}</apex:outputLink>
+                    </td>
+                </apex:outputText>
+                <apex:outputText rendered="{!IF(pos.nodeType=='end',true,false)}">
+                    <td>
+                        <apex:image id="Tree_end" url="/img/tree/nodeEnd.gif" height="16" width="20"/>&nbsp;
+                        <apex:image id="Icon_end" url="/img/icon/desk16.png" width="16" height="16" rendered="{!IF(pos.currentNode,false,true)}"/>
+                        <apex:image id="Icon_end_current" url="/img/icon/star16.png" width="16" height="16" rendered="{!IF(pos.currentNode,true,false)}"/>
+                        <apex:outputLink value="/{!pos.Account.Id}" target="_top">{!pos.account.name}</apex:outputLink>
+                    </td>
+                </apex:outputText>
+                <td><apex:outputText value="{!pos.account.Legal_Name__c}"/></td>
+                <td><apex:outputText value="{!pos.account.SDO_Billing_Country_Name__c}"/></td>
+                <td><apex:outputText value="{!pos.account.Owner.Name}"/></td>
+            </tr>                                
+        </apex:repeat>
+    </table>
+</apex:component>
