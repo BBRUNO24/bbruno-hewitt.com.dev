@@ -8,6 +8,7 @@
             <li id="tabOpportunity" class="{!IF(tabToShow = 'Opportunity', activeTab , inactiveTab)}" title="Item One" role="presentation"><a class="slds-tabs--default__link" href="#void" role="tab" tabindex="0" aria-selected="true" aria-controls="tab-default-1" id="tab-default-1__item">Opportunity</a></li>
             <li id="tabProducts" class="{!IF(tabToShow = 'Products', activeTab , inactiveTab)}" title="Item Two" role="presentation"><a class="slds-tabs--default__link" 
             href="#void" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-default-2" id="tab-default-2__item">Products</a></li>
+            <li id="tabOpportunity" class="{!IF(tabToShow = 'Contact', activeTab , inactiveTab)}" title="Item One" role="presentation"><a class="slds-tabs--default__link" href="#void" role="tab" tabindex="0" aria-selected="true" aria-controls="tab-default-1" id="tab-default-1__item">Contact</a></li>            
             <li id="tabSalesCredit" class="{!IF(tabToShow = 'SalesCredit', activeTab , inactiveTab)}" title="Item Two" role="presentation">
                 <apex:outputLink id="tab-default-3__item" styleClass="slds-tabs--default__link" value="#void" rendered="{!showSalesCredit}">Sales Credit</apex:outputLink>
             </li>

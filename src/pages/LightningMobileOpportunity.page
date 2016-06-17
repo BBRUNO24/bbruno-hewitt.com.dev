@@ -22,23 +22,33 @@
                 removeProductAF(prodName);
             }
 
-            function createOpportunityJS(domRef){
-                checkProductsAF();
+            function disableSubmit(domRef){
                 var submitForm = j$('#disableSubmitButton').val();
                 domRef.disabled = submitForm;
-                createOpportunityAF();
             }
         </script>
         <apex:actionFunction name="rerenderStageFieldsAF" action="{!rerenderStageFields}" rerender="proposeSolutionPanel,closeWonPanel,probabilityPanel" status="rerenderingStageFields" >
             <apex:param name="oppStageTemp" assignTo="{!selectedOpportunityStage}" value="" />
         </apex:actionFunction>
-        <apex:actionFunction name="checkProductsAF" action="{!checkProducts}" rerender="submitFormPanel" ></apex:actionFunction>
-        <apex:actionFunction name="createOpportunityAF" action="{!saveWithProducts}"></apex:actionFunction>
+        
+        
         <apex:actionFunction name="removeProductAF" action="{!removeProduct}" reRender="productsList, toastContainer">
             <apex:param name="productNameTemp" assignTo="{!productId}" value="" />
         </apex:actionFunction>
     </apex:form>
     <apex:form id="opportunityForm"> 
+        <script>
+            function createOpportunityJS(domRef){
+                checkProductsAF();
+                var submitForm = j$('#disableSubmitButton').val();
+
+                domRef.disabled = submitForm;
+                createOpportunityAF();
+            }
+        </script>
+
+        <apex:actionFunction name="checkProductsAF" action="{!checkProducts}" rerender="submitFormPanel" status="creatingOpportunity" ></apex:actionFunction>
+        <apex:actionFunction name="createOpportunityAF" action="{!saveWithProducts}" status="creatingOpportunity"></apex:actionFunction>
         <apex:outputPanel id="submitFormPanel">
             <input type="hidden" value="{!disableSubmitButton}" id="disableSubmitButton"/>
         </apex:outputPanel>
@@ -96,12 +106,12 @@
 
                                             <!-- CLOSE DATE -->
                                             <label class="slds-form-element__label" for="stageName">Close Date</label>
-                                            <apex:inputField value="{!opp.CloseDate}" styleClass="slds-input" type="auto" required="true"></apex:inputField>
+                                            <apex:inputField value="{!opp.CloseDate}" styleClass="slds-input" type="auto" required="false"></apex:inputField>
                                             <!-- / CLOSE DATE -->
 
                                             <!-- PROPOSE SOLUTION/NEGOTIATE STAGE FIELDS -->
                                             <apex:outputPanel id="proposeSolutionPanel" layout="block">
-                                                <apex:outputPanel id="proposeSoluitonFields" layout="block" rendered="{!opp.StageName = 'Propose Solution'}">
+                                                <apex:outputPanel id="proposeSoluitonFields" layout="block" rendered="{!opp.StageName == 'Propose Solution' || opp.StageName == 'Negotiate'}">
                                                     <c:LexInputField sobject="{!opp}" Field="Current_Provider_Reference__c"></c:LexInputField>
                                                     <div styleClass="slds-form-element" >
                                                         <apex:outputPanel styleClass="requiredInput" layout="block" id="proposeCompetitor" >
@@ -145,9 +155,10 @@
                                                     </div>
                                                     <c:LexInputField sobject="{!opp}" Field="Reason_Won_or_Lost__c" required="true"></c:LexInputField>
                                                     <c:LexInputField sobject="{!opp}" Field="Chosen_Provider_Reference__c"></c:LexInputField>
-                                                    <c:LexInputField sobject="{!opp}" Field="Executed_Contract_Date__c" required="true"></c:LexInputField>
+                                                    <label class="slds-form-element__label" for="stageName">Close Date</label>
+                                                    <apex:inputField value="{!opp.Executed_Contract_Date__c}" styleClass="slds-input" type="auto" required="false"></apex:inputField>
+                                                    <!-- <c:LexInputField sobject="{!opp}" Field="Executed_Contract_Date__c" required="true"></c:LexInputField> -->
                                                     <c:LexInputField sobject="{!opp}" Field="CAS_ID__c" required="true"></c:LexInputField>
-                                                    <c:LexInputField sobject="{!opp}" Field="Probability" required="true"></c:LexInputField>
                                                 </apex:outputPanel>
                                             </apex:outputPanel>
                                             <!-- / CLOSED WON STAGE FIELDS -->
@@ -252,19 +263,16 @@
 
                                         <!-- SERVICE START DATE -->
                                         <label class="slds-form-element__label" for="stageName">Service Start Date</label>
-                                        <apex:inputField value="{!currOLI.Service_Start_Date__c}" styleClass="slds-input" type="auto" required="true"></apex:inputField>
+                                        <apex:inputField value="{!currOLI.Service_Start_Date__c}" styleClass="slds-input" type="auto" required="false"></apex:inputField>
                                         <!-- / SERVICE START DATE -->   
 
                                         <!-- SERVICE END DATE -->
                                         <div><label class="slds-form-element__label" for="stageName">Service End Date</label></div>
-                                        <apex:inputField value="{!currOLI.Service_End_Date__c}" styleClass="slds-input" type="auto" required="true"></apex:inputField>
+                                        <apex:inputField value="{!currOLI.Service_End_Date__c}" styleClass="slds-input" type="auto" required="false"></apex:inputField>
                                         <!-- / SERVICE END DATE -->   
 
-
-                                        <!-- <apex:commandButton value="Back" action="{!goToProducts}" styleClass="slds-button slds-button--brand slds-m-top--medium" reRender="productsList, toastContainer"   /> --> 
                                         <apex:pageBlock id="productsBottons">
                                             <apex:outputPanel >
-                                              <!--   <apex:commandLink value="Back" action="{!goToProducts}" styleClass="slds-button slds-button--brand slds-m-top--medium" id="oppLink" reRender="tabsPanel,productsPanel,opportunityPanel" /> -->
                                                 <apex:commandButton value="Add Product" action="{!addProduct}" styleClass="slds-button slds-button--brand slds-m-top--medium" reRender="productsList, toastContainer" />       
                                             </apex:outputPanel>
                                         </apex:pageBlock>                      
@@ -314,15 +322,7 @@
                                               </div>
                                             </section>
                                             <!-- / CARD BODY = SECTION + TABLE -->
-                                           <input type="submit" value="Save and Create Opportunity" onclick="createOpportunityJS(this); return false;" class="slds-button slds-button--brand slds-m-top--medium" />
-                                           <!--  <apex:commandButton value="Save and Create Opportunity" action="{!saveWithProducts}" status="creatingOpportunity" styleClass="slds-button slds-button--brand slds-m-top--medium" />     -->
-                                            <apex:actionStatus id="creatingOpportunity">
-                                                    <apex:facet name="start">
-                                                        <apex:image value="/img/loading.gif"/>                                                    
-                                                    </apex:facet>
-                                                    <apex:facet name="stop"/>
-                                            </apex:actionStatus>
-
+                                            <apex:commandButton value="Save & Next" action="{!goToContact}" status="creatingOpportunity" styleClass="slds-button slds-button--brand slds-m-top--medium" />    
                                         </div>
 
                                     </fieldset>
@@ -334,13 +334,54 @@
                 </apex:outputPanel>
                 <!-- / TAB 2 PRODUCTS -->
 
-                <!-- TAB 3 SALES CREDIT -->
+                <!-- TAB 3 CONTACT --> 
+                <apex:outputPanel id="contactPanel" layout="block" >
+                     <apex:outputPanel id="contactContainter" layout="block" rendered="{!tabToShow = 'Contact'}">
+                        <div id="tab-default-3" class="{!activePanel}" role="tabpanel" aria-labelledby="tab-default-2__item">
+                            <!-- PRIMARY CONTENT WRAPPER -->
+                            <div class="myapp">     
+                                 <!-- BOXED AREA -->
+                                <fieldset class="slds-box slds-theme--default slds-container--small">
+                                    <legend id="newaContactform" class="slds-text-heading--medium slds-p-vertical--medium">Add a Contact</legend>
+                                    <table class="slds-table slds-table--bordered slds-max-medium-table--stacked-horizontal">
+                                        <thead>
+                                            <tr class="slds-no-hover">
+                                                <!-- <th class="slds-text-heading--label " scope="col">Primary</th> -->
+                                                <th class="slds-text-heading--label " scope="col">Contact</th>
+                                                <th class="slds-text-heading--label " scope="col">Role</th>
+                                            </tr>
+                                        </thead>
+                                        <apex:repeat var="cr" value="{!contactRoles}">
+                                            <tr>
+                                                <!-- <td><c:LexInputField sObject="{!cr}" Field="IsPrimary" required="false"></c:LexInputField> </td> -->
+                                                <td><c:LexInputField sObject="{!cr}" Field="ContactId" required="false" Label=" "></c:LexInputField></td>
+                                                <td><c:LexInputField sObject="{!cr}" Field="Role" required="false" Label=" "></c:LexInputField></td>
+                                            </tr>
+                                        </apex:repeat>
+                                    </table>
+
+                                    <input type="submit" value="Save and Create Opportunity" onclick="createOpportunityJS(this); return false;" class="slds-button slds-button--brand slds-m-top--medium" />
+                                    <apex:actionStatus id="creatingOpportunity">
+                                            <apex:facet name="start">
+                                                <apex:image value="/img/loading.gif"/>                                                    
+                                            </apex:facet>
+                                            <apex:facet name="stop"/>
+                                    </apex:actionStatus>
+                                </fieldset>
+
+                            </div>
+                        </div>
+                    </apex:outputPanel>
+                </apex:outputPanel>
+                <!-- / TAB 3 Contact -->                
+
+                <!-- TAB 4 SALES CREDIT -->
                 <apex:outputPanel id="salesCreditPanel" layout="block">
                     <apex:outputPanel id="salesCreditContainer" layout="block" rendered="{!tabToShow = 'SalesCredit'}">
                         <c:MobileOpportunitySalesCredit id="salesCreditComponent" tabToShow="{!tabToShow}" toast="{!toast}" parentOpportunity="{!opp}"/>
                     </apex:outputPanel>
                 </apex:outputPanel>
-                <!-- / TAB 3 SALES CREDIT -->
+                <!-- / TAB 4 SALES CREDIT -->
 
             </div> 
             <!-- / TABS -->

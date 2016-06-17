@@ -6,7 +6,7 @@ public with sharing class LightningMobileOppExtension {
         currentUser = [SELECT Id, Reporting_Country__c FROM User where Id=:UserInfo.getUserId() ];
 
         //INITIALIZE PROPERTIES
-        this.opp = new Opportunity();
+        this.opp = new Opportunity();       
         this.currOLI = new OpportunityLineItem();
         this.currOLI.Fee_Commission__c = 'Fee';
         this.salesCredit  = new Sales_Credit__c();
@@ -20,12 +20,11 @@ public with sharing class LightningMobileOppExtension {
         this.disableSubmitButton = false;
 
         this.competitorOptions = LightningMobileOppUtil.getPickValues(opp, 'Competitor__c', null);
-
     }
     
     private user currentUser;
+    
     public SLDS_Toast toast { get; set; }
-
     public Opportunity opp { get; set; }
     public Sales_Credit__c salesCredit { get; set; }
     public List<PricebookEntry> pbEntryList { get; set; }    
@@ -80,6 +79,27 @@ public with sharing class LightningMobileOppExtension {
         }
     }
 
+    public List<OpportunityContactRole> contactRoles { get; set; }
+    public void populateOpportunityContacts(){
+        //get{
+            System.debug('contactRoles: ' + contactRoles);
+            if(contactRoles == null && opp.AccountId != null){
+                System.debug('Inside if Statement');
+                List<Contact> contactsList = [SELECT Id FROM Contact WHERE AccountId = :opp.AccountId AND Contact_Status__c != 'Inactive'];
+
+                contactRoles = new List<OpportunityContactRole>();
+
+                for(Contact c : contactsList){
+                    contactRoles.add(new OpportunityContactRole(ContactId = c.Id,Role=null,IsPrimary=false));
+                }
+                System.debug('contactRoles: ' + contactRoles);
+            }
+
+            //return contactRoles;
+        //}
+        //set{ contactRoles = value; }
+    }
+
 
     public String productSelection { get; set; }
 
@@ -107,11 +127,11 @@ public with sharing class LightningMobileOppExtension {
                 System.debug('product selection is: ' + productSelection);
 
                 if(practiceSelection == 'Please select a practice' || productSelection == 'Please select a product'){
-                    toast.showToast = true;
-                    toast.toastMsg = 'Please select a Practice and Product.';
-                    toast.toastType = SLDS_ToastEnum.ERROR;
-                    
-                } else{
+                    displayToast(true, 'Please select a Practice and Product.', SLDS_ToastEnum.ERROR);
+
+                } else if (currOLI.Service_Start_Date__c == null || currOLI.Service_End_Date__c == null){
+                    displayToast(true, 'Please enter Service Start Date and Service End Date.', SLDS_ToastEnum.ERROR);
+                }else{
                     OpportunityLineItem oppProduct = new OpportunityLineItem();
 
                     List<PricebookEntry> peResults = [SELECT id, Name, Product2id, Pricebook2Id, CurrencyISOCode 
@@ -177,24 +197,43 @@ public with sharing class LightningMobileOppExtension {
     } 
 
     public PageReference saveWithProducts() {
+        displayToast(false, '', SLDS_ToastEnum.ERROR);
+        System.debug('contactRoles: ' + JSON.serialize(this.contactRoles));
+       
+        List<OpportunityContactRole> ocrToSave = new List<OpportunityContactRole>();
+        for(OpportunityContactRole ocr:this.contactRoles){
+            System.debug('OCR: ' + JSON.serialize(ocr));
+            if(ocr.Role != null){
+                ocrToSave.add(ocr);
+            }
+        }
+        System.debug('ocrToSave: ' + ocrToSave);
 
         //CREATE A SAVEPOINT, IF THERE IS AN ERROR WE WANT TO ROLLBACK. WE DON'T WANT TO CREATE OPPORTUNITIES WITHOUT PRODUCTS
         Savepoint sp = Database.setSavepoint();
 
-        if(addedOLI.size() > 0){
+        if(ocrToSave.size() > 0){
             try{
                 disableSubmitButton = true;
 
                 // CREATE OPPORTUNITY
-                insert opp;
+                upsert opp;
 
                 for (OpportunityLineItem o : addedOLI) {
-                    o.OpportunityId = opp.id;
+                    o.OpportunityId = opp.Id;
                 }
 
-                // ACC OPPORTUNITY LINE ITEMS
-                insert addedOLI;
+                // ADD OPPORTUNITY LINE ITEMS
+                upsert addedOLI;
                 system.debug('Added Products: ' + addedOLI);
+
+                for(OpportunityContactRole ocr:ocrToSave){
+                    ocr.OpportunityId = opp.Id;
+                }
+
+                // ADD OPPORTUNITY CONTACT ROLES
+                upsert ocrToSave;
+                system.debug('Added Opportunity Contact Roles: ' + ocrToSave);
 
             } catch(Exception ex){
                 //ROLLBACK IF THERE ARE ANY ACCEPTIONS
@@ -205,14 +244,14 @@ public with sharing class LightningMobileOppExtension {
                 return goToOpportunity();
             }
             
-            // NAVIGATE TO SALES CREDIT IF CURREN USER REPORTING COUNTRY = 'US'
+            //NAVIGATE TO SALES CREDIT IF CURREN USER REPORTING COUNTRY = 'US'
             if(showSalesCredit){
                 return goToSalesCredit();
             } else {
                 return navigateToOpportunity();
             }
         }else{
-            displayToast(true, 'Please add a product to the Opportunity.', SLDS_ToastEnum.Error);
+            displayToast(true, 'Please add a Contact to the Opportunity.', SLDS_ToastEnum.Error);
         }
         return null;
     }
@@ -226,7 +265,6 @@ public with sharing class LightningMobileOppExtension {
             System.debug('Exception: ' + ex);
             displayToast(true, ex.getMessage(), SLDS_ToastEnum.ERROR);
         }
-
         return null;
     }
 
@@ -239,7 +277,7 @@ public with sharing class LightningMobileOppExtension {
                 System.debug('1st if statement.');
                 displayToast(true, 'Please select an account before you continue.', SLDS_ToastEnum.ERROR);
                 this.tabToShow = 'Opportunity';
-            }else if(opp.StageName == 'Closed Won' && (opp.Current_Provider_Reference__c == null || opp.Chosen_Provider_Reference__c == null)){
+            }else if(opp.StageName == 'Closed Won' && (opp.Current_Provider_Reference__c == null || opp.Chosen_Provider_Reference__c == null || opp.Executed_Contract_Date__c == null)){
                 System.debug('2nd if statement.');
                 displayToast(true, 'Please select a current and chosen provider.', SLDS_ToastEnum.ERROR);
                 this.tabToShow = 'Opportunity';
@@ -247,8 +285,12 @@ public with sharing class LightningMobileOppExtension {
                 System.debug('3rd if statement.');
                 displayToast(true, 'Please select a competitor.', SLDS_ToastEnum.ERROR);
                 this.tabToShow = 'Opportunity';
+            }else if(opp.CloseDate == null){
+                system.debug('4th if statement.');
+                displayToast(true, 'Please enter a Close Date.', SLDS_ToastEnum.ERROR);
+                this.tabToShow = 'Opportunity';
             }else{
-                System.debug('4th if statement.');
+                System.debug('5th if statement.');
                 System.debug('Opportunity: ' + opp);
 
                 //SET PRICEBOOK FOR OPPORTUNITY
@@ -258,16 +300,11 @@ public with sharing class LightningMobileOppExtension {
                 this.toast.showToast = false;
 
                 this.practiceOptions = LightningMobileOppUtil.getPracticeOptions(opp.Pricebook2Id);
-
-              
-            }
+                }
 
            
-
         } catch(Exception ex) {
-            this.toast.showToast = true;
-            this.toast.toastMsg = ex.getMessage();
-            this.toast.toastType = SLDS_ToastEnum.ERROR;
+            displayToast(true, ex.getMessage(), SLDS_ToastEnum.ERROR);
         }
 
         return null;
@@ -275,6 +312,19 @@ public with sharing class LightningMobileOppExtension {
 
     public PageReference goToOpportunity(){
         this.tabToShow = 'Opportunity';
+        return null;
+    }
+
+    public PageReference goToContact(){
+        populateOpportunityContacts();
+
+        if(addedOLI.size() > 0){
+            this.tabToShow = 'Contact'; 
+        }else{
+            tabToShow = 'Products';
+            displayToast(true, 'Please add a product to the Opportunity.', SLDS_ToastEnum.Error);
+        }
+
         return null;
     }
 
