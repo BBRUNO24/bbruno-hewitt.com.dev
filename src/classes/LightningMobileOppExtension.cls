@@ -64,7 +64,7 @@ public with sharing class LightningMobileOppExtension {
 
     public String inactivePanel{
         get{
-            return 'slds-tabs__content slds-tabs--default__content  slds-hide';
+            return 'slds-tabs__content slds-tabs--default__content slds-hide';
         }
     }    
 
@@ -81,23 +81,23 @@ public with sharing class LightningMobileOppExtension {
 
     public List<OpportunityContactRole> contactRoles { get; set; }
     public void populateOpportunityContacts(){
-        //get{
-            System.debug('contactRoles: ' + contactRoles);
-            if(contactRoles == null && opp.AccountId != null){
-                System.debug('Inside if Statement');
-                List<Contact> contactsList = [SELECT Id FROM Contact WHERE AccountId = :opp.AccountId AND Contact_Status__c != 'Inactive'];
+        System.debug('contactRoles: ' + contactRoles);
+        if(contactRoles == null && opp.AccountId != null){
+            System.debug('Inside if Statement');
+            List<Contact> contactsList = [SELECT Id FROM Contact WHERE AccountId = :opp.AccountId AND Contact_Status__c != 'Inactive'];
 
-                contactRoles = new List<OpportunityContactRole>();
+            contactRoles = new List<OpportunityContactRole>();
 
-                for(Contact c : contactsList){
-                    contactRoles.add(new OpportunityContactRole(ContactId = c.Id,Role=null,IsPrimary=false));
-                }
-                System.debug('contactRoles: ' + contactRoles);
+            for(Contact c : contactsList){
+                contactRoles.add(new OpportunityContactRole(ContactId = c.Id,Role=null,IsPrimary=false));
             }
 
-            //return contactRoles;
-        //}
-        //set{ contactRoles = value; }
+            if(contactRoles.size() < 1){
+                contactRoles.add(new OpportunityContactRole());
+            }
+
+            System.debug('contactRoles: ' + contactRoles);
+        }
     }
 
 
@@ -105,13 +105,9 @@ public with sharing class LightningMobileOppExtension {
 
     public String practiceSelection { get; set; }
 
-    public Boolean showOpportunity { get; set; }
-
-    public Boolean showProducts { get;  set; }
-
     //public String pricebookSelection { get; set; }
 
-    public List<SelectOption> pricebookOptions { get; set; }
+    //public List<SelectOption> pricebookOptions { get; set; }
 
     public List<SelectOption> productOptions { get; set; }
 
@@ -217,8 +213,10 @@ public with sharing class LightningMobileOppExtension {
                 disableSubmitButton = true;
 
                 // CREATE OPPORTUNITY
-                upsert opp;
+                System.debug('opp: ' + JSON.serialize(opp));
+                insert opp;
 
+                System.debug('addedOLI: ' + JSON.serialize(addedOLI));
                 for (OpportunityLineItem o : addedOLI) {
                     o.OpportunityId = opp.Id;
                 }
@@ -239,6 +237,7 @@ public with sharing class LightningMobileOppExtension {
                 //ROLLBACK IF THERE ARE ANY ACCEPTIONS
                 Database.Rollback(sp);
                 System.debug('Exception: ' + ex);
+                System.debug('StackTrace: ' + ex.getStackTraceString());
                 displayToast(true, ex.getMessage(), SLDS_ToastEnum.ERROR);
                 disableSubmitButton = false;
                 return goToOpportunity();
@@ -256,17 +255,17 @@ public with sharing class LightningMobileOppExtension {
         return null;
     }
 
-    public PageReference addSalesCredit(){
-        try{
-            salesCredit.Related_Opportunity__c = opp.Id;
-            insert(salesCredit);
-            addedSalesCredit.add(salesCredit);
-        } catch(Exception ex){
-            System.debug('Exception: ' + ex);
-            displayToast(true, ex.getMessage(), SLDS_ToastEnum.ERROR);
-        }
-        return null;
-    }
+    //public PageReference addSalesCredit(){
+    //    try{
+    //        salesCredit.Related_Opportunity__c = opp.Id;
+    //        insert(salesCredit);
+    //        addedSalesCredit.add(salesCredit);
+    //    } catch(Exception ex){
+    //        System.debug('Exception: ' + ex);
+    //        displayToast(true, ex.getMessage(), SLDS_ToastEnum.ERROR);
+    //    }
+    //    return null;
+    //}
 
 
     public PageReference goToProducts(){
@@ -300,6 +299,7 @@ public with sharing class LightningMobileOppExtension {
                 this.toast.showToast = false;
 
                 this.practiceOptions = LightningMobileOppUtil.getPracticeOptions(opp.Pricebook2Id);
+                System.debug('practiceOptions: ' + practiceOptions);
                 }
 
            
